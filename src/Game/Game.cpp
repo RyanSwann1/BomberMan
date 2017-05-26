@@ -3,7 +3,7 @@
 
 Game::Game()
 	: m_window("SFML_WINDOW", sf::Vector2f(480, 600)),
-	m_currentState(std::make_unique<StateBase>(StateType::Game)),
+	m_currentState(std::make_unique<StateGame>(StateType::Game)),
 	m_clock(),
 	m_timeElasped()
 {
