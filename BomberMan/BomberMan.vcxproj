@@ -87,7 +87,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SFML_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TIXML_USE_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SFML_DIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -100,7 +100,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SFML_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TIXML_USE_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SFML_DIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -115,7 +115,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SFML_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TIXML_USE_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -131,7 +131,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SFML_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TIXML_USE_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -141,15 +141,48 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Game\Game.cpp" />
+    <ClCompile Include="..\src\Level\CollisionLayer.cpp" />
+    <ClCompile Include="..\src\Level\Level.cpp" />
+    <ClCompile Include="..\src\Level\LevelParser.cpp" />
+    <ClCompile Include="..\src\Level\TileLayer.cpp" />
+    <ClCompile Include="..\src\Locators\TextureManagerLocator.cpp" />
+    <ClCompile Include="..\src\Locators\TileSheetManagerLocator.cpp" />
     <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\Managers\LevelManager.cpp" />
+    <ClCompile Include="..\src\Managers\TileSheetManager.cpp" />
     <ClCompile Include="..\src\States\StateGame.cpp" />
+    <ClCompile Include="..\src\Tile\Tile.cpp" />
+    <ClCompile Include="..\src\Tile\TileSheet.cpp" />
+    <ClCompile Include="..\src\Utilities\Base64.cpp" />
+    <ClCompile Include="..\src\Utilities\tinyxml.cpp" />
+    <ClCompile Include="..\src\Utilities\tinyxmlerror.cpp" />
+    <ClCompile Include="..\src\Utilities\tinyxmlparser.cpp" />
+    <ClCompile Include="..\src\Utilities\Utilities.cpp" />
     <ClCompile Include="..\src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Game\Game.h" />
+    <ClInclude Include="..\src\Level\CollisionLayer.h" />
+    <ClInclude Include="..\src\Level\Level.h" />
+    <ClInclude Include="..\src\Level\LevelDetails.h" />
+    <ClInclude Include="..\src\Level\LevelParser.h" />
+    <ClInclude Include="..\src\Level\TileLayer.h" />
+    <ClInclude Include="..\src\Locators\TextureManagerLocator.h" />
+    <ClInclude Include="..\src\Locators\TileSheetManagerLocator.h" />
+    <ClInclude Include="..\src\Managers\LevelManager.h" />
+    <ClInclude Include="..\src\Managers\ResourceManager.h" />
+    <ClInclude Include="..\src\Managers\TextureManager.h" />
+    <ClInclude Include="..\src\Managers\TileSheetManager.h" />
     <ClInclude Include="..\src\States\StateBase.h" />
     <ClInclude Include="..\src\States\StateGame.h" />
     <ClInclude Include="..\src\States\StateType.h" />
+    <ClInclude Include="..\src\Tile\Tile.h" />
+    <ClInclude Include="..\src\Tile\TileSheet.h" />
+    <ClInclude Include="..\src\Tile\TileSheetDetails.h" />
+    <ClInclude Include="..\src\Utilities\Base64.h" />
+    <ClInclude Include="..\src\Utilities\FileDirectory.h" />
+    <ClInclude Include="..\src\Utilities\tinyxml.h" />
+    <ClInclude Include="..\src\Utilities\Utilities.h" />
     <ClInclude Include="..\src\Window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

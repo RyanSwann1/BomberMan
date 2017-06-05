@@ -1,10 +1,4 @@
-
 #include "Game\Game.h"
-#include <iostream>
-#include <SFML\Graphics.hpp>
-#include <SFML\Window.hpp>
-
-
 
 int main()
 {
