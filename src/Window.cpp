@@ -1,8 +1,14 @@
 #include "Window.h"
 
-Window::Window(const std::string & name, const sf::Vector2f & size)
+Window::Window(const std::string & name, const sf::Vector2i & size)
 	: m_window(sf::VideoMode(size.x, size.y), name, sf::Style::Default)
 {
+	m_window.setFramerateLimit(60);
+}
+
+sf::RenderWindow & Window::getWindow()
+{
+	return m_window;
 }
 
 bool Window::isOpen() const
@@ -16,7 +22,7 @@ void Window::display()
 	m_window.clear(sf::Color::Black);
 }
 
-void Window::draw(sf::Drawable & drawable)
+void Window::draw(const sf::Drawable & drawable)
 {
 	m_window.draw(drawable);
 }

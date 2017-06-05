@@ -9,8 +9,10 @@ StateGame::StateGame(StateType stateType)
 
 void StateGame::update(float deltaTime)
 {
+
 }
 
-void StateGame::draw(Window & window)
+void StateGame::draw(sf::RenderWindow& window)
 {
+	m_levelManager.draw(window);
 }
