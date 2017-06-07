@@ -7,7 +7,6 @@ class Level
 {
 public:
 	Level(std::vector<TileLayer>&& tileLayers, const CollisionLayer& collisionLayer, const LevelDetails& levelDetails, const std::string& levelName);
-
 	void draw(sf::RenderWindow& window);
 
 private:

@@ -9,7 +9,7 @@ class TileLayer
 {
 public:
 	TileLayer(const std::vector<std::vector<int>>& tileMap, const LevelDetails& levelDetails);
-	TileLayer(TileLayer& const orig);
+
 	void draw(sf::RenderWindow& window);
 
 private:

@@ -2,7 +2,6 @@
 #include <Level\LevelParser.h>
 #include <Locators\TileSheetManagerLocator.h>
 #include <Utilities\Utilities.h>
-
 #include <assert.h>
 #include <utility>
 #include <algorithm>
@@ -27,9 +26,9 @@ void LevelManager::loadNextLevel()
 	{
 		const auto& fileDirectory = m_levelDirectories.at(m_currentLevelIndex).m_fileDirectory;
 		const auto& fileName = m_levelDirectories.at(m_currentLevelIndex).m_fileName;
-		m_levels.emplace_back(LevelParser::parseLevel(fileDirectory, fileName));
-		m_currentLevel = &m_levels.back();
-		
+		m_levels.emplace_back(LevelParser::parseLevel(fileDirectory, fileName, EntityManagerLocator::getEntityManager()));
+		//TODO:: Change how current level is found
+		m_currentLevel = m_levels.back().get();
 		++m_currentLevelIndex;
 	}
 }

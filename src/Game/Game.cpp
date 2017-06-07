@@ -4,10 +4,12 @@
 
 Game::Game()
 	: m_window("BomberMan", sf::Vector2i(336, 336)),
+	m_textureManager(),
 	m_gameState(std::make_unique<StateGame>(StateType::Game)),
 	m_clock(),
 	m_timeElasped()
 {
+	
 }
 
 const Window & Game::getWindow() const
