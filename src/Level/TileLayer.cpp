@@ -1,7 +1,6 @@
 #include "TileLayer.h"
 #include "LevelDetails.h"
 #include <assert.h>
-
 TileLayer::TileLayer(const std::vector<std::vector<int>>& tileMap, const LevelDetails & levelDetails)
 	: m_tileMap()
 {
@@ -17,11 +16,6 @@ TileLayer::TileLayer(const std::vector<std::vector<int>>& tileMap, const LevelDe
 		}
 	}
 	assert(!m_tileMap.empty());
-}
-
-TileLayer::TileLayer(TileLayer & const orig)
-	: m_tileMap(std::move(orig.m_tileMap))
-{
 }
 
 void TileLayer::draw(sf::RenderWindow& window)

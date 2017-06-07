@@ -3,6 +3,7 @@
 #include <tile\TileSheet.h>
 #include <Locators\TileSheetManagerLocator.h>
 #include <Managers\TileSheetManager.h>
+#include <Managers\EntityManager.h>
 #include <Utilities\tinyxml.h>
 #include <Utilities\Base64.h>
 #include <assert.h>
@@ -12,6 +13,7 @@ CollisionLayer parseCollisionLayer(const TiXmlElement& rootElement);
 LevelDetails parseLevelDetails(const TiXmlElement& rootElement);
 std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElement, const LevelDetails& levelDetails);
 void parseTileSheets(const TiXmlElement& rootElement);
+void parseEntities(const TiXmlElement& rootElement, EntityManager& entityManager);
 
 void parseTileSheets(const TiXmlElement& rootElement)
 {
@@ -44,6 +46,27 @@ void parseTileSheets(const TiXmlElement& rootElement)
 		const int columns = tileSetSize.x / (tileSize + spacing);
 		const int rows = tileSetSize.y / (tileSize + spacing);
 		tileSheetManager.addTileSheet(tileSheetFirstGID, TileSheet(std::move(tileSheetName), tileSize, columns, rows, firstGID, margin, spacing));
+	}
+}
+
+void parseEntities(const TiXmlElement & rootElement, EntityManager& entityManager)
+{
+	for (const auto* entityElementRoot = rootElement.FirstChildElement(); entityElementRoot != nullptr; entityElementRoot = entityElementRoot->NextSiblingElement())
+	{
+		if (entityElementRoot->Value() != std::string("objectgroup"))
+		{
+			continue;
+		}
+
+		
+		for (const auto* entityElement = entityElementRoot->FirstChildElement(); entityElement != nullptr; entityElement = entityElement->NextSiblingElement())
+		{
+			int xPosition = 0, yPosition = 0;
+			entityElement->Attribute("x", &xPosition);
+			entityElement->Attribute("y", &yPosition);
+
+			entityManager.addEntity(xPosition, yPosition);
+		}
 	}
 }
 
@@ -94,7 +117,7 @@ LevelDetails parseLevelDetails(const TiXmlElement& rootElement)
 	return LevelDetails(sf::Vector2i(width, height), tileSize);
 }
 
-Level LevelParser::parseLevel(const std::string& fileDirectory, const std::string& levelName)
+std::unique_ptr<Level> LevelParser::parseLevel(const std::string& fileDirectory, const std::string& levelName, EntityManager& entityManager)
 {
 	TiXmlDocument mapFile;
 	const bool mapLoaded = mapFile.LoadFile(fileDirectory);
@@ -103,8 +126,9 @@ Level LevelParser::parseLevel(const std::string& fileDirectory, const std::strin
 	const auto& rootElement = mapFile.RootElement();
 	const auto levelDetails = parseLevelDetails(*rootElement);
 	parseTileSheets(*rootElement);
+	parseEntities(*rootElement, entityManager);
 
-	return Level(parseTileLayers(*rootElement, levelDetails), parseCollisionLayer(*rootElement), levelDetails, levelName);
+	return std::make_unique<Level>(parseTileLayers(*rootElement, levelDetails), parseCollisionLayer(*rootElement), levelDetails, levelName);
 }
 
 std::vector<TileLayer> parseTileLayers(const TiXmlElement & rootElement, const LevelDetails& levelDetails)
@@ -116,8 +140,6 @@ std::vector<TileLayer> parseTileLayers(const TiXmlElement & rootElement, const L
 		{
 			continue;
 		}
-		
-		const std::string name = tileLayerElement->FirstChildElement()->Value();
 		
 		auto tileMap = decodeTileLayer(*tileLayerElement, levelDetails);
 		tileLayers.emplace_back(std::move(tileMap), levelDetails);

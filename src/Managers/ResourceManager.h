@@ -18,7 +18,7 @@ class ResourceManager
 	public:
 		Resource(const std::function<const T&(const std::string&)>& fp_loadFromFile, const std::string& filePath)
 			: m_resource(&fp_loadFromFile(filePath)),
-			m_counter(1)
+			m_counter(0)
 		{}
 		~Resource()
 		{
