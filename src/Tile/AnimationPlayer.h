@@ -4,6 +4,7 @@
 #include <string>
 #include <SFML\Graphics.hpp>
 
+enum class Direction;
 class TileSheet;
 class AnimationPlayer
 {
@@ -13,10 +14,12 @@ class AnimationPlayer
 		Animation(const std::string& tileSheetName, const std::string& animationName, int startID, int endID, 
 			 float frameTime, bool repeatable, const sf::Vector2f& drawLocationSize, bool reversible);
 
+		const std::string& getName() const;
 		sf::IntRect getDrawLocation(const TileSheet& tileSheet) const;
 		void update(float deltaTime);
 		void reset();
 
+	private:
 		const std::string m_tileSheetName;
 		const std::string m_animationName;
 		const int m_startID;
@@ -28,6 +31,7 @@ class AnimationPlayer
 		sf::IntRect m_frame;
 		int m_currentID;
 		float m_elaspedTime;
+		bool m_animationFinished;
 	};
 
 
@@ -37,6 +41,7 @@ public:
 
 	const Animation& getCurrentAnimation() const;
 
+	void play(Direction movementDirection);
 	void play(const std::string& animationName);
 	void update(float deltaTime);
 	void draw(const sf::Vector2f& entityPosition, sf::RenderWindow& window);

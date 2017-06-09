@@ -2,6 +2,7 @@
 
 #include <SFML\Graphics.hpp>
 #include <Tile\AnimationPlayer.h>
+#include "Direction.h"
 class EntityManager;
 class Entity
 {
@@ -21,7 +22,9 @@ private:
 	sf::Vector2f m_velocity;
 	sf::Vector2f m_maxVelocity;
 	sf::Vector2f m_friction;
+	Direction m_currentMoveDirection;
 
 	void handleVelocity();
+	void handleDirection();
 	void applyFriction();
 };

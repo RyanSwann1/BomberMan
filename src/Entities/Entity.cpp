@@ -8,7 +8,8 @@ Entity::Entity(const std::string& name, const sf::Vector2f& position, EntityMana
 	m_position(position),
 	m_speed(5, 5),
 	m_maxVelocity(25, 25),
-	m_friction(1, 1)
+	m_friction(1, 1),
+	m_currentMoveDirection(Direction::None)
 {
 	m_animationPlayer.play("Idle");
 }
@@ -42,9 +43,11 @@ void Entity::update(float deltaTime)
 	}
 
 	handleVelocity();
+	handleDirection();
 	applyFriction();
 	const sf::Vector2f deltaPos = m_position += (m_velocity * deltaTime);
 	m_animationPlayer.update(deltaTime);
+	m_animationPlayer.play(m_currentMoveDirection);
 }
 
 void Entity::handleVelocity()
@@ -70,6 +73,39 @@ void Entity::handleVelocity()
 		{
 			m_velocity.y = -m_maxVelocity.y;
 		}
+	}
+}
+
+void Entity::handleDirection()
+{
+	//Moving horizontally
+	if (std::abs(m_velocity.x) > std::abs(m_velocity.y))
+	{
+		if (m_velocity.x > 0.0f)
+		{
+			m_currentMoveDirection = Direction::Right;
+		}
+		else if(m_velocity.x < 0.0f)
+		{
+			m_currentMoveDirection = Direction::Left;
+		}
+	}
+	//Moving vertically
+	else if (std::abs(m_velocity.y) > std::abs(m_velocity.x))
+	{
+		if (m_velocity.y > 0.0f)
+		{
+			m_currentMoveDirection = Direction::Down;
+		}
+		else if (m_velocity.y < 0.0f)
+		{
+			m_currentMoveDirection = Direction::Up;
+		}
+	}
+	//Idling
+	else
+	{
+		m_currentMoveDirection = Direction::None;
 	}
 }
 
