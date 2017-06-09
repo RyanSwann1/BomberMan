@@ -20,5 +20,6 @@ void Entity::draw(sf::RenderWindow & window)
 
 void Entity::update(float deltaTime)
 {
+
 	m_animationPlayer.update(deltaTime);
 }
