@@ -9,7 +9,6 @@ Game::Game()
 	m_clock(),
 	m_timeElasped()
 {
-	
 }
 
 const Window & Game::getWindow() const

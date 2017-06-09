@@ -27,7 +27,6 @@ void parseTileSheets(const TiXmlElement& rootElement)
 
 		int tileSheetFirstGID = 0;
 		tileSheetElement->Attribute("firstgid", &tileSheetFirstGID);
-
 		auto& tileSheetManager = TileSheetManagerLocator::getTileSheetManager();
 		if (tileSheetManager.hasTileSheet(tileSheetFirstGID))
 		{
@@ -58,14 +57,18 @@ void parseEntities(const TiXmlElement & rootElement, EntityManager& entityManage
 			continue;
 		}
 
+		if (entityElementRoot->Attribute("name") != std::string("Entity Layer"))
+		{
+			continue;
+		}
 		
 		for (const auto* entityElement = entityElementRoot->FirstChildElement(); entityElement != nullptr; entityElement = entityElement->NextSiblingElement())
 		{
 			int xPosition = 0, yPosition = 0;
 			entityElement->Attribute("x", &xPosition);
 			entityElement->Attribute("y", &yPosition);
-
-			entityManager.addEntity(xPosition, yPosition);
+			std::string entityName = entityElement->Attribute("name");
+			entityManager.addEntity(std::move(entityName), xPosition, yPosition);
 		}
 	}
 }
