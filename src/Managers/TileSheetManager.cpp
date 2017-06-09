@@ -13,6 +13,13 @@ void TileSheetManager::addTileSheet(int firstGID, const TileSheet & tileSheet)
 	m_tileSheets.insert(std::pair<int, TileSheet>(firstGID, tileSheet));
 }
 
+const TileSheet & TileSheetManager::getTileSheet(const std::string & tileSheetName) const
+{
+	auto iter = std::find_if(m_tileSheets.cbegin(), m_tileSheets.cend(), [&tileSheetName](const auto& tileSheet) {return tileSheet.second.m_name == tileSheetName; });
+	assert(iter != m_tileSheets.cend());
+	return iter->second;
+}
+
 const TileSheet& TileSheetManager::getTileSheet(int tileID) const
 {
 	const TileSheet* tileSheet = nullptr;
@@ -21,11 +28,9 @@ const TileSheet& TileSheetManager::getTileSheet(int tileID) const
 	{
 		const int firstGID = iter->second.m_firstGID;
 		const int tile = (tileID - firstGID);
-		if (tile <= 0)
+		if (tile >= 0)
 		{
-			--iter;
 			tileSheet = &iter->second;
-			break;
 		}
 		++iter;
 	}

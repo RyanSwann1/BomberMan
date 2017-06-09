@@ -16,8 +16,8 @@ class ResourceManager
 	class Resource 
 	{
 	public:
-		Resource(const std::function<const T&(const std::string&)>& fp_loadFromFile, const std::string& filePath)
-			: m_resource(&fp_loadFromFile(filePath)),
+		Resource(const std::function<const T&(const std::string&)>& fp_loadFromFile, const std::string& fileDirectory)
+			: m_resource(&fp_loadFromFile(fileDirectory)),
 			m_counter(0)
 		{}
 		~Resource()

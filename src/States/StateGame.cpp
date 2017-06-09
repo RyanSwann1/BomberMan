@@ -16,10 +16,11 @@ StateGame::~StateGame()
 
 void StateGame::update(float deltaTime)
 {
-
+	m_entityManager.update(deltaTime);
 }
 
 void StateGame::draw(sf::RenderWindow& window)
 {
 	m_levelManager.draw(window);
+	m_entityManager.draw(window);
 }

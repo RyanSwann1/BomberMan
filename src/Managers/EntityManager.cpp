@@ -11,7 +11,7 @@ std::unique_ptr<Entity> EntityManager::EntityFactory::getEntity(const std::strin
 {
 	auto iter = m_entityFactory.find(entityName);
 	assert(iter != m_entityFactory.cend());
-	return iter->second(entityPosition, entityID);
+	return iter->second(entityName, entityPosition, entityID);
 }
 
 //EntityManager
@@ -21,12 +21,11 @@ EntityManager::EntityManager()
 	m_entityCount(0)
 {
 	EntityManagerLocator::provide(*this);
-	
 }
 
-void EntityManager::addEntity(float xPosition, float yPosition)
+void EntityManager::addEntity(std::string && entityName, float xPosition, float yPosition)
 {
-	m_entities.emplace_back(std::make_unique<Entity>(sf::Vector2f(xPosition, yPosition), *this, m_entityCount));
+	m_entityQueue.emplace_back(std::move(entityName), sf::Vector2f(xPosition, yPosition));
 	++m_entityCount;
 }
 
@@ -44,4 +43,22 @@ void EntityManager::update(float deltaTime)
 	{
 		entity.get()->update(deltaTime);
 	}
+
+	handleQueue();
+	handleRemovals();
+}
+
+void EntityManager::handleQueue()
+{
+	for (auto& entityInQueue : m_entityQueue)
+	{
+		m_entities.emplace_back(m_entityFactory.getEntity(entityInQueue.m_name, entityInQueue.m_position, m_entityCount));
+		++m_entityCount;
+	}
+
+	m_entityQueue.clear();
+}
+
+void EntityManager::handleRemovals()
+{
 }

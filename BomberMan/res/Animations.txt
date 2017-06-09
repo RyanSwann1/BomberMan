@@ -1,0 +1,4 @@
+|EntityName|SpriteSheet|Name|StartID|EndID|FrameTime|Repeatable|DrawLocationSize.x|DrawLocationSize.y|Reversible|
+Player bomb_party_v4 Idle 256 256 0.75 0 1 1 0
+Player bomb_party_v4 WalkingUp 263 264 0.75 0 1 1 0
+Player bomb_party_v4 WalkingDown 256 258 0.75 0 1 1 0

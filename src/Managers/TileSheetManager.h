@@ -8,7 +8,8 @@ class TileSheetManager
 {
 public:
 	TileSheetManager();
-		
+	
+	const TileSheet& getTileSheet(const std::string& tileSheetName) const;
 	const TileSheet& getTileSheet(int tileID) const;
 	bool hasTileSheet(int firstGID) const;
 	void addTileSheet(int firstGID, const TileSheet& tileSheet);
