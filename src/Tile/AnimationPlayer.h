@@ -1,9 +1,8 @@
 #pragma once
 
-#include "AnimationName.h"
-#include "Animation.h"
 #include <unordered_map>
 #include <string>
+#include <SFML\Graphics.hpp>
 
 class TileSheet;
 class AnimationPlayer
