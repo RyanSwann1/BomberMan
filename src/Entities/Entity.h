@@ -17,4 +17,11 @@ private:
 	AnimationPlayer m_animationPlayer;
 	const int m_ID;
 	sf::Vector2f m_position;
+	sf::Vector2f m_speed;
+	sf::Vector2f m_velocity;
+	sf::Vector2f m_maxVelocity;
+	sf::Vector2f m_friction;
+
+	void handleVelocity();
+	void applyFriction();
 };
