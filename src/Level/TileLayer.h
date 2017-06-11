@@ -4,11 +4,10 @@
 #include <vector>
 #include <memory>
 
-class LevelDetails;
 class TileLayer
 {
 public:
-	TileLayer(const std::vector<std::vector<int>>& tileMap, const LevelDetails& levelDetails);
+	TileLayer(const std::vector<std::vector<int>>& tileMap, const sf::Vector2i& mapSize);
 
 	void draw(sf::RenderWindow& window);
 

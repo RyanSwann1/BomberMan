@@ -1,12 +1,11 @@
 #include "TileLayer.h"
-#include "LevelDetails.h"
 #include <assert.h>
-TileLayer::TileLayer(const std::vector<std::vector<int>>& tileMap, const LevelDetails & levelDetails)
+TileLayer::TileLayer(const std::vector<std::vector<int>>& tileMap, const sf::Vector2i& mapSize)
 	: m_tileMap()
 {
-	for (int row = 0; row < levelDetails.m_size.y; ++row)
+	for (int row = 0; row < mapSize.y; ++row)
 	{
-		for (int col = 0; col < levelDetails.m_size.x; ++col)
+		for (int col = 0; col < mapSize.x; ++col)
 		{
 			const int tileID = tileMap[row][col];
 			if (tileID >= 0)
