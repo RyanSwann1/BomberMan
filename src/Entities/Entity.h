@@ -3,12 +3,13 @@
 #include <SFML\Graphics.hpp>
 #include <Tile\AnimationPlayer.h>
 #include "Direction.h"
+#include <Locators\LevelManagerLocator.h>
+
 class EntityManager;
-class Entity
+class Entity : private LevelManagerLocator
 {
 public:
 	Entity(const std::string& name, const sf::Vector2f& position, EntityManager& entityManager, int entityID);
-	~Entity();
 
 	void draw(sf::RenderWindow& window);
 	void update(float deltaTime);
@@ -19,12 +20,7 @@ private:
 	const int m_ID;
 	sf::Vector2f m_position;
 	sf::Vector2f m_speed;
-	sf::Vector2f m_velocity;
-	sf::Vector2f m_maxVelocity;
-	sf::Vector2f m_friction;
 	Direction m_currentMoveDirection;
 
-	void handleVelocity();
-	void handleDirection();
-	void applyFriction();
+	void handleDirection(const sf::Vector2f& movement);
 };

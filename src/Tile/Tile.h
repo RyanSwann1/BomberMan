@@ -15,5 +15,4 @@ private:
 	const int m_ID;
 	const TileSheet& m_tileSheet;
 	sf::Sprite m_sprite;
-	
 };

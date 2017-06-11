@@ -1,6 +1,7 @@
 #include "LevelManager.h"
 #include <Level\LevelParser.h>
 #include <Locators\TileSheetManagerLocator.h>
+#include <Locators\LevelManagerLocator.h>
 #include <Utilities\Utilities.h>
 #include <assert.h>
 #include <utility>
@@ -12,12 +13,19 @@ LevelManager::LevelManager()
 	m_currentLevel(nullptr),
 	m_currentLevelIndex(0)
 {
+	LevelManagerLocator::provide(*this);
 	loadNextLevel();
 }
 
 void LevelManager::draw(sf::RenderWindow& window)
 {
 	m_currentLevel->draw(window);
+}
+
+const Level & LevelManager::getCurrentLevel() const
+{
+	assert(m_currentLevel);
+	return *m_currentLevel;
 }
 
 void LevelManager::loadNextLevel()

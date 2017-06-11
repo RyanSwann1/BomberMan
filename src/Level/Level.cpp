@@ -1,11 +1,13 @@
 #include "Level.h"
 #include <utility>
 
-Level::Level(std::vector<TileLayer>&& tileLayers, const CollisionLayer & collisionLayer, const LevelDetails & levelDetails, const std::string& levelName)
+Level::Level(std::vector<TileLayer>&& tileLayers, std::vector<sf::Vector2i>&& collisionLayer,
+	const std::string& levelName, const sf::Vector2i& levelSize, int tileSize)
 	: m_tileLayers(std::move(tileLayers)),
-	m_collisionLayer(collisionLayer),
-	m_levelDetails(levelDetails),
-	m_levelName(levelName)
+	m_collisionLayer(std::move(collisionLayer)),
+	m_levelName(levelName),
+	m_levelSize(levelSize),
+	m_tileSize(tileSize)
 {
 }
 
@@ -15,4 +17,14 @@ void Level::draw(sf::RenderWindow& window)
 	{
 		tileLayer.draw(window);
 	}
+}
+
+const std::vector<sf::Vector2i>& Level::getCollisionLayer() const
+{
+	return m_collisionLayer;
+}
+
+int Level::getTileSize() const
+{
+	return m_tileSize;
 }

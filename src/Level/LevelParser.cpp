@@ -8,12 +8,24 @@
 #include <Utilities\Base64.h>
 #include <assert.h>
 
-std::vector<TileLayer> parseTileLayers(const TiXmlElement& rootElement, const LevelDetails& levelDetails);
-CollisionLayer parseCollisionLayer(const TiXmlElement& rootElement);
+class LevelDetails
+{
+public:
+	LevelDetails(const sf::Vector2i& size, int tileSize)
+		: m_levelSize(size),
+		m_tileSize(tileSize)
+	{}
+
+	const sf::Vector2i m_levelSize;
+	const int m_tileSize;
+};
+
+std::vector<TileLayer> parseTileLayers(const TiXmlElement& rootElement, const sf::Vector2i& levelSize);
+std::vector<sf::Vector2i> parseCollisionLayer(const TiXmlElement& rootElement, int tileSize);
 LevelDetails parseLevelDetails(const TiXmlElement& rootElement);
-std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElement, const LevelDetails& levelDetails);
+std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElement, const sf::Vector2i& levelSize);
 void parseTileSheets(const TiXmlElement& rootElement);
-void parseEntities(const TiXmlElement& rootElement, EntityManager& entityManager);
+void parseEntities(const TiXmlElement& rootElement, EntityManager& entityManager, int tileSize);
 
 void parseTileSheets(const TiXmlElement& rootElement)
 {
@@ -48,7 +60,7 @@ void parseTileSheets(const TiXmlElement& rootElement)
 	}
 }
 
-void parseEntities(const TiXmlElement & rootElement, EntityManager& entityManager)
+void parseEntities(const TiXmlElement & rootElement, EntityManager& entityManager, int tileSize)
 {
 	for (const auto* entityElementRoot = rootElement.FirstChildElement(); entityElementRoot != nullptr; entityElementRoot = entityElementRoot->NextSiblingElement())
 	{
@@ -68,14 +80,17 @@ void parseEntities(const TiXmlElement & rootElement, EntityManager& entityManage
 			entityElement->Attribute("x", &xPosition);
 			entityElement->Attribute("y", &yPosition);
 			std::string entityName = entityElement->Attribute("name");
+
+			yPosition -= tileSize;
 			entityManager.addEntity(std::move(entityName), xPosition, yPosition);
 		}
 	}
 }
 
-std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElement, const LevelDetails& levelDetails)
+std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElement, const sf::Vector2i& levelSize)
 {
 	std::vector<std::vector<int>> tileData;
+	tileData.reserve(levelSize.y);
 
 	std::string decodedIDs; //Base64 decoded information
 	const TiXmlElement* dataNode = nullptr; //Store our node once we find it
@@ -93,17 +108,17 @@ std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElem
 	const std::string t = text->Value();
 	decodedIDs = base64.base64_decode(t);
 
-	const std::vector<int> layerColumns(levelDetails.m_size.x);
-	for (int i = 0; i < levelDetails.m_size.y; ++i)
+	const std::vector<int> layerColumns(levelSize.x);
+	for (int i = 0; i < levelSize.y; ++i)
 	{
 		tileData.push_back(layerColumns);
 	}
 
-	for (int rows = 0; rows < levelDetails.m_size.y; ++rows)
+	for (int rows = 0; rows < levelSize.y; ++rows)
 	{
-		for (int cols = 0; cols < levelDetails.m_size.x; ++cols)
+		for (int cols = 0; cols < levelSize.x; ++cols)
 		{
-			tileData[rows][cols] = *((int*)decodedIDs.data() + rows * levelDetails.m_size.x + cols) - 1;
+			tileData[rows][cols] = *((int*)decodedIDs.data() + rows * levelSize.x + cols) - 1;
 		}
 	}
 
@@ -112,12 +127,12 @@ std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElem
 
 LevelDetails parseLevelDetails(const TiXmlElement& rootElement)
 {
-	int width = 0, height = 0, tileSize = 0;
-	rootElement.Attribute("width", &width);
-	rootElement.Attribute("height", &height);
+	sf::Vector2i levelSize;
+	int tileSize = 0;
+	rootElement.Attribute("width", &levelSize.x);
+	rootElement.Attribute("height", &levelSize.y);
 	rootElement.Attribute("tilewidth", &tileSize);
-
-	return LevelDetails(sf::Vector2i(width, height), tileSize);
+	return LevelDetails(levelSize, tileSize);
 }
 
 std::unique_ptr<Level> LevelParser::parseLevel(const std::string& fileDirectory, const std::string& levelName, EntityManager& entityManager)
@@ -127,14 +142,15 @@ std::unique_ptr<Level> LevelParser::parseLevel(const std::string& fileDirectory,
 	assert(mapLoaded);
 
 	const auto& rootElement = mapFile.RootElement();
-	const auto levelDetails = parseLevelDetails(*rootElement);
+	const LevelDetails levelDetails = parseLevelDetails(*rootElement);
 	parseTileSheets(*rootElement);
-	parseEntities(*rootElement, entityManager);
+	parseEntities(*rootElement, entityManager, levelDetails.m_tileSize);
 
-	return std::make_unique<Level>(parseTileLayers(*rootElement, levelDetails), parseCollisionLayer(*rootElement), levelDetails, levelName);
+	return std::make_unique<Level>(parseTileLayers(*rootElement, levelDetails.m_levelSize), 
+		parseCollisionLayer(*rootElement, levelDetails.m_tileSize), levelName, levelDetails.m_levelSize, levelDetails.m_tileSize);
 }
 
-std::vector<TileLayer> parseTileLayers(const TiXmlElement & rootElement, const LevelDetails& levelDetails)
+std::vector<TileLayer> parseTileLayers(const TiXmlElement & rootElement, const sf::Vector2i& levelSize)
 {
 	std::vector<TileLayer> tileLayers;
 	for (const auto* tileLayerElement = rootElement.FirstChildElement(); tileLayerElement != nullptr; tileLayerElement = tileLayerElement->NextSiblingElement())
@@ -144,15 +160,15 @@ std::vector<TileLayer> parseTileLayers(const TiXmlElement & rootElement, const L
 			continue;
 		}
 		
-		auto tileMap = decodeTileLayer(*tileLayerElement, levelDetails);
-		tileLayers.emplace_back(std::move(tileMap), levelDetails);
+		auto tileMap = decodeTileLayer(*tileLayerElement, levelSize);
+		tileLayers.emplace_back(std::move(tileMap), levelSize);
 	}
 
 	assert(!tileLayers.empty());
 	return tileLayers;
 }
 
-CollisionLayer parseCollisionLayer(const TiXmlElement & rootElement)
+std::vector<sf::Vector2i> parseCollisionLayer(const TiXmlElement & rootElement, int tileSize)
 {
 	std::vector<sf::Vector2i> collidablePositions;
 	for (const auto* collisionLayerElement = rootElement.FirstChildElement(); collisionLayerElement != nullptr; 
@@ -174,10 +190,11 @@ CollisionLayer parseCollisionLayer(const TiXmlElement & rootElement)
 			int xPosition = 0, yPosition = 0;
 			collisionElement->Attribute("x", &xPosition);
 			collisionElement->Attribute("y", &yPosition);
+			yPosition -= tileSize;
 			collidablePositions.emplace_back(xPosition, yPosition);
 		}
 	}
 
 	assert(!collidablePositions.empty());
-	return CollisionLayer(std::move(collidablePositions));
+	return collidablePositions;
 }

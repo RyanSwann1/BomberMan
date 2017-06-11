@@ -123,6 +123,11 @@ void AnimationPlayer::play(Direction movementDirection)
 		m_sprite.setScale(-1, 1);
 		break;
 	}
+	case Direction::None :
+	{
+		play("Idle");
+		break;
+	}
 	}
 }
 
@@ -167,4 +172,10 @@ const AnimationPlayer::Animation& AnimationPlayer::getCurrentAnimation() const
 {
 	assert(m_currentAnimation);
 	return *m_currentAnimation;
+}
+
+const TileSheet & AnimationPlayer::getTileSheet() const
+{
+	assert(m_tileSheet);
+	return *m_tileSheet;
 }

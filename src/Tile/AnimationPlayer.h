@@ -34,12 +34,12 @@ class AnimationPlayer
 		bool m_animationFinished;
 	};
 
-
 public:
 	AnimationPlayer(const std::string& entityName);
 	~AnimationPlayer();
 
 	const Animation& getCurrentAnimation() const;
+	const TileSheet& getTileSheet() const;
 
 	void play(Direction movementDirection);
 	void play(const std::string& animationName);

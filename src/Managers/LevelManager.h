@@ -11,6 +11,7 @@ public:
 	LevelManager();
 
 	void draw(sf::RenderWindow& window);
+	const Level& getCurrentLevel() const;
 
 private:
 	std::vector<std::unique_ptr<Level>> m_levels;
