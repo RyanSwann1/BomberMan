@@ -8,21 +8,6 @@
 #include <assert.h>
 #include <iostream>
 
-//protected:
-	//	const std::string m_tileSheetName;
-	//	const int m_startID;
-	//	const int m_endID;
-	//	const float m_frameTime;
-	//	int m_currentID;
-	//	float m_elaspedTime;
-	//	bool m_animationFinished;
-	//private:
-	//	const std::string m_animationName;
-	//	const bool m_repeatable;
-	//	const sf::Vector2f m_drawLocationSize;
-	//	const bool m_reversible;
-	//	sf::IntRect m_frame;
-
 AnimationPlayer::Animation::Animation(const std::string & tileSheetName, const std::string & animationName, 
 	int startID, int endID, float frameTime, bool repeatable, const sf::Vector2f & drawLocationSize, bool reversible)
 	: m_tileSheetName(tileSheetName),
