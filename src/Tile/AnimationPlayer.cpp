@@ -6,7 +6,6 @@
 #include <Entities\Direction.h>
 #include "Tile.h"
 #include <assert.h>
-#include <iostream>
 
 AnimationPlayer::Animation::Animation(const std::string & tileSheetName, const std::string & animationName, 
 	int startID, int endID, float frameTime, bool repeatable, const sf::Vector2f & drawLocationSize, bool reversible)
@@ -123,10 +122,9 @@ void AnimationPlayer::Animation::reset()
 {
 	m_currentID = m_startID;
 	m_elaspedTime = 0;
-	if (m_repeatable)
-	{
-		m_animationFinished = false;
-	}
+
+	m_animationFinished = false;
+	
 }
 
 //Animation Player
@@ -166,7 +164,6 @@ AnimationPlayer::~AnimationPlayer()
 
 void AnimationPlayer::play(Direction movementDirection)
 {
-	m_sprite.setScale(1, 1);
 	switch (movementDirection)
 	{
 	case Direction::Up :
@@ -233,6 +230,7 @@ void AnimationPlayer::draw(const sf::Vector2f& entityPosition, sf::RenderWindow 
 	}
 	m_sprite.setTextureRect(m_currentAnimation->getDrawLocation(*m_tileSheet));
 	window.draw(m_sprite);
+	m_sprite.setScale(1, 1);
 }
 
 const AnimationPlayer::Animation& AnimationPlayer::getCurrentAnimation() const
