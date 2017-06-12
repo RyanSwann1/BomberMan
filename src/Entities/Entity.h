@@ -3,23 +3,29 @@
 #include <SFML\Graphics.hpp>
 #include <Tile\AnimationPlayer.h>
 #include "Direction.h"
-#include <Locators\LevelManagerLocator.h>
 
 class EntityManager;
-class Entity : private LevelManagerLocator
+class Entity
 {
 public:
 	Entity(const std::string& name, const sf::Vector2f& position, EntityManager& entityManager, int entityID);
 
+	int getID() const;
+
 	void draw(sf::RenderWindow& window);
-	void update(float deltaTime);
+	virtual void update(float deltaTime);
 	
-private:
-	EntityManager& m_entityManager;
-	AnimationPlayer m_animationPlayer;
-	const int m_ID;
-	sf::Vector2f m_position;
+protected:
 	sf::Vector2f m_speed;
+	sf::Vector2f m_velocity;
+	sf::Vector2f m_position;
+	AnimationPlayer m_animationPlayer;
+	EntityManager& m_entityManager;
+	
+	Direction getCurrentMoveDirection() const;
+
+private:
+	const int m_ID;
 	Direction m_currentMoveDirection;
 
 	void handleDirection(const sf::Vector2f& movement);

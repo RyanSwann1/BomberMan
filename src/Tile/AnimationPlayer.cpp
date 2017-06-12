@@ -8,37 +8,47 @@
 #include <assert.h>
 #include <iostream>
 
+//protected:
+	//	const std::string m_tileSheetName;
+	//	const int m_startID;
+	//	const int m_endID;
+	//	const float m_frameTime;
+	//	int m_currentID;
+	//	float m_elaspedTime;
+	//	bool m_animationFinished;
+	//private:
+	//	const std::string m_animationName;
+	//	const bool m_repeatable;
+	//	const sf::Vector2f m_drawLocationSize;
+	//	const bool m_reversible;
+	//	sf::IntRect m_frame;
+
 AnimationPlayer::Animation::Animation(const std::string & tileSheetName, const std::string & animationName, 
 	int startID, int endID, float frameTime, bool repeatable, const sf::Vector2f & drawLocationSize, bool reversible)
 	: m_tileSheetName(tileSheetName),
-	m_animationName(animationName),
 	m_startID(startID),
 	m_endID(endID),
 	m_frameTime(frameTime),
+	m_currentID(m_startID),
+	m_elaspedTime(0),
+	m_animationFinished(false),
+	m_animationName(std::move(animationName)),
 	m_repeatable(repeatable),
 	m_drawLocationSize(drawLocationSize),
 	m_reversible(reversible),
-	m_frame(),
-	m_currentID(m_startID),
-	m_elaspedTime(0),
-	m_animationFinished(false)
+	m_frame()
 {
+	
 }
 
-const std::string & AnimationPlayer::Animation::getName() const
-{
-	return m_animationName;
-}
+AnimationPlayer::AnimationHorizontal::AnimationHorizontal(const std::string & tileSheetName, const std::string & animationName, int startID, int endID, float frameTime, bool repeatable, const sf::Vector2f & drawLocationSize, bool reversible)
+	: Animation(tileSheetName, animationName, startID, endID, frameTime, repeatable, drawLocationSize, reversible)
+{}
 
-sf::IntRect AnimationPlayer::Animation::getDrawLocation(const TileSheet & tileSheet) const
-{
-	return tileSheet.getTileLocation(m_currentID);
-}
-
-void AnimationPlayer::Animation::update(float deltaTime)
+void AnimationPlayer::AnimationHorizontal::update(float deltaTime)
 {
 	m_elaspedTime += deltaTime;
-	
+
 	if (m_elaspedTime < m_frameTime)
 	{
 		return;
@@ -47,14 +57,18 @@ void AnimationPlayer::Animation::update(float deltaTime)
 	if (!m_animationFinished)
 	{
 		m_elaspedTime = 0;
-		if (m_currentID < m_endID)
+		if (m_currentID > m_endID)
+		{
+			--m_currentID;
+		}
+		else if (m_currentID < m_endID)
 		{
 			++m_currentID;
-			if (m_currentID == m_endID)
-			{
-				m_animationFinished = true;
-				return;
-			}
+		}
+		else if (m_currentID == m_endID)
+		{
+			m_animationFinished = true;
+			return;
 		}
 	}
 
@@ -64,11 +78,70 @@ void AnimationPlayer::Animation::update(float deltaTime)
 	}
 }
 
+AnimationPlayer::AnimationVertical::AnimationVertical(const std::string & tileSheetName, const std::string & animationName, int startID, int endID, float frameTime, bool repeatable, const sf::Vector2f & drawLocationSize, bool reversible)
+	: Animation(tileSheetName, animationName, startID, endID, frameTime, repeatable, drawLocationSize, reversible)
+{
+
+}
+
+void AnimationPlayer::AnimationVertical::update(float deltaTime)
+{
+	m_elaspedTime += deltaTime;
+
+	if (m_elaspedTime < m_frameTime)
+	{
+		return;
+	}
+
+	if (!m_animationFinished)
+	{
+		m_elaspedTime = 0;
+		const auto& tileSheet = TileSheetManagerLocator::getTileSheetManager().getTileSheet(m_tileSheetName);
+
+		if (m_currentID < m_endID)
+		{
+			m_currentID += tileSheet.m_columns;
+		}
+		else if (m_currentID > m_endID)
+		{
+			m_currentID -= tileSheet.m_columns;
+		}
+		else if (m_currentID == m_endID)
+		{
+			m_animationFinished = true;
+			return;
+		}
+	}
+
+	if (m_animationFinished)
+	{
+		reset();
+	}
+}
+
+const std::string & AnimationPlayer::Animation::getName() const
+{
+	return m_animationName;
+}
+
+bool AnimationPlayer::Animation::isFinished() const
+{
+	return m_animationFinished;
+}
+
+sf::IntRect AnimationPlayer::Animation::getDrawLocation(const TileSheet & tileSheet) const
+{
+	return tileSheet.getTileLocation(m_currentID);
+}
+
 void AnimationPlayer::Animation::reset()
 {
 	m_currentID = m_startID;
 	m_elaspedTime = 0;
-	m_animationFinished = false;
+	if (m_repeatable)
+	{
+		m_animationFinished = false;
+	}
 }
 
 //Animation Player
@@ -82,9 +155,18 @@ AnimationPlayer::AnimationPlayer(const std::string & entityName)
 	const auto& animationDetailsManager = AnimationDetailsManagerLocator::getAnimationDetailsManager();
 	for (const auto& animationDetails : animationDetailsManager.getEntityAnimationDetails(entityName))
 	{
-		m_animations.emplace(animationDetails.m_animationName,
-			Animation(animationDetails.m_tileSheetName, animationDetails.m_animationName, animationDetails.m_startID,
-				animationDetails.m_endID, animationDetails.m_frameTime, animationDetails.m_repeatable, animationDetails.m_drawLocationSize, animationDetails.m_reversible));
+		if (animationDetails.m_animationDirection == "Horizontal")
+		{
+			m_animations.emplace(animationDetails.m_animationName,
+				std::make_unique<AnimationHorizontal>(animationDetails.m_tileSheetName, animationDetails.m_animationName, animationDetails.m_startID,
+					animationDetails.m_endID, animationDetails.m_frameTime, animationDetails.m_repeatable, animationDetails.m_drawLocationSize, animationDetails.m_reversible));
+		}
+		else if (animationDetails.m_animationDirection == "Vertical")
+		{
+			m_animations.emplace(animationDetails.m_animationName,
+				std::make_unique<AnimationVertical>(animationDetails.m_tileSheetName, animationDetails.m_animationName, animationDetails.m_startID,
+					animationDetails.m_endID, animationDetails.m_frameTime, animationDetails.m_repeatable, animationDetails.m_drawLocationSize, animationDetails.m_reversible));
+		}
 	}
 	//Assign tile sheet
 	const auto& tileSheetName = animationDetailsManager.getTileSheetName(entityName);
@@ -144,7 +226,7 @@ void AnimationPlayer::play(const std::string& animationName)
 
 	auto iter = m_animations.find(animationName);
 	assert(iter != m_animations.cend());
-	m_currentAnimation = &iter->second;
+	m_currentAnimation = iter->second.get();
 }
 
 void AnimationPlayer::update(float deltaTime)

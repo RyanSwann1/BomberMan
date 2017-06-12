@@ -9,10 +9,9 @@ Entity::Entity(const std::string& name, const sf::Vector2f& position, EntityMana
 	m_animationPlayer(name),
 	m_ID(entityID),
 	m_position(position),
-	m_speed(75, 75),
+	m_speed(50, 50),
 	m_currentMoveDirection(Direction::None)
 {
-	m_animationPlayer.play(m_currentMoveDirection);
 }
 
 void Entity::draw(sf::RenderWindow & window)
@@ -22,29 +21,21 @@ void Entity::draw(sf::RenderWindow & window)
 
 void Entity::update(float deltaTime)
 {
-	sf::Vector2f movement;
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-	{
-		movement.x -= m_speed.x * deltaTime;
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-	{
-		movement.x += m_speed.x * deltaTime;
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-	{
-		movement.y -= m_speed.y * deltaTime;
-	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-	{
-		movement.y += m_speed.y * deltaTime;
-	}
-
-	handleDirection(movement);
-	CollisionHandler::ClampMovement(movement, m_position, LevelManagerLocator::getLevelManager().getCurrentLevel());
-	m_position += movement;
+	handleDirection(m_velocity);
+	CollisionHandler::ClampMovement(m_velocity, m_position);
+	m_position += m_velocity;
 	m_animationPlayer.update(deltaTime);
-	m_animationPlayer.play(m_currentMoveDirection);
+	m_velocity = sf::Vector2f();
+}
+
+int Entity::getID() const
+{
+	return m_ID;
+}
+
+Direction Entity::getCurrentMoveDirection() const
+{
+	return m_currentMoveDirection;
 }
 
 void Entity::handleDirection(const sf::Vector2f& movement)

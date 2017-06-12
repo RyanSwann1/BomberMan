@@ -39,25 +39,25 @@ std::unordered_map<std::string, AnimationDetailsManager::EntityAnimationDetails>
 	{
 		std::stringstream keyStream(line);
 
-		std::string entityName, spriteSheetName, animationName;
+		std::string entityName, spriteSheetName, animationName, direction;
 		int startID = 0, endID = 0;
 		float frameTime = 0;
 		bool repeatable, reversible;
 		sf::Vector2f drawLocationSize;
 
-		keyStream >> entityName >> spriteSheetName >> animationName >> startID >> endID >> frameTime >> repeatable 
+		keyStream >> entityName >> spriteSheetName >> animationName >> direction >> startID >> endID >> frameTime >> repeatable 
 			>> drawLocationSize.x >> drawLocationSize.y >> reversible;
 
 		auto iter = animationDetails.find(entityName);
 		if (iter != animationDetails.cend())
 		{
-			iter->second.m_entityAnimationDetails.emplace_back(std::move(spriteSheetName), std::move(animationName), startID,
-				endID, frameTime, repeatable, drawLocationSize, reversible);
+			iter->second.m_entityAnimationDetails.emplace_back(std::move(spriteSheetName), std::move(animationName), 
+				std::move(direction), startID, endID, frameTime, repeatable, drawLocationSize, reversible);
 		}
 		else
 		{
-			animationDetails.emplace(std::move(entityName), AnimationDetails(std::move(spriteSheetName), std::move(animationName), startID,
-				endID, frameTime, repeatable, drawLocationSize, reversible));
+			animationDetails.emplace(std::move(entityName), AnimationDetails(std::move(spriteSheetName), 
+				std::move(animationName), std::move(direction), startID, endID, frameTime, repeatable, drawLocationSize, reversible));
 		}
 	}
 
