@@ -10,8 +10,8 @@ public:
 		m_levelManager = &levelManager;
 	}
 
-protected:
-	static LevelManager& getLevelManager()
+
+	static const LevelManager& getLevelManager()
 	{
 		return *m_levelManager;
 	}

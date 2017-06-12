@@ -16,9 +16,7 @@ class EntityManager
 		EntityInQueue(std::string&& entityName, const sf::Vector2f& position)
 			: m_name(std::move(entityName)),
 			m_position(position)
-		{
-
-		}
+		{}
 
 		const std::string m_name;
 		const sf::Vector2f m_position;
@@ -48,7 +46,9 @@ class EntityManager
 public:
 	EntityManager();
 
+	void addEntity(std::string&& entityName, const sf::Vector2f& position);
 	void addEntity(std::string&& entityName, float xPosition, float yPosition);
+	void removeEntity(int entityID);
 	void draw(sf::RenderWindow& window);
 	void update(float deltaTime);
 
@@ -56,8 +56,10 @@ private:
 	EntityFactory m_entityFactory;
 	std::vector<std::unique_ptr<Entity>> m_entities;
 	std::vector<EntityInQueue> m_entityQueue;
+	std::vector<int> m_removals;
 	int m_entityCount;
 
 	void handleQueue();
 	void handleRemovals();
+	void removeActiveEntity(int entityID);
 };

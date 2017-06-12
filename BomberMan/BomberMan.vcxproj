@@ -140,8 +140,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\Entities\Bomb.cpp" />
     <ClCompile Include="..\src\Entities\CollisionHandler.cpp" />
     <ClCompile Include="..\src\Entities\Entity.cpp" />
+    <ClCompile Include="..\src\Entities\Player.cpp" />
     <ClCompile Include="..\src\Game\Game.cpp" />
     <ClCompile Include="..\src\Level\Level.cpp" />
     <ClCompile Include="..\src\Level\LevelParser.cpp" />
@@ -169,9 +171,11 @@
     <ClCompile Include="..\src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Entities\Bomb.h" />
     <ClInclude Include="..\src\Entities\CollisionHandler.h" />
     <ClInclude Include="..\src\Entities\Direction.h" />
     <ClInclude Include="..\src\Entities\Entity.h" />
+    <ClInclude Include="..\src\Entities\Player.h" />
     <ClInclude Include="..\src\Game\Game.h" />
     <ClInclude Include="..\src\Level\Level.h" />
     <ClInclude Include="..\src\Level\LevelParser.h" />

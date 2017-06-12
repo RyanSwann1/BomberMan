@@ -1,8 +1,10 @@
 #include "CollisionHandler.h"
-#include <Level\Level.h>
+#include <Locators\LevelManagerLocator.h>
+#include <Managers\LevelManager.h>
 
-void CollisionHandler::ClampMovement(sf::Vector2f& movement, const sf::Vector2f& entityPosition, const Level & level)
+void CollisionHandler::ClampMovement(sf::Vector2f& movement, const sf::Vector2f& entityPosition)
 {
+	const auto& level = LevelManagerLocator::getLevelManager().getCurrentLevel();
 	const int tileSize = level.getTileSize();
 	const sf::FloatRect entityAABB(entityPosition + movement, sf::Vector2f(tileSize / 2.0f, tileSize / 2.0f));
 	for (const auto& collidableTile : level.getCollisionLayer())
