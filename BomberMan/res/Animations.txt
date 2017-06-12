@@ -5,4 +5,4 @@ Player bomb_party_v4 WalkingDown Horizontal 257 258 0.25 0 1 1 0
 Player bomb_party_v4 WalkingRight Horizontal 259 262 0.25 0 1 1 0
 Player bomb_party_v4 WalkingLeft Horizontal 259 262 0.25 0 1 1 0
 Bomb bomb_party_v4 Bomb Vertical 236 266 0.75 0 1 1 0
-Bomb bomb_party_v4 Explode Vertical 284 254 0.75 0 1 1 0
+Bomb bomb_party_v4 Explode Vertical 284 254 0.25 0 1 1 0

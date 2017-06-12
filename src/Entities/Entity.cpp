@@ -25,7 +25,8 @@ void Entity::update(float deltaTime)
 	CollisionHandler::ClampMovement(m_velocity, m_position);
 	m_position += m_velocity;
 	m_animationPlayer.update(deltaTime);
-	m_velocity = sf::Vector2f();
+	m_velocity.x = 0;
+	m_velocity.y = 0;
 }
 
 int Entity::getID() const
