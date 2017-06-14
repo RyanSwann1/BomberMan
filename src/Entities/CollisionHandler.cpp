@@ -6,11 +6,11 @@ void CollisionHandler::ClampMovement(sf::Vector2f& movement, const sf::Vector2f&
 {
 	const auto& level = LevelManagerLocator::getLevelManager().getCurrentLevel();
 	const int tileSize = level.getTileSize();
-	const sf::FloatRect entityAABB(entityPosition + movement, sf::Vector2f(tileSize / 2.0f, tileSize / 2.0f));
+	const sf::FloatRect entityAABB(entityPosition + movement, sf::Vector2f(tileSize, tileSize));
 	for (const auto& collidableTile : level.getCollisionLayer())
 	{
 		sf::FloatRect intersection;
-		const sf::FloatRect tileRect(sf::Vector2f(collidableTile.x, collidableTile.y), sf::Vector2f(tileSize, tileSize));
+		const sf::FloatRect tileRect(sf::Vector2f(collidableTile.x, collidableTile.y), sf::Vector2f(tileSize - 6, tileSize - 6));
 		if (!entityAABB.intersects(tileRect, intersection))
 		{
 			continue;

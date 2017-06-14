@@ -7,61 +7,45 @@
 #include "Tile.h"
 #include <assert.h>
 
-AnimationPlayer::Animation::Animation(const std::string & tileSheetName, const std::string & animationName, 
-	int startID, int endID, float frameTime, bool repeatable, const sf::Vector2f & drawLocationSize, bool reversible)
-	: m_tileSheetName(tileSheetName),
-	m_startID(startID),
-	m_endID(endID),
-	m_frameTime(frameTime),
-	m_currentID(m_startID),
-	m_elaspedTime(0),
-	m_animationFinished(false),
-	m_animationName(std::move(animationName)),
-	m_repeatable(repeatable),
-	m_drawLocationSize(drawLocationSize),
-	m_reversible(reversible),
-	m_frame()
-{
-	
-}
-
+//AnimationHorizontal
 AnimationPlayer::AnimationHorizontal::AnimationHorizontal(const std::string & tileSheetName, const std::string & animationName, int startID, int endID, float frameTime, bool repeatable, const sf::Vector2f & drawLocationSize, bool reversible)
 	: Animation(tileSheetName, animationName, startID, endID, frameTime, repeatable, drawLocationSize, reversible)
 {}
 
 void AnimationPlayer::AnimationHorizontal::update(float deltaTime)
 {
-	m_elaspedTime += deltaTime;
-
-	if (m_elaspedTime < m_frameTime)
+	Animation::update(deltaTime);
+	if (!m_proceedToNextFrame)
 	{
 		return;
 	}
 
-	if (!m_animationFinished)
+	m_proceedToNextFrame = false;
+	if (m_reverseAnimation)
 	{
-		m_elaspedTime = 0;
-		if (m_currentID > m_endID)
+		if (m_currentFrame > m_startFrame)
 		{
-			--m_currentID;
+			--m_currentFrame;
 		}
-		else if (m_currentID < m_endID)
+		else if (m_currentFrame < m_startFrame)
 		{
-			++m_currentID;
+			++m_currentFrame;
 		}
-		else if (m_currentID == m_endID)
-		{
-			m_animationFinished = true;
-			return;
-		}
-	}
-
-	if (m_animationFinished)
+	}	
+	else
 	{
-		reset();
+		if (m_currentFrame > m_endFrame)
+		{
+			--m_currentFrame;
+		}
+		else if (m_currentFrame < m_endFrame)
+		{
+			++m_currentFrame;
+		}
 	}
 }
 
+//AnimationVertical
 AnimationPlayer::AnimationVertical::AnimationVertical(const std::string & tileSheetName, const std::string & animationName, int startID, int endID, float frameTime, bool repeatable, const sf::Vector2f & drawLocationSize, bool reversible)
 	: Animation(tileSheetName, animationName, startID, endID, frameTime, repeatable, drawLocationSize, reversible)
 {
@@ -70,38 +54,55 @@ AnimationPlayer::AnimationVertical::AnimationVertical(const std::string & tileSh
 
 void AnimationPlayer::AnimationVertical::update(float deltaTime)
 {
-	m_elaspedTime += deltaTime;
-
-	if (m_elaspedTime < m_frameTime)
+	Animation::update(deltaTime);
+	if (!m_proceedToNextFrame)
 	{
 		return;
 	}
 
-	if (!m_animationFinished)
+	m_proceedToNextFrame = false;
+	const auto& tileSheet = TileSheetManagerLocator::getTileSheetManager().getTileSheet(m_tileSheetName);
+	if (m_reverseAnimation)
 	{
-		m_elaspedTime = 0;
-		const auto& tileSheet = TileSheetManagerLocator::getTileSheetManager().getTileSheet(m_tileSheetName);
-
-		if (m_currentID < m_endID)
+		if (m_currentFrame < m_startFrame)
 		{
-			m_currentID += tileSheet.m_columns;
+			m_currentFrame += tileSheet.m_columns;
 		}
-		else if (m_currentID > m_endID)
+		else if (m_currentFrame > m_startFrame)
 		{
-			m_currentID -= tileSheet.m_columns;
-		}
-		else if (m_currentID == m_endID)
-		{
-			m_animationFinished = true;
-			return;
+			m_currentFrame -= tileSheet.m_columns;
 		}
 	}
-
-	if (m_animationFinished)
+	else
 	{
-		reset();
+		if (m_currentFrame < m_endFrame)
+		{
+			m_currentFrame += tileSheet.m_columns;
+		}
+		else if (m_currentFrame > m_endFrame)
+		{
+			m_currentFrame -= tileSheet.m_columns;
+		}
 	}
 }
+
+AnimationPlayer::Animation::Animation(const std::string & tileSheetName, const std::string & animationName,
+	int startID, int endID, float frameTime, bool repeatable, const sf::Vector2f & drawLocationSize, bool reversible)
+	: m_tileSheetName(tileSheetName),
+	m_startFrame(startID),
+	m_endFrame(endID),
+	m_frameTime(frameTime),
+	m_currentFrame(m_startFrame),
+	m_elaspedTime(0),
+	m_animationFinished(false),
+	m_animationName(std::move(animationName)),
+	m_animationRepeatable(repeatable),
+	m_drawLocationSize(drawLocationSize),
+	m_animationReversible(reversible),
+	m_proceedToNextFrame(false),
+	m_animationPlaying(true),
+	m_reverseAnimation(false)
+{}
 
 const std::string & AnimationPlayer::Animation::getName() const
 {
@@ -110,21 +111,64 @@ const std::string & AnimationPlayer::Animation::getName() const
 
 bool AnimationPlayer::Animation::isFinished() const
 {
-	return m_animationFinished;
+	return !m_animationPlaying;
 }
 
 sf::IntRect AnimationPlayer::Animation::getDrawLocation(const TileSheet & tileSheet) const
 {
-	return tileSheet.getTileLocation(m_currentID);
+	auto& drawLocation = tileSheet.getTileLocation(m_currentFrame);
+	drawLocation.height *= m_drawLocationSize.x;
+	drawLocation.width *= m_drawLocationSize.y;
+
+	return drawLocation;
+}
+
+void AnimationPlayer::Animation::update(float deltaTime)
+{
+	if (!m_animationPlaying)
+	{
+		return;
+	}
+
+	m_elaspedTime += deltaTime;
+	if (m_elaspedTime < m_frameTime)
+	{
+		return;
+	}
+
+	if (m_currentFrame == m_endFrame)
+	{
+		if (m_animationReversible)
+		{
+			m_reverseAnimation = true;
+		}
+		else
+		{
+			reset();
+			return;
+		}
+	}
+
+	if (m_reverseAnimation && m_currentFrame == m_startFrame)
+	{
+		reset();
+		return;
+	}
+
+	m_proceedToNextFrame = true;
+	m_elaspedTime = 0;
 }
 
 void AnimationPlayer::Animation::reset()
 {
-	m_currentID = m_startID;
-	m_elaspedTime = 0;
-
 	m_animationFinished = false;
-	
+	m_proceedToNextFrame = false;
+	m_animationPlaying = m_animationRepeatable;
+	if (m_animationPlaying)
+	{
+		m_currentFrame = m_startFrame;
+	}
+	m_elaspedTime = 0;
 }
 
 //Animation Player
@@ -162,53 +206,14 @@ AnimationPlayer::~AnimationPlayer()
 	m_tileSheet->releaseTileSheet();
 }
 
-void AnimationPlayer::play(Direction movementDirection)
+void AnimationPlayer::play(const std::string& animationName, Direction moveDirection)
 {
-	switch (movementDirection)
+	if (moveDirection == Direction::Left)
 	{
-	case Direction::Up :
-	{
-		play("WalkingUp");
-		break;
-	}
-	case Direction::Down :
-	{
-		play("WalkingDown");
-		break;
-	}
-	case Direction::Right :
-	{
-		play("WalkingRight");
-		break;
-	}
-	case Direction::Left :
-	{
-		play("WalkingLeft");
 		m_sprite.setScale(-1, 1);
-		break;
 	}
-	case Direction::None :
-	{
-		play("Idle");
-		break;
-	}
-	}
-}
-
-void AnimationPlayer::play(const std::string& animationName)
-{
-	if (m_currentAnimation)
-	{
-		if (m_currentAnimation->getName() == animationName)
-		{
-			return;
-		}
-		m_currentAnimation->reset();
-	}
-
-	auto iter = m_animations.find(animationName);
-	assert(iter != m_animations.cend());
-	m_currentAnimation = iter->second.get();
+	
+	switchToAnimation(animationName);
 }
 
 void AnimationPlayer::update(float deltaTime)
@@ -223,7 +228,7 @@ void AnimationPlayer::draw(const sf::Vector2f& entityPosition, sf::RenderWindow 
 	assert(m_currentAnimation);
 	assert(m_tileSheet);
 	//Hack.
-	//Not sure of work around
+	//Not sure of work around to get rendered properly
 	if (m_sprite.getScale().x - 1)
 	{
 		m_sprite.setPosition(m_sprite.getPosition().x + 16, m_sprite.getPosition().y);
@@ -231,6 +236,22 @@ void AnimationPlayer::draw(const sf::Vector2f& entityPosition, sf::RenderWindow 
 	m_sprite.setTextureRect(m_currentAnimation->getDrawLocation(*m_tileSheet));
 	window.draw(m_sprite);
 	m_sprite.setScale(1, 1);
+}
+
+void AnimationPlayer::switchToAnimation(const std::string & animationName)
+{
+	if (m_currentAnimation)
+	{
+		if (m_currentAnimation->getName() == animationName)
+		{
+			return;
+		}
+		m_currentAnimation->reset();
+	}
+
+	auto iter = m_animations.find(animationName);
+	assert(iter != m_animations.cend());
+	m_currentAnimation = iter->second.get();
 }
 
 const AnimationPlayer::Animation& AnimationPlayer::getCurrentAnimation() const

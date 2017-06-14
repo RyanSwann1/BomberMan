@@ -2,7 +2,6 @@
 
 #include <SFML\Graphics.hpp>
 #include <Tile\AnimationPlayer.h>
-#include "Direction.h"
 
 class EntityManager;
 class Entity
@@ -23,6 +22,7 @@ protected:
 	EntityManager& m_entityManager;
 	
 	Direction getCurrentMoveDirection() const;
+	virtual void handleAnimation() {}
 
 private:
 	const int m_ID;

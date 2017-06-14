@@ -13,4 +13,5 @@ public:
 private:
 	
 	void placeBomb();
+	void handleAnimation() override;
 };

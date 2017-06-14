@@ -190,6 +190,7 @@ std::vector<sf::Vector2i> parseCollisionLayer(const TiXmlElement & rootElement, 
 			int xPosition = 0, yPosition = 0;
 			collisionElement->Attribute("x", &xPosition);
 			collisionElement->Attribute("y", &yPosition);
+			//Hack for Tiled.
 			yPosition -= tileSize;
 			collidablePositions.emplace_back(xPosition, yPosition);
 		}
