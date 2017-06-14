@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Entities\Direction.h>
 #include <unordered_map>
 #include <string>
 #include <memory>
@@ -18,24 +19,27 @@ class AnimationPlayer
 		const std::string& getName() const;
 		bool isFinished() const;
 		sf::IntRect getDrawLocation(const TileSheet& tileSheet) const;
-		virtual void update(float deltaTime) = 0;
+		virtual void update(float deltaTime);
 		void reset();
 
 	protected:
 		const std::string m_tileSheetName;
-		const int m_startID;
-		const int m_endID;
+		const int m_startFrame;
+		const int m_endFrame;
 		const float m_frameTime;
-		int m_currentID;
+		const bool m_animationReversible;
+		int m_currentFrame;
 		float m_elaspedTime;
 		bool m_animationFinished;
+		bool m_proceedToNextFrame;
+		bool m_animationPlaying;
+		bool m_reverseAnimation;
 
 	private:
 		const std::string m_animationName;
-		const bool m_repeatable;
+		const bool m_animationRepeatable;
 		const sf::Vector2f m_drawLocationSize;
-		const bool m_reversible;
-		sf::IntRect m_frame;
+		
 	};
 
 	class AnimationHorizontal : public Animation
@@ -63,8 +67,7 @@ public:
 	const Animation& getCurrentAnimation() const;
 	const TileSheet& getTileSheet() const;
 
-	void play(Direction movementDirection);
-	void play(const std::string& animationName);
+	void play(const std::string& animationName, Direction moveDirection = Direction::None);
 	void update(float deltaTime);
 	void draw(const sf::Vector2f& entityPosition, sf::RenderWindow& window);
 	
@@ -73,4 +76,6 @@ private:
 	sf::Sprite m_sprite;
 	const TileSheet* m_tileSheet;
 	Animation* m_currentAnimation;
+
+	void switchToAnimation(const std::string& animationName);
 };

@@ -23,6 +23,7 @@ void Entity::update(float deltaTime)
 {
 	handleDirection(m_velocity);
 	CollisionHandler::ClampMovement(m_velocity, m_position);
+	handleAnimation();
 	m_position += m_velocity;
 	m_animationPlayer.update(deltaTime);
 	m_velocity.x = 0;

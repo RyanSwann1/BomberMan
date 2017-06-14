@@ -7,10 +7,8 @@ Bomb::Bomb(const std::string & name, const sf::Vector2f & position, EntityManage
 	m_animationPlayer.play("Bomb");
 }
 
-void Bomb::update(float deltaTime)
+void Bomb::handleAnimation()
 {
-	Entity::update(deltaTime);
-
 	if (m_animationPlayer.getCurrentAnimation().getName() == "Bomb" && m_animationPlayer.getCurrentAnimation().isFinished())
 	{
 		m_animationPlayer.play("Explode");
