@@ -39,7 +39,6 @@ class AnimationPlayer
 		const std::string m_animationName;
 		const bool m_animationRepeatable;
 		const sf::Vector2f m_drawLocationSize;
-		
 	};
 
 	class AnimationHorizontal : public Animation
@@ -60,11 +59,12 @@ class AnimationPlayer
 		void update(float deltaTime) override;
 	};
 
+
 public:
 	AnimationPlayer(const std::string& entityName);
 	~AnimationPlayer();
 
-	const Animation& getCurrentAnimation() const;
+	const Animation& getCurrentAnimation(const std::string& animationName) const;
 	const TileSheet& getTileSheet() const;
 
 	void play(const std::string& animationName, Direction moveDirection = Direction::None);
