@@ -254,9 +254,10 @@ void AnimationPlayer::switchToAnimation(const std::string & animationName)
 	m_currentAnimation = iter->second.get();
 }
 
-const AnimationPlayer::Animation& AnimationPlayer::getCurrentAnimation() const
+const AnimationPlayer::Animation& AnimationPlayer::getCurrentAnimation(const std::string& animationName) const
 {
 	assert(m_currentAnimation);
+	assert(m_currentAnimation->getName() == animationName);
 	return *m_currentAnimation;
 }
 

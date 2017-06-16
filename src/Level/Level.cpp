@@ -1,6 +1,6 @@
 #include "Level.h"
 #include <utility>
-
+#include <algorithm>
 Level::Level(std::vector<TileLayer>&& tileLayers, std::vector<sf::Vector2i>&& collisionLayer,
 	const std::string& levelName, const sf::Vector2i& levelSize, int tileSize)
 	: m_tileLayers(std::move(tileLayers)),
@@ -17,6 +17,19 @@ void Level::draw(sf::RenderWindow& window)
 	{
 		tileLayer.draw(window);
 	}
+}
+
+bool Level::collisionTileAtPosition(const sf::Vector2f & position) const
+{
+	for (const auto& collidableTile : m_collisionLayer)
+	{
+		const sf::Vector2f tilePosition(std::floor(collidableTile.x / m_tileSize), std::floor(collidableTile.y / m_tileSize));
+		if (position == tilePosition)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 const std::vector<sf::Vector2i>& Level::getCollisionLayer() const
