@@ -1,22 +1,51 @@
 #include "Character.h"
 #include "CollisionHandler.h"
+#include <Locators\LevelManagerLocator.h>
+#include <Managers\LevelManager.h>
+#include <Managers\EntityManager.h>
 
 Character::Character(const std::string & name, const sf::Vector2f & position, EntityManager & entityManager, int entityID)
 	: Entity(name, position, entityManager, entityID),
 	m_speed(50, 50),
-	m_currentMoveDirection(Direction::None)
+	m_currentMoveDirection(Direction::None),
+	m_bombPlacementTimer(1.25f)
 {}
 
 void Character::update(float deltaTime)
 {
+	m_bombPlacementTimer.update(deltaTime);
 	handleAnimation();
 	handleDirection();
-	CollisionHandler::ClampMovement(m_velocity, m_position);
+	CollisionHandler::handleCollisions(m_position, m_entityManager, m_velocity, *this);
 	m_position += m_velocity;
+
 	m_velocity.x = 0;
 	m_velocity.y = 0;
 
 	Entity::update(deltaTime);
+}
+
+void Character::handleEntityCollision(const std::unique_ptr<Entity>& entity, const sf::FloatRect& intersection)
+{
+	if (entity->getName() == "Crate")
+	{
+		if (m_velocity.x < 0.f)
+		{
+			m_velocity.x += intersection.width;
+		}
+		else if (m_velocity.x > 0.f)
+		{
+			m_velocity.x -= intersection.width;
+		}
+		if (m_velocity.y < 0.f)
+		{
+			m_velocity.y += intersection.height;
+		}
+		else if (m_velocity.y > 0.f)
+		{
+			m_velocity.y -= intersection.height;
+		}
+	}
 }
 
 void Character::handleDirection()
@@ -82,4 +111,22 @@ void Character::handleAnimation()
 		break;
 	}
 	}
+}
+
+void Character::placeBomb()
+{
+	if (!m_bombPlacementTimer.isExpired())
+	{
+		return;
+	}
+
+	const int tileSize = LevelManagerLocator::getLevelManager().getCurrentLevel().getTileSize();
+	sf::Vector2f bombSpawnPosition;
+	bombSpawnPosition.x = std::floor((m_position.x + tileSize / 2.0f) / tileSize);
+	bombSpawnPosition.y = std::floor((m_position.y + tileSize / 2.0f) / tileSize);
+
+	bombSpawnPosition.x *= tileSize;
+	bombSpawnPosition.y *= tileSize;
+	m_entityManager.addEntity("Bomb", bombSpawnPosition);
+	m_bombPlacementTimer.reset();
 }

@@ -2,7 +2,9 @@
 #include <Entities\Player.h>
 #include <Entities\Bomb.h>
 #include <Entities\Explosion.h>
+#include <entities\Enemy.h>
 #include <Locators\EntityManagerLocator.h>
+#include <Entities\EntityType.h>
 #include <algorithm>
 
 //EntityFactory
@@ -11,6 +13,8 @@ EntityManager::EntityFactory::EntityFactory(EntityManager * entityManager)
 	registerEntity<Player>("Player", entityManager);
 	registerEntity<Bomb>("Bomb", entityManager);
 	registerEntity<Explosion>("Explosion", entityManager);
+	registerEntity<Enemy>("Enemy", entityManager);
+	registerEntity<Entity>("Crate", entityManager);
 }
 
 std::unique_ptr<Entity> EntityManager::EntityFactory::getEntity(const std::string & entityName, const sf::Vector2f & entityPosition, int entityID) const
@@ -29,6 +33,11 @@ EntityManager::EntityManager()
 	EntityManagerLocator::provide(*this);
 }
 
+const std::vector<std::unique_ptr<Entity>>& EntityManager::getEntities() const
+{
+	return m_entities;
+}
+
 void EntityManager::addEntity(std::string && entityName, const sf::Vector2f & position)
 {
 	m_entityQueue.emplace_back(std::move(entityName), position);
@@ -43,8 +52,10 @@ void EntityManager::addEntity(std::string && entityName, float xPosition, float 
 
 void EntityManager::removeEntity(int entityID)
 {
-	assert(std::find(m_removals.cbegin(), m_removals.cend(), entityID) == m_removals.cend());
-	m_removals.push_back(entityID);
+	if (std::find(m_removals.cbegin(), m_removals.cend(), entityID) == m_removals.cend())
+	{
+		m_removals.push_back(entityID);
+	}
 }
 
 void EntityManager::draw(sf::RenderWindow & window)
