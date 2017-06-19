@@ -4,7 +4,6 @@
 #include <Entities\Explosion.h>
 #include <entities\Enemy.h>
 #include <Locators\EntityManagerLocator.h>
-#include <Entities\EntityType.h>
 #include <algorithm>
 
 //EntityFactory
