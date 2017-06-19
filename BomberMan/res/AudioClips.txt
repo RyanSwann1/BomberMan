@@ -1,0 +1,2 @@
+BombExplode res/BombExplode.wav
+EnemyDeath res/EnemyDeath.wav

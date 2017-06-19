@@ -91,7 +91,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SFML_DIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;opengl32.lib;freetype.lib;jpeg.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sfml-window-d.lib;sfml-graphics-d.lib;sfml-system-d.lib;winmm.lib;opengl32.lib;freetype.lib;jpeg.lib;vorbis.lib;vorbisenc.lib;vorbisfile.lib;openal32.lib;sfml-audio-d.lib;flac.lib;ogg.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -104,7 +104,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SFML_DIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;opengl32.lib;freetype.lib;jpeg.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sfml-window-d.lib;sfml-graphics-d.lib;sfml-system-d.lib;winmm.lib;opengl32.lib;freetype.lib;jpeg.lib;vorbis.lib;vorbisenc.lib;vorbisfile.lib;openal32.lib;sfml-audio-d.lib;flac.lib;ogg.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -140,6 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\Audio\AudioClipPlayer.cpp" />
     <ClCompile Include="..\src\Entities\Bomb.cpp" />
     <ClCompile Include="..\src\Entities\Character.cpp" />
     <ClCompile Include="..\src\Entities\CollisionHandler.cpp" />
@@ -155,12 +156,15 @@
     <ClCompile Include="..\src\Level\LevelParser.cpp" />
     <ClCompile Include="..\src\Level\TileLayer.cpp" />
     <ClCompile Include="..\src\Locators\AnimationDetailsManagerLocator.cpp" />
+    <ClCompile Include="..\src\Locators\AudioClipManagerLocator.cpp" />
+    <ClCompile Include="..\src\Locators\AudioClipPlayerLocator.cpp" />
     <ClCompile Include="..\src\Locators\EntityManagerLocator.cpp" />
     <ClCompile Include="..\src\Locators\LevelManagerLocator.cpp" />
     <ClCompile Include="..\src\Locators\TextureManagerLocator.cpp" />
     <ClCompile Include="..\src\Locators\TileSheetManagerLocator.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Managers\AnimationDetailsManager.cpp" />
+    <ClCompile Include="..\src\Managers\AudioClipManager.cpp" />
     <ClCompile Include="..\src\Managers\EntityManager.cpp" />
     <ClCompile Include="..\src\Managers\LevelManager.cpp" />
     <ClCompile Include="..\src\Managers\TextureManager.cpp" />
@@ -177,6 +181,8 @@
     <ClCompile Include="..\src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Audio\AudioClipName.h" />
+    <ClInclude Include="..\src\Audio\AudioClipPlayer.h" />
     <ClInclude Include="..\src\Entities\Bomb.h" />
     <ClInclude Include="..\src\Entities\Character.h" />
     <ClInclude Include="..\src\Entities\CollisionHandler.h" />
@@ -186,6 +192,7 @@
     <ClInclude Include="..\src\Entities\Entity.h" />
     <ClInclude Include="..\src\Entities\Explosion.h" />
     <ClInclude Include="..\src\Entities\Player.h" />
+    <ClInclude Include="..\src\EventQueue.h" />
     <ClInclude Include="..\src\Game\Game.h" />
     <ClInclude Include="..\src\Game\GameLogic.h" />
     <ClInclude Include="..\src\Game\Timer.h" />
@@ -193,11 +200,14 @@
     <ClInclude Include="..\src\Level\LevelParser.h" />
     <ClInclude Include="..\src\Level\TileLayer.h" />
     <ClInclude Include="..\src\Locators\AnimationDetailsManagerLocator.h" />
+    <ClInclude Include="..\src\Locators\AudioClipManagerLocator.h" />
+    <ClInclude Include="..\src\Locators\AudioClipPlayerLocator.h" />
     <ClInclude Include="..\src\Locators\EntityManagerLocator.h" />
     <ClInclude Include="..\src\Locators\LevelManagerLocator.h" />
     <ClInclude Include="..\src\Locators\TextureManagerLocator.h" />
     <ClInclude Include="..\src\Locators\TileSheetManagerLocator.h" />
     <ClInclude Include="..\src\Managers\AnimationDetailsManager.h" />
+    <ClInclude Include="..\src\Managers\AudioClipManager.h" />
     <ClInclude Include="..\src\Managers\EntityManager.h" />
     <ClInclude Include="..\src\Managers\LevelManager.h" />
     <ClInclude Include="..\src\Managers\ResourceManager.h" />

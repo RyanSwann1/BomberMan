@@ -19,6 +19,7 @@ const Window & Game::getWindow() const
 void Game::update()
 {
 	m_gameState->update(m_timeElasped.asSeconds());
+	m_audioClipPlayer.update();
 	m_window.update();
 }
 

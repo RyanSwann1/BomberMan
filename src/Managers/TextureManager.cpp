@@ -11,7 +11,7 @@ TextureManager::TextureManager()
 const sf::Texture & TextureManager::loadFromFile(const std::string & fileDirectory) const
 {
 	sf::Texture* texture = new sf::Texture();
-	texture->loadFromFile(fileDirectory);
-	assert(texture);
+	const bool textureLoaded = texture->loadFromFile(fileDirectory);
+	assert(textureLoaded);
 	return *texture;
 }
