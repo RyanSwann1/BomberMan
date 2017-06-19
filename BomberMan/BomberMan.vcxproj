@@ -159,6 +159,7 @@
     <ClCompile Include="..\src\Locators\AudioClipManagerLocator.cpp" />
     <ClCompile Include="..\src\Locators\AudioClipPlayerLocator.cpp" />
     <ClCompile Include="..\src\Locators\EntityManagerLocator.cpp" />
+    <ClCompile Include="..\src\Locators\GameEventMessengerLocator.cpp" />
     <ClCompile Include="..\src\Locators\LevelManagerLocator.cpp" />
     <ClCompile Include="..\src\Locators\TextureManagerLocator.cpp" />
     <ClCompile Include="..\src\Locators\TileSheetManagerLocator.cpp" />
@@ -194,7 +195,9 @@
     <ClInclude Include="..\src\Entities\Player.h" />
     <ClInclude Include="..\src\EventQueue.h" />
     <ClInclude Include="..\src\Game\Game.h" />
+    <ClInclude Include="..\src\Game\GameEvent.h" />
     <ClInclude Include="..\src\Game\GameLogic.h" />
+    <ClInclude Include="..\src\Game\MessageHandler.h" />
     <ClInclude Include="..\src\Game\Timer.h" />
     <ClInclude Include="..\src\Level\Level.h" />
     <ClInclude Include="..\src\Level\LevelParser.h" />
@@ -203,6 +206,7 @@
     <ClInclude Include="..\src\Locators\AudioClipManagerLocator.h" />
     <ClInclude Include="..\src\Locators\AudioClipPlayerLocator.h" />
     <ClInclude Include="..\src\Locators\EntityManagerLocator.h" />
+    <ClInclude Include="..\src\Locators\GameEventMessengerLocator.h" />
     <ClInclude Include="..\src\Locators\LevelManagerLocator.h" />
     <ClInclude Include="..\src\Locators\TextureManagerLocator.h" />
     <ClInclude Include="..\src\Locators\TileSheetManagerLocator.h" />

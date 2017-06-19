@@ -30,3 +30,13 @@ void Player::update(float deltaTime)
 	
 	Character::update(deltaTime);
 }
+
+void Player::handleEntityCollision(const std::unique_ptr<Entity>& entity, const sf::FloatRect & intersection)
+{
+	Character::handleEntityCollision(entity, intersection);
+
+	if (entity->getName() == "Explosion")
+	{
+		
+	}
+}

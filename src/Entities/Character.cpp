@@ -46,6 +46,11 @@ void Character::handleEntityCollision(const std::unique_ptr<Entity>& entity, con
 			m_velocity.y -= intersection.height;
 		}
 	}
+
+	else if (entity->getName() == "Explosion")
+	{
+
+	}
 }
 
 void Character::handleDirection()

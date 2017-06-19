@@ -5,6 +5,8 @@
 #include <Entities\Enemy.h>
 #include <Entities\Crate.h>
 #include <Locators\EntityManagerLocator.h>
+#include <Game\MessageHandler.h>
+#include <Locators\GameEventMessengerLocator.h>
 #include <algorithm>
 
 //EntityFactory
@@ -31,6 +33,8 @@ EntityManager::EntityManager()
 	m_entityCount(0)
 {
 	EntityManagerLocator::provide(*this);
+	GameEventMessengerLocator::getGameEventMessenger().subscribe(std::bind(&EntityManager::purgeEntities, this), 
+		"EntityManager", GameEvent::ChangeToNextLevel);
 }
 
 const std::vector<std::unique_ptr<Entity>>& EntityManager::getEntities() const
@@ -102,4 +106,11 @@ void EntityManager::removeActiveEntity(int entityID)
 	auto iter = std::find_if(m_entities.begin(), m_entities.end(), [entityID](const auto& entity) {return entity.get()->getID() == entityID; });
 	assert(iter != m_entities.cend());
 	m_entities.erase(iter);
+}
+
+void EntityManager::purgeEntities()
+{
+	m_entities.clear();
+	m_entityQueue.clear();
+	m_entityCount = 0;
 }

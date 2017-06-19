@@ -1,14 +1,20 @@
 #include "Game.h"
 #include <Utilities\Utilities.h>
+#include <Locators\GameEventMessengerLocator.h>
 #include <assert.h>
 
 Game::Game()
 	: m_window("BomberMan", sf::Vector2i(336, 336)),
 	m_textureManager(),
-	m_gameState(std::make_unique<StateGame>(StateType::Game)),
+	m_audioClipManager(),
+	m_audioClipPlayer(),
+	m_gameEventMessenger(),
+	m_gameState(),
 	m_clock(),
 	m_timeElasped()
 {
+	GameEventMessengerLocator::provide(m_gameEventMessenger);
+	m_gameState = std::make_unique<StateGame>(StateType::Game);
 }
 
 const Window & Game::getWindow() const

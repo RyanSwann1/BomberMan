@@ -13,6 +13,7 @@ class AudioClipPlayer
 	public:
 		AudioClip(std::string&& audioClipName);
 		~AudioClip();
+		AudioClip(const AudioClip&) = delete;
 
 		sf::Sound m_audioClip;
 		const std::string m_name;
