@@ -3,9 +3,7 @@
 
 Explosion::Explosion(const std::string & name, const sf::Vector2f & position, EntityManager & entityManager, int entityID)
 	: Entity(name, position, entityManager, entityID)
-{
-	m_animationPlayer.play("Default");
-}
+{}
 
 void Explosion::update(float deltaTime)
 {

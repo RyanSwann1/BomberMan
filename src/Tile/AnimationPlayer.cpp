@@ -91,9 +91,7 @@ AnimationPlayer::Animation::Animation(const std::string & tileSheetName, const s
 	: m_tileSheetName(tileSheetName),
 	m_startFrame(startID),
 	m_endFrame(endID),
-	m_frameTime(frameTime),
 	m_currentFrame(m_startFrame),
-	m_elaspedTime(0),
 	m_animationFinished(false),
 	m_animationName(std::move(animationName)),
 	m_animationRepeatable(repeatable),
@@ -101,7 +99,8 @@ AnimationPlayer::Animation::Animation(const std::string & tileSheetName, const s
 	m_animationReversible(reversible),
 	m_proceedToNextFrame(false),
 	m_animationPlaying(true),
-	m_reverseAnimation(false)
+	m_reverseAnimation(false),
+	m_frameTimer(frameTime)
 {}
 
 const std::string & AnimationPlayer::Animation::getName() const
@@ -129,12 +128,18 @@ void AnimationPlayer::Animation::update(float deltaTime)
 	{
 		return;
 	}
-
-	m_elaspedTime += deltaTime;
-	if (m_elaspedTime < m_frameTime)
+	
+	m_frameTimer.update(deltaTime);
+	if (!m_frameTimer.isExpired())
 	{
 		return;
 	}
+
+	//m_elaspedTime += deltaTime;
+	//if (m_elaspedTime < m_frameTime)
+	//{
+	//	return;
+	//}
 
 	if (m_currentFrame == m_endFrame)
 	{
@@ -156,7 +161,7 @@ void AnimationPlayer::Animation::update(float deltaTime)
 	}
 
 	m_proceedToNextFrame = true;
-	m_elaspedTime = 0;
+	m_frameTimer.reset();
 }
 
 void AnimationPlayer::Animation::reset()
@@ -168,7 +173,7 @@ void AnimationPlayer::Animation::reset()
 	{
 		m_currentFrame = m_startFrame;
 	}
-	m_elaspedTime = 0;
+	m_frameTimer.reset();
 }
 
 //Animation Player

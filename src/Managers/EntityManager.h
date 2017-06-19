@@ -31,14 +31,14 @@ class EntityManager
 	private:
 		std::unordered_map<std::string, std::function<std::unique_ptr<Entity>(const std::string&, const sf::Vector2f&, int)>> m_entityFactory;
 	
-		template<class EntityType>
+		template<class T>
 		void registerEntity(std::string&& entityName, EntityManager* entityManager)
 		{
 			assert(m_entityFactory.find(entityName) == m_entityFactory.cend());
 			m_entityFactory.emplace(std::move(entityName), [entityManager](const std::string& name, 
 				const sf::Vector2f& position, int entityID) -> std::unique_ptr<Entity>
 			{
-				return std::make_unique<EntityType>(name, position, *entityManager, entityID);
+				return std::make_unique<T>(name, position, *entityManager, entityID);
 			});
 		}
 	};
@@ -46,6 +46,7 @@ class EntityManager
 public:
 	EntityManager();
 
+	const std::vector<std::unique_ptr<Entity>>& getEntities() const;
 	void addEntity(std::string&& entityName, const sf::Vector2f& position);
 	void addEntity(std::string&& entityName, float xPosition, float yPosition);
 	void removeEntity(int entityID);

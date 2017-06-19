@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Game\Timer.h>
 #include <Entities\Direction.h>
 #include <unordered_map>
 #include <string>
@@ -26,15 +27,15 @@ class AnimationPlayer
 		const std::string m_tileSheetName;
 		const int m_startFrame;
 		const int m_endFrame;
-		const float m_frameTime;
+		//const float m_frameTime;
 		const bool m_animationReversible;
 		int m_currentFrame;
-		float m_elaspedTime;
+		//float m_elaspedTime;
 		bool m_animationFinished;
 		bool m_proceedToNextFrame;
 		bool m_animationPlaying;
 		bool m_reverseAnimation;
-
+		Timer m_frameTimer;
 	private:
 		const std::string m_animationName;
 		const bool m_animationRepeatable;
