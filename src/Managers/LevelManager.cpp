@@ -19,6 +19,7 @@ LevelManager::LevelManager()
 
 void LevelManager::draw(sf::RenderWindow& window)
 {
+	assert(m_currentLevel);
 	m_currentLevel->draw(window);
 }
 

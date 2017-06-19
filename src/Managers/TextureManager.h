@@ -5,7 +5,6 @@
 
 class TextureManager : public ResourceManager<sf::Texture>
 {
-
 public:
 	TextureManager();
 
