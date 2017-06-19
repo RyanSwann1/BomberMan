@@ -63,4 +63,5 @@ private:
 	void handleQueue();
 	void handleRemovals();
 	void removeActiveEntity(int entityID);
+	void purgeEntities();
 };
