@@ -2,7 +2,8 @@
 #include <Entities\Player.h>
 #include <Entities\Bomb.h>
 #include <Entities\Explosion.h>
-#include <entities\Enemy.h>
+#include <Entities\Enemy.h>
+#include <Entities\Crate.h>
 #include <Locators\EntityManagerLocator.h>
 #include <algorithm>
 
@@ -13,7 +14,7 @@ EntityManager::EntityFactory::EntityFactory(EntityManager * entityManager)
 	registerEntity<Bomb>("Bomb", entityManager);
 	registerEntity<Explosion>("Explosion", entityManager);
 	registerEntity<Enemy>("Enemy", entityManager);
-	registerEntity<Entity>("Crate", entityManager);
+	registerEntity<Crate>("Crate", entityManager);
 }
 
 std::unique_ptr<Entity> EntityManager::EntityFactory::getEntity(const std::string & entityName, const sf::Vector2f & entityPosition, int entityID) const
