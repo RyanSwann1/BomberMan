@@ -16,6 +16,8 @@ public:
 
 	}
 
+	StateType getType() const { return m_stateType; }
+
 	virtual void update(float deltaTime) = 0;
 	virtual void draw(sf::RenderWindow& window) = 0;
 
