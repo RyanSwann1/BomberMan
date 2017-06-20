@@ -16,7 +16,6 @@ void Crate::handleEntityCollision(const std::unique_ptr<Entity>& entity, const s
 {
 	if (entity->getName() == "Explosion")
 	{
-		
 		m_entityManager.removeEntity(Entity::getID());
 	}
 }

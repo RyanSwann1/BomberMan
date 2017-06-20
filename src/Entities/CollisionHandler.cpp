@@ -29,7 +29,6 @@ void checkForEntityCollisions(const sf::Vector2f & entityPosition, const EntityM
 		if (movementAABB.intersects(i->getAABB(), intersection))
 		{
 			entity.handleEntityCollision(i, intersection);
-			break;
 		}
 	}
 }

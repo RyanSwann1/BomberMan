@@ -1,9 +1,11 @@
 #pragma once
 
-
 enum class GameEvent
 {
-	ChangeToNextLevel = 0,
-	GameOver,
+	ClearMap = 0,
+	ReloadCurrentLevel,
+	ChangeToNextLevel,
 	WinGame,
+	EnemyDeath,
+	PlayerDeath
 };

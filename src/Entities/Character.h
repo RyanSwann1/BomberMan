@@ -16,11 +16,12 @@ protected:
 	sf::Vector2f m_speed;
 	sf::Vector2f m_velocity;
 	Direction m_currentMoveDirection;
-
+	int m_lives;
+	Timer m_bombPlacementTimer;
+	
 	void placeBomb();
 
 private:
-	Timer m_bombPlacementTimer;
 	void handleDirection();	
 	void handleAnimation();
 };

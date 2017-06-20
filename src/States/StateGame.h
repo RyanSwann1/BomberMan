@@ -5,6 +5,7 @@
 #include <Managers\TileSheetManager.h>
 #include <Managers\EntityManager.h>
 #include <Managers\AnimationDetailsManager.h>
+#include <Managers\GameManager.h>
 
 class StateGame : public StateBase
 {
@@ -20,4 +21,5 @@ private:
 	TileSheetManager m_tileSheetManager;
 	EntityManager m_entityManager;
 	LevelManager m_levelManager;
+	GameManager m_gameManager;
 };

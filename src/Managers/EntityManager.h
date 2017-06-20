@@ -45,6 +45,7 @@ class EntityManager
 
 public:
 	EntityManager();
+	~EntityManager();
 
 	const std::vector<std::unique_ptr<Entity>>& getEntities() const;
 	void addEntity(std::string&& entityName, const sf::Vector2f& position);

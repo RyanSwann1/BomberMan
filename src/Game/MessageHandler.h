@@ -6,6 +6,7 @@
 #include <assert.h>
 #include <utility>
 #include <algorithm>
+#include <memory>
 
 template <class MessageType>
 class MessageHandler
@@ -14,14 +15,12 @@ class MessageHandler
 	{
 	public:
 		Listener(const std::function<void()>& fp, std::string&& listenerName)
-			: m_listeners(),
+			: m_listener(fp),
 			m_name(std::move(listenerName))
-		{
-			m_listeners.push_back(fp);
-		}
+		{}
 
-		std::vector<std::function<void()>> m_listeners;
-		const std::string m_name;
+		std::function<void()> m_listener;
+		std::string m_name;
 	};
 
 public:
@@ -30,11 +29,11 @@ public:
 		auto iter = m_listeners.find(message);
 		if (iter != m_listeners.cend())
 		{
-			iter->second.m_listeners.push_back(fp);
+			iter->second.emplace_back(fp, std::move(listenerName));
 		}
 		else
 		{
-			m_listeners.emplace(message, Listener(fp, std::move(listenerName)));
+			m_listeners.emplace(message, std::vector<Listener>{Listener(fp, std::move(listenerName))});
 		}
 	}
 
@@ -42,21 +41,22 @@ public:
 	{
 		auto iter = m_listeners.find(message);
 		assert(iter != m_listeners.cend());
-		for (auto& listener : iter->second.m_listeners)
+		for (const auto& listener : iter->second)
 		{
-			listener();
+			listener.m_listener();
 		}
 	}
 
-	void unsubscribe(MessageType message, const std::string& listenerName)
+	void unsubscribe(const std::string& listenerName, MessageType message)
 	{
 		auto iter = m_listeners.find(message);
 		assert(iter != m_listeners.cend());
-		auto listener = std::find_if(iter->second.m_listeners.begin(), iter->second.m_listeners.end(), [&listenerName](const auto& listener) {return listener.m_name == listenerName; });
-		assert(listener != iter->second.m_listeners.cend());
-		iter->second.m_listeners.erase(listener);
+		auto listener = std::find_if(iter->second.begin(), iter->second.end(), 
+			[&listenerName](const auto& listener) {return listener.m_name == listenerName; });
+		assert(listener != iter->second.cend());
+		iter->second.erase(listener);
 	}
 
 private:
-	std::unordered_map<MessageType, Listener> m_listeners;
+	std::unordered_map<MessageType, std::vector<Listener>> m_listeners;
 };

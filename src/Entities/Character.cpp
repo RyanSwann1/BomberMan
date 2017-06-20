@@ -8,7 +8,8 @@ Character::Character(const std::string & name, const sf::Vector2f & position, En
 	: Entity(name, position, entityManager, entityID),
 	m_speed(50, 50),
 	m_currentMoveDirection(Direction::None),
-	m_bombPlacementTimer(1.25f)
+	m_bombPlacementTimer(1.25f),
+	m_lives(0)
 {}
 
 void Character::update(float deltaTime)
@@ -46,10 +47,13 @@ void Character::handleEntityCollision(const std::unique_ptr<Entity>& entity, con
 			m_velocity.y -= intersection.height;
 		}
 	}
-
 	else if (entity->getName() == "Explosion")
 	{
-
+		--m_lives;
+		if (m_lives <= 0)
+		{
+			m_entityManager.removeEntity(Entity::getID());
+		}
 	}
 }
 

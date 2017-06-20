@@ -1,2 +1,4 @@
 BombExplode res/BombExplode.wav
 EnemyDeath res/EnemyDeath.wav
+PlayerDeath res/PlayerDeath.wav
+PlaceBomb res/PlaceBomb.wav
