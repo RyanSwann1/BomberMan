@@ -1,6 +1,8 @@
 #pragma once
 
-class GameManager
+#include <Locators\StateManagerLocator.h>
+
+class GameManager : private StateManagerLocator
 {
 public:
 	GameManager();

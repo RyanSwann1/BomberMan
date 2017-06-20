@@ -5,16 +5,16 @@
 
 Game::Game()
 	: m_window("BomberMan", sf::Vector2i(336, 336)),
+	m_stateManager(),
 	m_textureManager(),
 	m_audioClipManager(),
 	m_audioClipPlayer(),
 	m_gameEventMessenger(),
-	m_gameState(),
 	m_clock(),
 	m_timeElasped()
 {
 	GameEventMessengerLocator::provide(m_gameEventMessenger);
-	m_gameState = std::make_unique<StateGame>(StateType::Game);
+	m_stateManager.switchToState(StateType::Game);
 }
 
 const Window & Game::getWindow() const
@@ -24,14 +24,14 @@ const Window & Game::getWindow() const
 
 void Game::update()
 {
-	m_gameState->update(m_timeElasped.asSeconds());
+	m_stateManager.update(m_timeElasped.asSeconds());
 	m_audioClipPlayer.update();
 	m_window.update();
 }
 
 void Game::draw()
 {
-	m_gameState->draw(m_window.getWindow());
+	m_stateManager.draw(m_window.getWindow());
 	m_window.display();
 }
 

@@ -2,5 +2,6 @@
 
 enum class StateType
 {
-	Game
+	Game = 0,
+	WinGame
 };

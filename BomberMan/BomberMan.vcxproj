@@ -161,6 +161,7 @@
     <ClCompile Include="..\src\Locators\EntityManagerLocator.cpp" />
     <ClCompile Include="..\src\Locators\GameEventMessengerLocator.cpp" />
     <ClCompile Include="..\src\Locators\LevelManagerLocator.cpp" />
+    <ClCompile Include="..\src\Locators\StateManagerLocator.cpp" />
     <ClCompile Include="..\src\Locators\TextureManagerLocator.cpp" />
     <ClCompile Include="..\src\Locators\TileSheetManagerLocator.cpp" />
     <ClCompile Include="..\src\main.cpp" />
@@ -169,9 +170,11 @@
     <ClCompile Include="..\src\Managers\EntityManager.cpp" />
     <ClCompile Include="..\src\Managers\GameManager.cpp" />
     <ClCompile Include="..\src\Managers\LevelManager.cpp" />
+    <ClCompile Include="..\src\Managers\StateManager.cpp" />
     <ClCompile Include="..\src\Managers\TextureManager.cpp" />
     <ClCompile Include="..\src\Managers\TileSheetManager.cpp" />
     <ClCompile Include="..\src\States\StateGame.cpp" />
+    <ClCompile Include="..\src\States\StateWinGame.cpp" />
     <ClCompile Include="..\src\Tile\AnimationPlayer.cpp" />
     <ClCompile Include="..\src\Tile\Tile.cpp" />
     <ClCompile Include="..\src\Tile\TileSheet.cpp" />
@@ -209,6 +212,7 @@
     <ClInclude Include="..\src\Locators\EntityManagerLocator.h" />
     <ClInclude Include="..\src\Locators\GameEventMessengerLocator.h" />
     <ClInclude Include="..\src\Locators\LevelManagerLocator.h" />
+    <ClInclude Include="..\src\Locators\StateManagerLocator.h" />
     <ClInclude Include="..\src\Locators\TextureManagerLocator.h" />
     <ClInclude Include="..\src\Locators\TileSheetManagerLocator.h" />
     <ClInclude Include="..\src\Managers\AnimationDetailsManager.h" />
@@ -217,11 +221,13 @@
     <ClInclude Include="..\src\Managers\GameManager.h" />
     <ClInclude Include="..\src\Managers\LevelManager.h" />
     <ClInclude Include="..\src\Managers\ResourceManager.h" />
+    <ClInclude Include="..\src\Managers\StateManager.h" />
     <ClInclude Include="..\src\Managers\TextureManager.h" />
     <ClInclude Include="..\src\Managers\TileSheetManager.h" />
     <ClInclude Include="..\src\States\StateBase.h" />
     <ClInclude Include="..\src\States\StateGame.h" />
     <ClInclude Include="..\src\States\StateType.h" />
+    <ClInclude Include="..\src\States\StateWinGame.h" />
     <ClInclude Include="..\src\Tile\AnimationPlayer.h" />
     <ClInclude Include="..\src\Tile\Tile.h" />
     <ClInclude Include="..\src\Tile\TileSheet.h" />

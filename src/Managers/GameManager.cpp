@@ -1,6 +1,7 @@
 #include <Managers\GameManager.h>
 #include <Game\MessageHandler.h>
 #include <Locators\GameEventMessengerLocator.h>
+#include <Managers\StateManager.h>
 
 GameManager::GameManager()
 	: m_enemiesRemaining(3)
@@ -23,7 +24,9 @@ GameManager::~GameManager()
 
 void GameManager::winGame()
 {
-
+	auto& stateManager = StateManagerLocator::getStateManager();
+	stateManager.switchToState(StateType::WinGame);
+	stateManager.removeState(StateType::Game);
 }
 
 void GameManager::loseGame()
