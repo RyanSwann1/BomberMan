@@ -7,9 +7,11 @@ public:
 	Level(std::vector<TileLayer>&& tileLayers, std::vector<sf::Vector2i>&& collisionLayer, 
 		const std::string& levelName, const sf::Vector2i& levelSize, int tileSize);
 	
+	const std::string& getName() const;
 	bool collisionTileAtPosition(const sf::Vector2i& position) const;
 	const std::vector<sf::Vector2i>& getCollisionLayer() const;
 	int getTileSize() const;
+	
 	void draw(sf::RenderWindow& window);
 	
 private:

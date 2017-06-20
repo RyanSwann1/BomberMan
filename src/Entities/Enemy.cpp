@@ -1,6 +1,8 @@
 #include "Enemy.h"
 #include <Managers\EntityManager.h>
 #include <Locators\AudioClipPlayerLocator.h>
+#include <Locators\GameEventMessengerLocator.h>
+#include <Game\MessageHandler.h>
 #include <Audio\AudioClipPlayer.h>
 
 Enemy::Enemy(const std::string & name, const sf::Vector2f & position, EntityManager & entityManager, int entityID)
@@ -12,7 +14,10 @@ void Enemy::handleEntityCollision(const std::unique_ptr<Entity>& entity, const s
 	Character::handleEntityCollision(entity, intersection);
 	if (entity->getName() == "Explosion")
 	{
-		m_entityManager.removeEntity(Entity::getID());
-		AudioClipPlayerLocator::getAudioClipPlayer().playSound(AudioClipName::EnemyDeath);
+		if(m_lives <= 0)
+		{
+			AudioClipPlayerLocator::getAudioClipPlayer().playSound(AudioClipName::EnemyDeath);
+			GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::EnemyDeath);
+		}
 	}
 }

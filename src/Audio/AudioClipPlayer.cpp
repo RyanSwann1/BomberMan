@@ -20,6 +20,8 @@ AudioClipPlayer::AudioClipPlayer()
 	AudioClipPlayerLocator::provide(*this);
 	m_audioClips.emplace(AudioClipName::BombExplode, "BombExplode");
 	m_audioClips.emplace(AudioClipName::EnemyDeath, "EnemyDeath");
+	m_audioClips.emplace(AudioClipName::PlayerDeath, "PlayerDeath");
+	m_audioClips.emplace(AudioClipName::PlaceBomb, "PlaceBomb");
 }
 
 void AudioClipPlayer::playSound(AudioClipName audioName)

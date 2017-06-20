@@ -167,6 +167,7 @@
     <ClCompile Include="..\src\Managers\AnimationDetailsManager.cpp" />
     <ClCompile Include="..\src\Managers\AudioClipManager.cpp" />
     <ClCompile Include="..\src\Managers\EntityManager.cpp" />
+    <ClCompile Include="..\src\Managers\GameManager.cpp" />
     <ClCompile Include="..\src\Managers\LevelManager.cpp" />
     <ClCompile Include="..\src\Managers\TextureManager.cpp" />
     <ClCompile Include="..\src\Managers\TileSheetManager.cpp" />
@@ -213,6 +214,7 @@
     <ClInclude Include="..\src\Managers\AnimationDetailsManager.h" />
     <ClInclude Include="..\src\Managers\AudioClipManager.h" />
     <ClInclude Include="..\src\Managers\EntityManager.h" />
+    <ClInclude Include="..\src\Managers\GameManager.h" />
     <ClInclude Include="..\src\Managers\LevelManager.h" />
     <ClInclude Include="..\src\Managers\ResourceManager.h" />
     <ClInclude Include="..\src\Managers\TextureManager.h" />

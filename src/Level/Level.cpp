@@ -20,6 +20,11 @@ void Level::draw(sf::RenderWindow& window)
 	}
 }
 
+const std::string & Level::getName() const
+{
+	return m_levelName;
+}
+
 bool Level::collisionTileAtPosition(const sf::Vector2i & position) const
 {
 	for (const auto& collidableTile : m_collisionLayer)

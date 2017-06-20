@@ -33,8 +33,14 @@ EntityManager::EntityManager()
 	m_entityCount(0)
 {
 	EntityManagerLocator::provide(*this);
-	GameEventMessengerLocator::getGameEventMessenger().subscribe(std::bind(&EntityManager::purgeEntities, this), 
-		"EntityManager", GameEvent::ChangeToNextLevel);
+	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
+	gameEventMessenger.subscribe(std::bind(&EntityManager::purgeEntities, this), "EntityManager", GameEvent::ClearMap);
+}
+
+EntityManager::~EntityManager()
+{
+	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
+	gameEventMessenger.unsubscribe("EntityManager", GameEvent::ClearMap);
 }
 
 const std::vector<std::unique_ptr<Entity>>& EntityManager::getEntities() const
@@ -74,9 +80,9 @@ void EntityManager::update(float deltaTime)
 {
 	for (auto& entity : m_entities)
 	{
-		entity.get()->update(deltaTime);
+		entity->update(deltaTime);
 	}
-
+	
 	handleQueue();
 	handleRemovals();
 }
@@ -112,5 +118,6 @@ void EntityManager::purgeEntities()
 {
 	m_entities.clear();
 	m_entityQueue.clear();
+	m_removals.clear();
 	m_entityCount = 0;
 }

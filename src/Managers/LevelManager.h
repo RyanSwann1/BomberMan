@@ -9,15 +9,22 @@ class LevelManager : private EntityManagerLocator
 {
 public:
 	LevelManager();
+	~LevelManager();
 
-	void draw(sf::RenderWindow& window);
 	const Level& getCurrentLevel() const;
+	void draw(sf::RenderWindow& window);
+	void update();
 
 private:
-	std::vector<std::unique_ptr<Level>> m_levels;
+	std::unique_ptr<Level> m_level;
 	std::vector<FileDirectory> m_levelDirectories;
-	Level* m_currentLevel;
 	int m_currentLevelIndex;
+	bool m_loadNextLevel;
+	bool m_reloadCurrentLevel;
 
 	void loadNextLevel();
+	void parseLevel();
+
+	void setToLoadNextLevel();
+	void setToReloadCurrentLevel();
 };

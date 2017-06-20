@@ -2,8 +2,9 @@
 
 enum class AudioClipName
 {
-	PlantBomb = 0,
+	PlaceBomb = 0,
 	BombExplode,
 	CrateExplode,
-	EnemyDeath
+	EnemyDeath,
+	PlayerDeath
 };
