@@ -15,7 +15,9 @@ EntityManager::EntityFactory::EntityFactory(EntityManager * entityManager)
 	registerEntity<Player>("Player", entityManager);
 	registerEntity<Bomb>("Bomb", entityManager);
 	registerEntity<Explosion>("Explosion", entityManager);
-	registerEntity<Enemy>("Enemy", entityManager);
+	registerEntity<Enemy>("Enemy1", entityManager);
+	registerEntity<Enemy>("Enemy2", entityManager);
+	registerEntity<Enemy>("Enemy3", entityManager);
 	registerEntity<Crate>("Crate", entityManager);
 }
 

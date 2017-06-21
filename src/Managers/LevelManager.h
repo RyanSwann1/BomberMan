@@ -11,7 +11,7 @@ public:
 	LevelManager();
 	~LevelManager();
 
-	const Level& getCurrentLevel() const;
+	const std::unique_ptr<Level>& getCurrentLevel() const;
 	void draw(sf::RenderWindow& window);
 	void update();
 

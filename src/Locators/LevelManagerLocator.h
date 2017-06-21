@@ -10,9 +10,9 @@ public:
 		m_levelManager = &levelManager;
 	}
 
-
 	static const LevelManager& getLevelManager()
 	{
+		assert(m_levelManager);
 		return *m_levelManager;
 	}
 

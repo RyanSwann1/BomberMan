@@ -28,7 +28,8 @@ void Player::update(float deltaTime)
 	{
 		m_velocity.y += m_speed.y * deltaTime;
 	}
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 	{
 		if (m_bombPlacementTimer.isExpired())
 		{
