@@ -14,7 +14,7 @@ Entity::Entity(const std::string& entityName, const sf::Vector2f& entityPosition
 	m_name(entityName)
 {
 	const auto& level = LevelManagerLocator::getLevelManager().getCurrentLevel();
-	const int tileSize = level.getTileSize();
+	const int tileSize = level->getTileSize();
 	m_AABB.width = tileSize / 2;
 	m_AABB.height = tileSize / 2;
 	updateAABB();

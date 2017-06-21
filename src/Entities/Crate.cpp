@@ -1,6 +1,8 @@
 #include "Crate.h"
 #include "CollisionHandler.h"
 #include <Managers\EntityManager.h>
+#include <Managers\LevelManager.h>
+#include <Locators\LevelManagerLocator.h>
 
 Crate::Crate(const std::string & name, const sf::Vector2f & position, EntityManager & entityManager, int entityID)
 	: Entity(name, position, entityManager, entityID)

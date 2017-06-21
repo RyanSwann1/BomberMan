@@ -51,10 +51,10 @@ void LevelManager::update()
 	}
 }
 
-const Level & LevelManager::getCurrentLevel() const
+const std::unique_ptr<Level>& LevelManager::getCurrentLevel() const
 {
 	assert(m_level.get());
-	return *m_level;
+	return m_level;
 }
 
 void LevelManager::loadNextLevel()

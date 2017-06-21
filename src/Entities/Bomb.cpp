@@ -32,7 +32,9 @@ void Bomb::handleEntityCollision(const std::unique_ptr<Entity>& entity, const sf
 
 void Bomb::explode()
 {
-	const auto explosionSpawnPositions = GameLogic::explosionSpawnPositions(m_position, LevelManagerLocator::getLevelManager().getCurrentLevel());
+	const auto& currentLevel = LevelManagerLocator::getLevelManager().getCurrentLevel();
+	const auto explosionSpawnPositions = GameLogic::explosionSpawnPositions(m_position, m_entityManager, currentLevel);
+	
 	for (const auto& spawnPosition : explosionSpawnPositions)
 	{
 		m_entityManager.addEntity("Explosion", spawnPosition);

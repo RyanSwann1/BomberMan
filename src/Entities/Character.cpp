@@ -30,22 +30,7 @@ void Character::handleEntityCollision(const std::unique_ptr<Entity>& entity, con
 {
 	if (entity->getName() == "Crate")
 	{
-		if (m_velocity.x < 0.f)
-		{
-			m_velocity.x += intersection.width;
-		}
-		else if (m_velocity.x > 0.f)
-		{
-			m_velocity.x -= intersection.width;
-		}
-		if (m_velocity.y < 0.f)
-		{
-			m_velocity.y += intersection.height;
-		}
-		else if (m_velocity.y > 0.f)
-		{
-			m_velocity.y -= intersection.height;
-		}
+		CollisionHandler::clampMovement(intersection, m_velocity);
 	}
 	else if (entity->getName() == "Explosion")
 	{
@@ -129,7 +114,7 @@ void Character::placeBomb()
 		return;
 	}
 
-	const int tileSize = LevelManagerLocator::getLevelManager().getCurrentLevel().getTileSize();
+	const int tileSize = LevelManagerLocator::getLevelManager().getCurrentLevel()->getTileSize();
 	sf::Vector2f bombSpawnPosition;
 	bombSpawnPosition.x = std::floor((m_position.x + tileSize / 2.0f) / tileSize);
 	bombSpawnPosition.y = std::floor((m_position.y + tileSize / 2.0f) / tileSize);
