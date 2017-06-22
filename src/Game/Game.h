@@ -22,12 +22,12 @@ public:
 	void lateUpdate();
 
 private:
+	MessageHandler<GameEvent> m_gameEventMessenger;
 	Window m_window;
-	StateManager m_stateManager;
 	TextureManager m_textureManager;
 	AudioClipManager m_audioClipManager;
 	AudioClipPlayer m_audioClipPlayer;
-	MessageHandler<GameEvent> m_gameEventMessenger;
+	StateManager m_stateManager;
 	sf::Clock m_clock;
 	sf::Time m_timeElasped;
 };

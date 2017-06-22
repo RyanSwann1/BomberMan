@@ -26,11 +26,21 @@ const TileSheet& TileSheetManager::getTileSheet(int tileID) const
 	//Get appropriate tilesheet with requested tileID
 	for (auto iter = m_tileSheets.cbegin(); iter != m_tileSheets.cend();)
 	{
+		if (tileID == 0)
+		{
+			tileSheet = &m_tileSheets.begin()->second;
+			break;
+		}
+
 		const int firstGID = iter->second.m_firstGID;
 		const int tile = (tileID - firstGID);
 		if (tile >= 0)
 		{
 			tileSheet = &iter->second;
+		}
+		if (tileID == 0)
+		{
+			int i = 0;
 		}
 		++iter;
 	}
