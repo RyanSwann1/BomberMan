@@ -4,7 +4,7 @@
 #include <Managers\StateManager.h>
 
 GameManager::GameManager()
-	: m_enemiesRemaining(3)
+	: m_enemiesRemaining(1)
 {
 	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
 	gameEventMessenger.subscribe(std::bind(&GameManager::winGame, this), "GameManager", GameEvent::WinGame);

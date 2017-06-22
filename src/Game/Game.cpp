@@ -4,12 +4,12 @@
 #include <assert.h>
 
 Game::Game()
-	: m_window("BomberMan", sf::Vector2i(336, 336)),
-	m_stateManager(),
+	: m_gameEventMessenger(),
+	m_window("BomberMan", sf::Vector2i(336, 336)),
 	m_textureManager(),
 	m_audioClipManager(),
 	m_audioClipPlayer(),
-	m_gameEventMessenger(),
+	m_stateManager(),
 	m_clock(),
 	m_timeElasped()
 {

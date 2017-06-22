@@ -14,28 +14,30 @@ TileSheet::TileSheet(std::string&& tileSheetName, int tileSize, int columns, int
 
 sf::IntRect TileSheet::getTileLocation(int tileID) const
 {
-	//Scan through every tile on tilesheet to find appropriate tile by ID
-	int column = 0, row = 0;
-	const int lastTileID = m_columns * m_rows;
-	for (int i = 0; i < lastTileID; i++)
-	{
-		//If matching tile found
-		if (tileID == i)
-		{
-			break;
-		}
+	const int row = tileID / m_columns;
+	const int column = tileID % m_columns;
 
-		++column;
-		
-		//Move onto the next row
-		if (column == m_columns)
-		{
-			column = 0;
-			++row;
-		}
-	}
+	//Kept here for profiling 
 
-	assert(tileID <= lastTileID);
+	////Scan through every tile on tilesheet to find appropriate tile by ID
+	//int column = 0, row = 0;
+	//const int lastTileID = m_columns * m_rows;
+	//for (int i = 0; i < lastTileID; i++)
+	//{
+	//	//If matching tile found
+	//	if (tileID == i)
+	//	{
+	//		break;
+	//	}
+	//	++column;
+	//	
+	//	//Move onto the next row
+	//	if (column == m_columns)
+	//	{
+	//		column = 0;
+	//		++row;
+	//	}
+	//}
 
 	return sf::IntRect((m_margin + (m_spacing + m_tileSize) * column),
 		(m_margin + (m_spacing + m_tileSize) * row),
