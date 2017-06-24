@@ -11,7 +11,7 @@
 
 LevelManager::LevelManager()
 	: m_level(),
-	m_levelDirectories(Utilities::getFileDirectories("res/Maps.txt")),
+	m_levelDirectories(Utilities::getFileDirectories(Utilities::getResourceDirectory() + "Maps.txt")),
 	m_currentLevelIndex(0),
 	m_loadNextLevel(false),
 	m_reloadCurrentLevel(false)

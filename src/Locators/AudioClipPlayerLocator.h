@@ -1,21 +1,21 @@
 #pragma once
 
 #include <assert.h>
-class AudioClipPlayer;
+class AudioPlayer;
 class AudioClipPlayerLocator
 {
 public:
-	static void provide(AudioClipPlayer& audioClipPlayer)
+	static void provide(AudioPlayer& audioClipPlayer)
 	{
 		m_audioClipPlayer = &audioClipPlayer;
 	}
 
-	static AudioClipPlayer& getAudioClipPlayer()
+	static AudioPlayer& getAudioClipPlayer()
 	{
 		assert(m_audioClipPlayer);
 		return *m_audioClipPlayer;
 	}
 
 private:
-	static AudioClipPlayer* m_audioClipPlayer;
+	static AudioPlayer* m_audioClipPlayer;
 };

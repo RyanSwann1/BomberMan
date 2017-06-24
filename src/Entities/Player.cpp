@@ -1,7 +1,7 @@
 #include "Player.h"
 #include <Game\MessageHandler.h>
 #include <Locators\GameEventMessengerLocator.h>
-#include <Audio\AudioClipPlayer.h>
+#include <Audio\AudioPlayer.h>
 #include <Locators\AudioClipPlayerLocator.h>
 #include <Audio\AudioClipName.h>
 #include <math.h>
@@ -33,7 +33,7 @@ void Player::update(float deltaTime)
 	{
 		if (m_bombPlacementTimer.isExpired())
 		{
-			AudioClipPlayerLocator::getAudioClipPlayer().playSound(AudioClipName::PlaceBomb);
+			AudioClipPlayerLocator::getAudioClipPlayer().playAudioClip(AudioClipName::PlaceBomb);
 			placeBomb();
 		}
 	}
@@ -49,7 +49,7 @@ void Player::handleEntityCollision(const std::unique_ptr<Entity>& entity, const 
 	{
 		if (m_lives <= 0)
 		{
-			AudioClipPlayerLocator::getAudioClipPlayer().playSound(AudioClipName::PlayerDeath);
+			AudioClipPlayerLocator::getAudioClipPlayer().playAudioClip(AudioClipName::PlayerDeath);
 			GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::ReloadCurrentLevel);
 		}
 	}

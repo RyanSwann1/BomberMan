@@ -140,7 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\Audio\AudioClipPlayer.cpp" />
+    <ClCompile Include="..\src\Audio\AudioPlayer.cpp" />
     <ClCompile Include="..\src\Entities\Bomb.cpp" />
     <ClCompile Include="..\src\Entities\Character.cpp" />
     <ClCompile Include="..\src\Entities\CollisionHandler.cpp" />
@@ -187,7 +187,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Audio\AudioClipName.h" />
-    <ClInclude Include="..\src\Audio\AudioClipPlayer.h" />
+    <ClInclude Include="..\src\Audio\AudioPlayer.h" />
+    <ClInclude Include="..\src\Audio\MusicName.h" />
     <ClInclude Include="..\src\Entities\Bomb.h" />
     <ClInclude Include="..\src\Entities\Character.h" />
     <ClInclude Include="..\src\Entities\CollisionHandler.h" />

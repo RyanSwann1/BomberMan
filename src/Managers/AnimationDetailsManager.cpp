@@ -1,11 +1,12 @@
 #include "AnimationDetailsManager.h"
 #include "Locators\AnimationDetailsManagerLocator.h"
+#include <Utilities\Utilities.h>
 #include <assert.h>
 #include <sstream>
 #include <fstream>
 
 AnimationDetailsManager::AnimationDetailsManager()
-	: m_animationDetails(loadInAnimationDetails("res/Animations.txt"))
+	: m_animationDetails(loadInAnimationDetails(Utilities::getResourceDirectory() + "Animations.txt"))
 {
 	AnimationDetailsManagerLocator::provide(*this);
 	

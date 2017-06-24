@@ -6,5 +6,6 @@ enum class AudioClipName
 	BombExplode,
 	CrateExplode,
 	EnemyDeath,
-	PlayerDeath
+	PlayerDeath,
+	Victory
 };

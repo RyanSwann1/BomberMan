@@ -40,7 +40,7 @@ void StateManager::switchToState(StateType stateType)
 		createState(stateType);
 		return;
 	}
-
+	
 	m_stateQueue.push_back(stateType);
 }
 
@@ -85,6 +85,7 @@ void StateManager::handleRemovals()
 
 void StateManager::createState(StateType stateType)
 {
-	m_states.emplace_back(m_stateFactory.getState(stateType));
-	m_currentState = m_states.back().get();
+	auto& newState = m_stateFactory.getState(stateType);
+	m_currentState = newState.get();
+	m_states.emplace_back(std::move(newState));
 }

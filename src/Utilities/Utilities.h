@@ -6,7 +6,6 @@
 class FileDirectory;
 namespace Utilities
 {
-	void initialize();
-
+	const std::string& getResourceDirectory();
 	std::vector<FileDirectory> getFileDirectories(const std::string& fileName);
 }
