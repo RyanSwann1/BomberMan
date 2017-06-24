@@ -11,7 +11,6 @@ class StateGame : public StateBase
 {
 public:
 	StateGame(StateType stateType);
-	virtual ~StateGame();
 
 	void update(float deltaTime) override;
 	void draw(sf::RenderWindow& window) override;

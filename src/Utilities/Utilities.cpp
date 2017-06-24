@@ -3,6 +3,13 @@
 #include <fstream>
 #include <sstream>
 #include <assert.h>
+
+const std::string m_resourceDirectory("res/");
+
+const std::string & Utilities::getResourceDirectory()
+{
+	return m_resourceDirectory;
+}
 std::vector<FileDirectory> Utilities::getFileDirectories(const std::string & fileName)
 {
 	std::vector<FileDirectory> fileDirectories;

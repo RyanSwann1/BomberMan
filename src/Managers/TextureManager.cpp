@@ -3,7 +3,7 @@
 #include <Locators\TextureManagerLocator.h>
 
 TextureManager::TextureManager()
-	: ResourceManager(Utilities::getFileDirectories("res/Textures.txt"))
+	: ResourceManager(Utilities::getFileDirectories(Utilities::getResourceDirectory() + "Textures.txt"))
 {
 	TextureManagerLocator::provide(*this);
 }

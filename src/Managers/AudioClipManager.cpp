@@ -2,7 +2,7 @@
 #include <Locators\AudioClipManagerLocator.h>
 
 AudioClipManager::AudioClipManager()
-	: ResourceManager(Utilities::getFileDirectories("res/AudioClips.txt"))
+	: ResourceManager(Utilities::getFileDirectories(Utilities::getResourceDirectory() + "AudioClips.txt"))
 {
 	AudioClipManagerLocator::provide(*this);
 }

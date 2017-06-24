@@ -6,6 +6,5 @@ enum class GameEvent
 	ReloadCurrentLevel,
 	ChangeToNextLevel,
 	WinGame,
-	EnemyDeath,
-	PlayerDeath
+	EnemyDeath
 };

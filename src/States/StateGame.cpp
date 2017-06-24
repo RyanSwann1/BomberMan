@@ -1,4 +1,9 @@
 #include <States\StateGame.h>
+#include <Audio\AudioPlayer.h>
+#include <Locators\AudioClipPlayerLocator.h>
+#include <Locators\GameEventMessengerLocator.h>
+#include <Game\MessageHandler.h>
+#include <Game\GameEvent.h>
 #include <iostream>
 
 StateGame::StateGame(StateType stateType)
@@ -9,10 +14,7 @@ StateGame::StateGame(StateType stateType)
 	m_gameManager()
 {
 	std::cout << "You have entered the game.\n";
-}
-
-StateGame::~StateGame()
-{
+	AudioClipPlayerLocator::getAudioClipPlayer().playMusic("LevelMusic.wav");
 }
 
 void StateGame::update(float deltaTime)

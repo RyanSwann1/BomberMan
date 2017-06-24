@@ -5,7 +5,7 @@
 #include <Game\GameLogic.h>
 #include "CollisionHandler.h"
 #include <Locators\AudioClipPlayerLocator.h>
-#include <Audio\AudioClipPlayer.h>
+#include <Audio\AudioPlayer.h>
 
 Bomb::Bomb(const std::string & name, const sf::Vector2f & position, EntityManager & entityManager, int entityID)
 	: Entity(name, position, entityManager, entityID)
@@ -38,7 +38,7 @@ void Bomb::explode()
 	for (const auto& spawnPosition : explosionSpawnPositions)
 	{
 		m_entityManager.addEntity("Explosion", spawnPosition);
-		AudioClipPlayerLocator::getAudioClipPlayer().playSound(AudioClipName::BombExplode);
+		AudioClipPlayerLocator::getAudioClipPlayer().playAudioClip(AudioClipName::BombExplode);
 	}
 
 	m_entityManager.removeEntity(Entity::getID());

@@ -1,2 +1,2 @@
 #include "AudioClipPlayerLocator.h"
-AudioClipPlayer* AudioClipPlayerLocator::m_audioClipPlayer = nullptr;
+AudioPlayer* AudioClipPlayerLocator::m_audioClipPlayer = nullptr;
