@@ -1,14 +1,16 @@
 #include "StateManager.h"
 #include <States\StateGame.h>
-#include <States\StateWinGame.h>
+#include <States\StateGameCompleted.h>
+#include <States\StateRoundCompleted.h>
 #include <Locators\StateManagerLocator.h>
 #include <algorithm>
 
 //StateFactory
-StateManager::StateFactory::StateFactory()
+StateManager::StateFactory::StateFactory(StateManager* stateManager)
 {
-	registerState<StateGame>(StateType::Game);
-	registerState<StateWinGame>(StateType::WinGame);
+	registerState<StateGame>(stateManager, StateType::Game);
+	registerState<StateGameCompleted>(stateManager, StateType::GameCompleted);
+	registerState<StateRoundCompleted>(stateManager, StateType::RoundCompleted);
 }
 
 std::unique_ptr<StateBase> StateManager::StateFactory::getState(StateType stateType) const
@@ -18,8 +20,9 @@ std::unique_ptr<StateBase> StateManager::StateFactory::getState(StateType stateT
 	return iter->second();
 }
 
+//StateManager
 StateManager::StateManager()
-	: m_stateFactory(),
+	: m_stateFactory(this),
 	m_states(),
 	m_stateQueue(),
 	m_removals(),
@@ -28,20 +31,29 @@ StateManager::StateManager()
 	StateManagerLocator::provide(*this);
 }
 
-void StateManager::removeState(StateType stateType)
+void StateManager::removeState(StateType stateToRemove)
 {
-	m_removals.push_back(stateType);
+	m_removals.push_back(stateToRemove);
 }
 
-void StateManager::switchToState(StateType stateType)
+void StateManager::switchToState(StateType stateToSwitch)
 {
 	if (m_states.empty())
 	{
-		createState(stateType);
+		createState(stateToSwitch);
 		return;
 	}
+
+	for (const auto& state : m_states)
+	{
+		if (state->getType() == stateToSwitch)
+		{
+			m_currentState = state.get();
+			return;
+		}
+	}
 	
-	m_stateQueue.push_back(stateType);
+	m_stateQueue.push_back(stateToSwitch);
 }
 
 void StateManager::update(float deltaTime)
@@ -83,9 +95,9 @@ void StateManager::handleRemovals()
 	}
 }
 
-void StateManager::createState(StateType stateType)
+void StateManager::createState(StateType stateToCreate)
 {
-	auto& newState = m_stateFactory.getState(stateType);
+	auto& newState = m_stateFactory.getState(stateToCreate);
 	m_currentState = newState.get();
 	m_states.emplace_back(std::move(newState));
 }

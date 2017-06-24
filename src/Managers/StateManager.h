@@ -12,7 +12,7 @@ class StateManager
 	class StateFactory
 	{
 	public:
-		StateFactory();
+		StateFactory(StateManager* stateManager);
 
 		std::unique_ptr<StateBase> getState(StateType stateType) const;
 
@@ -20,12 +20,12 @@ class StateManager
 		std::unordered_map<StateType, std::function<std::unique_ptr<StateBase>()>> m_stateFactory;
 
 		template <class State>
-		void registerState(StateType stateType)
+		void registerState(StateManager* stateManager, StateType stateType)
 		{
 			assert(m_stateFactory.find(stateType) == m_stateFactory.cend());
-			m_stateFactory.emplace(stateType, [stateType]() -> std::unique_ptr<StateBase>
+			m_stateFactory.emplace(stateType, [stateManager, stateType]() -> std::unique_ptr<StateBase>
 			{
-				return std::make_unique<State>(stateType);
+				return std::make_unique<State>(*stateManager, stateType);
 			});
 		}
 	};
@@ -37,8 +37,8 @@ public:
 	StateManager(StateManager&&) = delete;
 	StateManager&& operator=(StateManager&&) = delete;
 
-	void removeState(StateType stateType);
-	void switchToState(StateType stateType);
+	void removeState(StateType stateToRemove);
+	void switchToState(StateType stateToSwitch);
 	void update(float deltaTime);
 	void draw(sf::RenderWindow& window);
 
@@ -51,5 +51,5 @@ private:
 
 	void handleQueue();
 	void handleRemovals();
-	void createState(StateType stateType);
+	void createState(StateType stateToCreate);
 };

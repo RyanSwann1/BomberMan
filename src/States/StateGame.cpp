@@ -1,20 +1,19 @@
 #include <States\StateGame.h>
 #include <Audio\AudioPlayer.h>
-#include <Locators\AudioClipPlayerLocator.h>
+#include <Locators\AudioPlayerLocator.h>
 #include <Locators\GameEventMessengerLocator.h>
 #include <Game\MessageHandler.h>
 #include <Game\GameEvent.h>
 #include <iostream>
 
-StateGame::StateGame(StateType stateType)
-	: StateBase(stateType),
+StateGame::StateGame(StateManager& stateManager, StateType stateType)
+	: StateBase(stateManager, stateType),
 	m_tileSheetManager(),
 	m_entityManager(),
 	m_levelManager(),
 	m_gameManager()
 {
 	std::cout << "You have entered the game.\n";
-	AudioClipPlayerLocator::getAudioClipPlayer().playMusic("LevelMusic.wav");
 }
 
 void StateGame::update(float deltaTime)

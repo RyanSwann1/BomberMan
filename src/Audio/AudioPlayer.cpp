@@ -1,7 +1,7 @@
 #include "AudioPlayer.h"
 #include <Utilities\Utilities.h>
 #include <Managers\AudioClipManager.h>
-#include <Locators\AudioClipPlayerLocator.h>
+#include <Locators\AudioPlayerLocator.h>
 #include <Game\MessageHandler.h>
 #include <Locators\GameEventMessengerLocator.h>
 #include <Game\GameEvent.h>
@@ -22,11 +22,12 @@ AudioPlayer::AudioClip::~AudioClip()
 //AudioClipPlayer
 AudioPlayer::AudioPlayer()
 {
-	AudioClipPlayerLocator::provide(*this);
+	AudioPlayerLocator::provide(*this);
 	m_audioClips.emplace(AudioClipName::BombExplode, "BombExplode");
 	m_audioClips.emplace(AudioClipName::EnemyDeath, "EnemyDeath");
 	m_audioClips.emplace(AudioClipName::PlayerDeath, "PlayerDeath");
 	m_audioClips.emplace(AudioClipName::PlaceBomb, "PlaceBomb");
+	m_audioClips.emplace(AudioClipName::Victory, "Victory");
 }
 
 void AudioPlayer::playAudioClip(AudioClipName audioName)
@@ -43,6 +44,11 @@ void AudioPlayer::playMusic(const std::string & musicName)
 	
 	m_music.openFromFile(Utilities::getResourceDirectory() + musicName);
 	m_music.play();
+}
+
+void AudioPlayer::stopMusic()
+{
+	m_music.stop();
 }
 
 void AudioPlayer::update()

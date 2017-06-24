@@ -3,5 +3,6 @@
 enum class StateType
 {
 	Game = 0,
-	WinGame
+	GameCompleted,
+	RoundCompleted
 };

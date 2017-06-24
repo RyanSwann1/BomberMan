@@ -5,6 +5,8 @@
 #include <Utilities\Utilities.h>
 #include <Game\MessageHandler.h>
 #include <Locators\GameEventMessengerLocator.h>
+#include <Locators\AudioPlayerLocator.h>
+#include <Audio\AudioPlayer.h>
 #include <assert.h>
 #include <utility>
 #include <algorithm>
@@ -63,6 +65,7 @@ void LevelManager::loadNextLevel()
 	{
 		++m_currentLevelIndex;
 		parseLevel();
+		AudioPlayerLocator::getAudioClipPlayer().playMusic("LevelMusic.wav");
 	}
 	else
 	{
