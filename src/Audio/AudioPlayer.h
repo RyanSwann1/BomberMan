@@ -2,7 +2,6 @@
 
 #include <Locators\AudioClipManagerLocator.h>
 #include "AudioClipName.h"
-#include "MusicName.h"
 #include <EventQueue.h>
 #include <SFML\Audio.hpp>
 #include <unordered_map>
@@ -25,6 +24,7 @@ public:
 	
 	void playAudioClip(AudioClipName audioName);
 	void playMusic(const std::string& musicName);
+	void stopMusic();
 
 	void update();
 

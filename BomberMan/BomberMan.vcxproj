@@ -157,7 +157,7 @@
     <ClCompile Include="..\src\Level\TileLayer.cpp" />
     <ClCompile Include="..\src\Locators\AnimationDetailsManagerLocator.cpp" />
     <ClCompile Include="..\src\Locators\AudioClipManagerLocator.cpp" />
-    <ClCompile Include="..\src\Locators\AudioClipPlayerLocator.cpp" />
+    <ClCompile Include="..\src\Locators\AudioPlayerLocator.cpp" />
     <ClCompile Include="..\src\Locators\EntityManagerLocator.cpp" />
     <ClCompile Include="..\src\Locators\GameEventMessengerLocator.cpp" />
     <ClCompile Include="..\src\Locators\LevelManagerLocator.cpp" />
@@ -174,7 +174,8 @@
     <ClCompile Include="..\src\Managers\TextureManager.cpp" />
     <ClCompile Include="..\src\Managers\TileSheetManager.cpp" />
     <ClCompile Include="..\src\States\StateGame.cpp" />
-    <ClCompile Include="..\src\States\StateWinGame.cpp" />
+    <ClCompile Include="..\src\States\StateRoundCompleted.cpp" />
+    <ClCompile Include="..\src\States\StateGameCompleted.cpp" />
     <ClCompile Include="..\src\Tile\AnimationPlayer.cpp" />
     <ClCompile Include="..\src\Tile\Tile.cpp" />
     <ClCompile Include="..\src\Tile\TileSheet.cpp" />
@@ -188,7 +189,6 @@
   <ItemGroup>
     <ClInclude Include="..\src\Audio\AudioClipName.h" />
     <ClInclude Include="..\src\Audio\AudioPlayer.h" />
-    <ClInclude Include="..\src\Audio\MusicName.h" />
     <ClInclude Include="..\src\Entities\Bomb.h" />
     <ClInclude Include="..\src\Entities\Character.h" />
     <ClInclude Include="..\src\Entities\CollisionHandler.h" />
@@ -209,7 +209,7 @@
     <ClInclude Include="..\src\Level\TileLayer.h" />
     <ClInclude Include="..\src\Locators\AnimationDetailsManagerLocator.h" />
     <ClInclude Include="..\src\Locators\AudioClipManagerLocator.h" />
-    <ClInclude Include="..\src\Locators\AudioClipPlayerLocator.h" />
+    <ClInclude Include="..\src\Locators\AudioPlayerLocator.h" />
     <ClInclude Include="..\src\Locators\EntityManagerLocator.h" />
     <ClInclude Include="..\src\Locators\GameEventMessengerLocator.h" />
     <ClInclude Include="..\src\Locators\LevelManagerLocator.h" />
@@ -228,7 +228,8 @@
     <ClInclude Include="..\src\States\StateBase.h" />
     <ClInclude Include="..\src\States\StateGame.h" />
     <ClInclude Include="..\src\States\StateType.h" />
-    <ClInclude Include="..\src\States\StateWinGame.h" />
+    <ClInclude Include="..\src\States\StateRoundCompleted.h" />
+    <ClInclude Include="..\src\States\StateGameCompleted.h" />
     <ClInclude Include="..\src\Tile\AnimationPlayer.h" />
     <ClInclude Include="..\src\Tile\Tile.h" />
     <ClInclude Include="..\src\Tile\TileSheet.h" />

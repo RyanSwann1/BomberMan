@@ -1,6 +1,6 @@
 #include "Enemy.h"
 #include <Managers\EntityManager.h>
-#include <Locators\AudioClipPlayerLocator.h>
+#include <Locators\AudioPlayerLocator.h>
 #include <Locators\GameEventMessengerLocator.h>
 #include <Game\MessageHandler.h>
 #include <Audio\AudioPlayer.h>
@@ -16,7 +16,7 @@ void Enemy::handleEntityCollision(const std::unique_ptr<Entity>& entity, const s
 	{
 		if(m_lives <= 0)
 		{
-			AudioClipPlayerLocator::getAudioClipPlayer().playAudioClip(AudioClipName::EnemyDeath);
+			AudioPlayerLocator::getAudioClipPlayer().playAudioClip(AudioClipName::EnemyDeath);
 			GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::EnemyDeath);
 		}
 	}

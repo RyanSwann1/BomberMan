@@ -10,7 +10,7 @@
 class StateGame : public StateBase
 {
 public:
-	StateGame(StateType stateType);
+	StateGame(StateManager& stateManager, StateType stateType);
 
 	void update(float deltaTime) override;
 	void draw(sf::RenderWindow& window) override;

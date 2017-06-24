@@ -2,20 +2,20 @@
 
 #include <assert.h>
 class AudioPlayer;
-class AudioClipPlayerLocator
+class AudioPlayerLocator
 {
 public:
 	static void provide(AudioPlayer& audioClipPlayer)
 	{
-		m_audioClipPlayer = &audioClipPlayer;
+		m_audioPlayer = &audioClipPlayer;
 	}
 
 	static AudioPlayer& getAudioClipPlayer()
 	{
-		assert(m_audioClipPlayer);
-		return *m_audioClipPlayer;
+		assert(m_audioPlayer);
+		return *m_audioPlayer;
 	}
 
 private:
-	static AudioPlayer* m_audioClipPlayer;
+	static AudioPlayer* m_audioPlayer;
 };

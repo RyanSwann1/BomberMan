@@ -23,7 +23,7 @@ GameManager::~GameManager()
 void GameManager::winGame()
 {
 	auto& stateManager = StateManagerLocator::getStateManager();
-	stateManager.switchToState(StateType::WinGame);
+	stateManager.switchToState(StateType::GameCompleted);
 	stateManager.removeState(StateType::Game);
 }
 
@@ -33,7 +33,7 @@ void GameManager::decreaseEnemyCount()
 	if (!m_enemiesRemaining)
 	{
 		auto& stateManager = StateManagerLocator::getStateManager();
-		GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::ChangeToNextLevel);
+		stateManager.switchToState(StateType::RoundCompleted);
 	}
 }
 

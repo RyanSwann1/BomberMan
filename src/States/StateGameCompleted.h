@@ -2,10 +2,10 @@
 
 #include "StateBase.h"
 
-class StateWinGame : public StateBase
+class StateGameCompleted : public StateBase
 {
 public:
-	StateWinGame(StateType stateType);
+	StateGameCompleted(StateManager& stateManager, StateType stateType);
 
 	void update(float deltaTime) override;
 	void draw(sf::RenderWindow& window) override;
