@@ -15,7 +15,7 @@ public:
 	const sf::Vector2f& getPosition() const;
 	int getID() const;
 	
-	void draw(sf::RenderWindow& window);
+	virtual void draw(sf::RenderWindow& window);
 	virtual void update(float deltaTime);
 	virtual void handleEntityCollision(const std::unique_ptr<Entity>& entity, const sf::FloatRect& intersection) {}
 	
