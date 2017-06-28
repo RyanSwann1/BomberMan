@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="21" height="21" tilewidth="16" tileheight="16" nextobjectid="211">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="21" height="21" tilewidth="16" tileheight="16" nextobjectid="213">
  <tileset firstgid="1" name="bomb_party_v4" tilewidth="16" tileheight="16" tilecount="285" columns="15">
   <image source="bomb_party_v4.png" trans="aa0000" width="240" height="304"/>
  </tileset>
@@ -42,8 +42,6 @@
   <object id="180" name="Crate" gid="205" x="160" y="224" width="16" height="16"/>
   <object id="181" name="Crate" gid="205" x="112" y="272" width="16" height="16"/>
   <object id="182" name="Enemy1" gid="242" x="64" y="272" width="16" height="16"/>
-  <object id="183" name="Enemy2" gid="227" x="256" y="272" width="16" height="16"/>
-  <object id="184" name="Enemy3" gid="212" x="256" y="80" width="16" height="16"/>
  </objectgroup>
  <objectgroup name="Collision Layer" opacity="0.45">
   <object id="2" gid="286" x="48" y="64" width="16" height="16"/>

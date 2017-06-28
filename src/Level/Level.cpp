@@ -11,6 +11,7 @@ Level::Level(std::vector<TileLayer>&& tileLayers, std::vector<sf::Vector2i>&& co
 	m_levelSize(levelSize),
 	m_tileSize(tileSize)
 {
+
 }
 
 void Level::draw(sf::RenderWindow& window)
@@ -19,6 +20,11 @@ void Level::draw(sf::RenderWindow& window)
 	{
 		tileLayer.draw(window);
 	}
+}
+
+const sf::Vector2i & Level::getSize() const
+{
+	return m_levelSize;
 }
 
 const std::string & Level::getName() const

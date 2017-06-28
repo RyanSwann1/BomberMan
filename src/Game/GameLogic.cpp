@@ -83,3 +83,19 @@ std::vector<sf::Vector2f> GameLogic::explosionSpawnPositions(const sf::Vector2f 
 
 	return explosionSpawnPositions;
 }
+
+const sf::Vector2f & GameLogic::getPlayerPosition(const EntityManager & entityManager)
+{
+	const auto& entities = entityManager.getEntities();
+	auto iter = std::find_if(entities.cbegin(), entities.cend(), [](const auto& entity) {return entity->getName() == "Player"; });
+	assert(iter != entities.cend());
+	return iter->get()->getPosition();
+}
+
+const sf::Vector2f & GameLogic::getEntityPosition(const EntityManager & entityManager, const std::string & entityName)
+{
+	const auto& entities = entityManager.getEntities();
+	auto iter = std::find_if(entities.cbegin(), entities.cend(), [&entityName](const auto& entity) {return entity->getName() == entityName; });
+	assert(iter != entities.cend());
+	return iter->get()->getPosition();
+}
