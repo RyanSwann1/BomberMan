@@ -7,6 +7,7 @@ public:
 	Level(std::vector<TileLayer>&& tileLayers, std::vector<sf::Vector2i>&& collisionLayer, 
 		const std::string& levelName, const sf::Vector2i& levelSize, int tileSize);
 	
+	const sf::Vector2i& getSize() const;
 	const std::string& getName() const;
 	const std::vector<sf::Vector2i>& getCollisionLayer() const;
 	int getTileSize() const;

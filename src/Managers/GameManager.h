@@ -12,6 +12,7 @@ private:
 	int m_enemiesRemaining;
 
 	void winGame();
-	void decreaseEnemyCount();
+	void onEnemyDeath();
 	void resetEnemyCount();
+	void onPlayerDeath();
 };

@@ -1,5 +1,7 @@
 #include "AnimationDetailsManager.h"
 #include "Locators\AnimationDetailsManagerLocator.h"
+#include <Locators\AnimationNameConverterLocator.h>
+#include <Utilities\AnimationNameConverter.h>
 #include <Utilities\Utilities.h>
 #include <assert.h>
 #include <sstream>
@@ -8,28 +10,33 @@
 AnimationDetailsManager::AnimationDetailsManager()
 	: m_animationDetails(loadInAnimationDetails(Utilities::getResourceDirectory() + "Animations.txt"))
 {
-	AnimationDetailsManagerLocator::provide(*this);
-	
+	AnimationDetailsManagerLocator::provide(*this);	
 }
 
 const std::string & AnimationDetailsManager::getTileSheetName(const std::string & entityName) const
 {
 	auto iter = m_animationDetails.find(entityName);
 	assert(iter != m_animationDetails.cend());
+	
 	return iter->second.m_entityAnimationDetails.begin()->m_tileSheetName;
 }
 
-const AnimationDetailsManager::AnimationDetails & AnimationDetailsManager::getAnimationDetails(const std::string & entityName, const std::string& animationName) const
+const AnimationDetailsManager::AnimationDetails& AnimationDetailsManager::getAnimationDetails
+	(const std::string & entityName, AnimationName animationName) const
 {
 	auto iter = m_animationDetails.find(entityName);
 	assert(iter != m_animationDetails.cend());
+	
 	const auto& entityAnimationDetails = iter->second.m_entityAnimationDetails;
-	auto animationDetails = std::find_if(entityAnimationDetails.cbegin(), entityAnimationDetails.cend(), [&animationName](const auto& details) {return details.m_animationName == animationName; });
+	auto animationDetails = std::find_if(entityAnimationDetails.cbegin(), entityAnimationDetails.cend(), 
+		[animationName](const auto& details) {return details.m_animationName == animationName; });
 	assert(animationDetails != entityAnimationDetails.cend());
+
 	return *animationDetails;
 }
 
-std::unordered_map<std::string, AnimationDetailsManager::EntityAnimationDetails> AnimationDetailsManager::loadInAnimationDetails(const std::string & fileName) const
+std::unordered_map<std::string, AnimationDetailsManager::EntityAnimationDetails> 
+	AnimationDetailsManager::loadInAnimationDetails(const std::string & fileName) const
 {
 	std::ifstream file(fileName);
 	assert(file.is_open());
@@ -39,7 +46,10 @@ std::unordered_map<std::string, AnimationDetailsManager::EntityAnimationDetails>
 	while (std::getline(file, line))
 	{
 		std::stringstream keyStream(line);
-
+		if (line[0] == '|')
+		{
+			continue;
+		}
 		std::string entityName, spriteSheetName, animationName, direction;
 		int startID = 0, endID = 0;
 		float frameTime = 0;
@@ -49,16 +59,18 @@ std::unordered_map<std::string, AnimationDetailsManager::EntityAnimationDetails>
 		keyStream >> entityName >> spriteSheetName >> animationName >> direction >> startID >> endID >> frameTime >> repeatable 
 			>> drawLocationSize.x >> drawLocationSize.y >> reversible;
 
+		auto& animationNameConverter = AnimationNameConverterLocator::getAnimationNameConverter();
+		const auto convertedAnimationName = animationNameConverter->convertName(animationName);
 		auto iter = animationDetails.find(entityName);
 		if (iter != animationDetails.cend())
 		{
-			iter->second.m_entityAnimationDetails.emplace_back(std::move(spriteSheetName), std::move(animationName), 
+			iter->second.m_entityAnimationDetails.emplace_back(std::move(spriteSheetName), convertedAnimationName,
 				std::move(direction), startID, endID, frameTime, repeatable, drawLocationSize, reversible);
 		}
 		else
 		{
 			animationDetails.emplace(std::move(entityName), AnimationDetails(std::move(spriteSheetName), 
-				std::move(animationName), std::move(direction), startID, endID, frameTime, repeatable, drawLocationSize, reversible));
+				convertedAnimationName, std::move(direction), startID, endID, frameTime, repeatable, drawLocationSize, reversible));
 		}
 	}
 
@@ -70,5 +82,6 @@ const std::vector<AnimationDetailsManager::AnimationDetails>& AnimationDetailsMa
 {
 	auto iter = m_animationDetails.find(entityName);
 	assert(iter != m_animationDetails.cend());
+	
 	return iter->second.m_entityAnimationDetails;
 }

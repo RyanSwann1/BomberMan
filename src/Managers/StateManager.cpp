@@ -2,6 +2,7 @@
 #include <States\StateGame.h>
 #include <States\StateGameCompleted.h>
 #include <States\StateRoundCompleted.h>
+#include <States\StateRoundFailed.h>
 #include <Locators\StateManagerLocator.h>
 #include <algorithm>
 
@@ -11,6 +12,7 @@ StateManager::StateFactory::StateFactory(StateManager* stateManager)
 	registerState<StateGame>(stateManager, StateType::Game);
 	registerState<StateGameCompleted>(stateManager, StateType::GameCompleted);
 	registerState<StateRoundCompleted>(stateManager, StateType::RoundCompleted);
+	registerState<StateRoundFailed>(stateManager, StateType::RoundFailed);
 }
 
 std::unique_ptr<StateBase> StateManager::StateFactory::getState(StateType stateType) const
@@ -26,7 +28,7 @@ StateManager::StateManager()
 	m_states(),
 	m_stateQueue(),
 	m_removals(),
-	m_currentState(nullptr)
+	m_tempStateToAdd()
 {
 	StateManagerLocator::provide(*this);
 }
@@ -44,11 +46,12 @@ void StateManager::switchToState(StateType stateToSwitch)
 		return;
 	}
 
-	for (const auto& state : m_states)
+
+	for (auto iter = m_states.begin(); iter != m_states.end(); ++iter)
 	{
-		if (state->getType() == stateToSwitch)
+		if (iter->get()->getType() == stateToSwitch)
 		{
-			m_currentState = state.get();
+			m_tempStateToAdd = std::move(*iter);
 			return;
 		}
 	}
@@ -56,10 +59,18 @@ void StateManager::switchToState(StateType stateToSwitch)
 	m_stateQueue.push_back(stateToSwitch);
 }
 
+void StateManager::switchToAndRemoveState(StateType stateToSwitchTo, StateType stateToRemove)
+{
+	switchToState(stateToSwitchTo);
+	removeState(stateToRemove);
+}
+
 void StateManager::update(float deltaTime)
 {
-	assert(m_currentState);
-	m_currentState->update(deltaTime);
+	for (auto& state : m_states)
+	{
+		state->update(deltaTime);
+	}
 
 	handleQueue();
 	handleRemovals();
@@ -67,8 +78,10 @@ void StateManager::update(float deltaTime)
 
 void StateManager::draw(sf::RenderWindow & window)
 {
-	assert(m_currentState);
-	m_currentState->draw(window);
+	for (auto& state : m_states)
+	{
+		state->draw(window);
+	}
 }
 
 void StateManager::handleQueue()
@@ -78,18 +91,32 @@ void StateManager::handleQueue()
 		createState(*iter);
 		iter = m_stateQueue.erase(iter);
 	}
+
+	if (m_tempStateToAdd)
+	{
+		m_states.emplace_back(std::move(m_tempStateToAdd));
+		m_tempStateToAdd.release();
+	}
 }
 
 void StateManager::handleRemovals()
 {
+	for (auto iter = m_states.begin(); iter != m_states.end();)
+	{
+		if (!*iter)
+		{
+			iter = m_states.erase(iter);
+			continue;
+		}
+
+		++iter;
+	}
+
 	for (auto iter = m_removals.begin(); iter != m_removals.end();)
 	{
 		auto state = std::find_if(m_states.begin(), m_states.end(), [iter](const auto& state) {return state.get()->getType() == *iter; });
 		assert(state != m_states.cend());
-		if (m_currentState && m_currentState->getType() == *iter)
-		{
-			m_currentState = nullptr;
-		}
+
 		m_states.erase(state);
 		iter = m_removals.erase(iter);
 	}
@@ -98,6 +125,5 @@ void StateManager::handleRemovals()
 void StateManager::createState(StateType stateToCreate)
 {
 	auto& newState = m_stateFactory.getState(stateToCreate);
-	m_currentState = newState.get();
 	m_states.emplace_back(std::move(newState));
 }

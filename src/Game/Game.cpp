@@ -1,5 +1,6 @@
 #include "Game.h"
 #include <Utilities\Utilities.h>
+#include "DebugOverlay.h"
 #include <Locators\GameEventMessengerLocator.h>
 #include <assert.h>
 
@@ -31,7 +32,8 @@ void Game::update()
 
 void Game::draw()
 {
-	m_stateManager.draw(m_window.getWindow());
+	m_stateManager.draw(m_window.getRenderWindow());
+	DebugOverlay::draw(m_window.getRenderWindow());
 	m_window.display();
 }
 

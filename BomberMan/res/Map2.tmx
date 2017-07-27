@@ -41,7 +41,7 @@
   <object id="52" name="Crate" gid="205" x="208" y="208" width="16" height="16"/>
   <object id="53" name="Crate" gid="205" x="176" y="112" width="16" height="16"/>
   <object id="54" name="Crate" gid="205" x="144" y="272" width="16" height="16"/>
-  <object id="55" name="Crate" gid="205" x="112.667" y="121.333" width="16" height="16"/>
+  <object id="55" name="Crate" gid="205" x="112" y="128" width="16" height="16"/>
   <object id="59" name="Player" gid="257" x="256" y="272" width="16" height="16"/>
   <object id="60" name="Enemy1" gid="242" x="64" y="272" width="16" height="16"/>
   <object id="63" name="Enemy2" gid="227" x="64" y="80" width="16" height="16"/>

@@ -6,9 +6,10 @@
 #include <Audio\AudioClipName.h>
 #include <math.h>
 
-Player::Player(const std::string & name, const sf::Vector2f & position, EntityManager & entityManager, int entityID)
-	: Character(name, position, entityManager, entityID)
-{}
+Player::Player(const std::string& name, EntityTag tag, const sf::Vector2f & spawnPosition, EntityManager & entityManager, int ID)
+	: Character(name, tag, spawnPosition, entityManager, ID)
+{
+}
 
 void Player::update(float deltaTime)
 {
@@ -31,11 +32,7 @@ void Player::update(float deltaTime)
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 	{
-		if (m_bombPlacementTimer.isExpired())
-		{
-			AudioPlayerLocator::getAudioClipPlayer().playAudioClip(AudioClipName::PlaceBomb);
-			placeBomb();
-		}
+		placeBomb();	
 	}
 	
 	Character::update(deltaTime);
@@ -43,14 +40,15 @@ void Player::update(float deltaTime)
 
 void Player::handleEntityCollision(const std::unique_ptr<Entity>& entity, const sf::FloatRect & intersection)
 {
+	if (!m_lives)
+	{
+		return;
+	}
 	Character::handleEntityCollision(entity, intersection);
 
-	if (entity->getName() == "Explosion")
+	if (m_lives <= 0)
 	{
-		if (m_lives <= 0)
-		{
-			AudioPlayerLocator::getAudioClipPlayer().playAudioClip(AudioClipName::PlayerDeath);
-			GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::ReloadCurrentLevel);
-		}
+		AudioPlayerLocator::getAudioClipPlayer().playAudioClip(AudioClipName::PlayerDeath);
+		GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::PlayerDeath);
 	}
 }

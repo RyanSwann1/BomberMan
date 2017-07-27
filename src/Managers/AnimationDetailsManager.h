@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML\Graphics.hpp>
+#include <Animation\AnimationName.h>
 #include <unordered_map>
 #include <vector>
 #include <string>
@@ -10,10 +11,10 @@ class AnimationDetailsManager
 	class AnimationDetails
 	{
 	public:
-		AnimationDetails(std::string&& tileSheetName, std::string&& animationName, std::string&& animationDirection, int startID, int endID,
+		AnimationDetails(std::string&& tileSheetName, AnimationName name, std::string&& animationDirection, int startID, int endID,
 			float frameTime, bool repeatable, const sf::Vector2f& drawLocationSize, bool reversible)
 			: m_tileSheetName(std::move(tileSheetName)),
-			m_animationName(std::move(animationName)),
+			m_animationName(name),
 			m_animationDirection(std::move(animationDirection)),
 			m_startID(startID),
 			m_endID(endID),
@@ -24,7 +25,7 @@ class AnimationDetailsManager
 		{}
 	
 		const std::string m_tileSheetName;
-		const std::string m_animationName;
+		const AnimationName m_animationName;
 		const std::string m_animationDirection;
 		const int m_startID;
 		const int m_endID;
@@ -49,7 +50,7 @@ public:
 	AnimationDetailsManager();
 
 	const std::string& getTileSheetName(const std::string& entityName) const;
-	const AnimationDetails& getAnimationDetails(const std::string& entityName, const std::string& animationName) const;
+	const AnimationDetails& getAnimationDetails(const std::string& entityName, AnimationName animationName) const;
 	const std::vector<AnimationDetails>& getEntityAnimationDetails(const std::string& entityName) const;
 
 private:

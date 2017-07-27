@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Game\Timer.h>
+#include <Animation\AnimationName.h>
 #include <Entities\Direction.h>
 #include <unordered_map>
 #include <string>
@@ -14,10 +15,10 @@ class AnimationPlayer
 	class Animation
 	{
 	public:
-		Animation(const std::string& tileSheetName, const std::string& animationName, int startID, int endID,
+		Animation(const std::string& tileSheetName, AnimationName name, int startID, int endID,
 			float frameTime, bool repeatable, const sf::Vector2f& drawLocationSize, bool reversible);
 
-		const std::string& getName() const;
+		AnimationName getName() const;
 		bool isFinished() const;
 		sf::IntRect getDrawLocation(const TileSheet& tileSheet) const;
 		virtual void update(float deltaTime);
@@ -37,7 +38,7 @@ class AnimationPlayer
 		bool m_reverseAnimation;
 		Timer m_frameTimer;
 	private:
-		const std::string m_animationName;
+		const AnimationName m_name;
 		const bool m_animationRepeatable;
 		const sf::Vector2f m_drawLocationSize;
 	};
@@ -45,7 +46,7 @@ class AnimationPlayer
 	class AnimationHorizontal : public Animation
 	{
 	public:
-		AnimationHorizontal(const std::string& tileSheetName, const std::string& animationName, int startID, int endID,
+		AnimationHorizontal(const std::string& tileSheetName, AnimationName name, int startID, int endID,
 			float frameTime, bool repeatable, const sf::Vector2f& drawLocationSize, bool reversible);
 
 		void update(float deltaTime) override;
@@ -54,7 +55,7 @@ class AnimationPlayer
 	class AnimationVertical : public Animation
 	{
 	public:
-		AnimationVertical(const std::string& tileSheetName, const std::string& animationName, int startID, int endID,
+		AnimationVertical(const std::string& tileSheetName, AnimationName name, int startID, int endID,
 			float frameTime, bool repeatable, const sf::Vector2f& drawLocationSize, bool reversible);
 	
 		void update(float deltaTime) override;
@@ -65,18 +66,18 @@ public:
 	AnimationPlayer(const std::string& entityName);
 	~AnimationPlayer();
 
-	const Animation& getCurrentAnimation(const std::string& animationName) const;
+	const Animation& getCurrentAnimation(AnimationName name) const;
 	const TileSheet& getTileSheet() const;
 
-	void play(const std::string& animationName, Direction moveDirection = Direction::None);
+	void play(AnimationName name, Direction moveDirection = Direction::None);
 	void update(float deltaTime);
 	void draw(const sf::Vector2f& entityPosition, sf::RenderWindow& window);
 	
 private:
-	std::unordered_map<std::string, std::unique_ptr<Animation>> m_animations;
+	std::unordered_map<AnimationName, std::unique_ptr<Animation>> m_animations;
 	sf::Sprite m_sprite;
 	const TileSheet* m_tileSheet;
 	Animation* m_currentAnimation;
 
-	void switchToAnimation(const std::string& animationName);
+	void switchToAnimation(AnimationName name);
 };

@@ -140,6 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\Animation\AnimationPlayer.cpp" />
     <ClCompile Include="..\src\Audio\AudioPlayer.cpp" />
     <ClCompile Include="..\src\Entities\Bomb.cpp" />
     <ClCompile Include="..\src\Entities\Character.cpp" />
@@ -149,13 +150,17 @@
     <ClCompile Include="..\src\Entities\Entity.cpp" />
     <ClCompile Include="..\src\Entities\Explosion.cpp" />
     <ClCompile Include="..\src\Entities\Player.cpp" />
+    <ClCompile Include="..\src\Game\AILogic.cpp" />
+    <ClCompile Include="..\src\Game\DebugOverlay.cpp" />
     <ClCompile Include="..\src\Game\Game.cpp" />
     <ClCompile Include="..\src\Game\GameLogic.cpp" />
+    <ClCompile Include="..\src\Game\RandomNumberGenerator.cpp" />
     <ClCompile Include="..\src\Game\Timer.cpp" />
     <ClCompile Include="..\src\Level\Level.cpp" />
     <ClCompile Include="..\src\Level\LevelParser.cpp" />
     <ClCompile Include="..\src\Level\TileLayer.cpp" />
     <ClCompile Include="..\src\Locators\AnimationDetailsManagerLocator.cpp" />
+    <ClCompile Include="..\src\Locators\AnimationNameConverterLocator.cpp" />
     <ClCompile Include="..\src\Locators\AudioClipManagerLocator.cpp" />
     <ClCompile Include="..\src\Locators\AudioPlayerLocator.cpp" />
     <ClCompile Include="..\src\Locators\EntityManagerLocator.cpp" />
@@ -176,7 +181,7 @@
     <ClCompile Include="..\src\States\StateGame.cpp" />
     <ClCompile Include="..\src\States\StateRoundCompleted.cpp" />
     <ClCompile Include="..\src\States\StateGameCompleted.cpp" />
-    <ClCompile Include="..\src\Tile\AnimationPlayer.cpp" />
+    <ClCompile Include="..\src\States\StateRoundFailed.cpp" />
     <ClCompile Include="..\src\Tile\Tile.cpp" />
     <ClCompile Include="..\src\Tile\TileSheet.cpp" />
     <ClCompile Include="..\src\Utilities\Base64.cpp" />
@@ -187,6 +192,8 @@
     <ClCompile Include="..\src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Animation\AnimationName.h" />
+    <ClInclude Include="..\src\Animation\AnimationPlayer.h" />
     <ClInclude Include="..\src\Audio\AudioClipName.h" />
     <ClInclude Include="..\src\Audio\AudioPlayer.h" />
     <ClInclude Include="..\src\Entities\Bomb.h" />
@@ -196,18 +203,23 @@
     <ClInclude Include="..\src\Entities\Direction.h" />
     <ClInclude Include="..\src\Entities\Enemy.h" />
     <ClInclude Include="..\src\Entities\Entity.h" />
+    <ClInclude Include="..\src\Entities\EntityTag.h" />
     <ClInclude Include="..\src\Entities\Explosion.h" />
     <ClInclude Include="..\src\Entities\Player.h" />
     <ClInclude Include="..\src\EventQueue.h" />
+    <ClInclude Include="..\src\Game\AILogic.h" />
+    <ClInclude Include="..\src\Game\DebugOverlay.h" />
     <ClInclude Include="..\src\Game\Game.h" />
     <ClInclude Include="..\src\Game\GameEvent.h" />
     <ClInclude Include="..\src\Game\GameLogic.h" />
     <ClInclude Include="..\src\Game\MessageHandler.h" />
+    <ClInclude Include="..\src\Game\RandomNumberGenerator.h" />
     <ClInclude Include="..\src\Game\Timer.h" />
     <ClInclude Include="..\src\Level\Level.h" />
     <ClInclude Include="..\src\Level\LevelParser.h" />
     <ClInclude Include="..\src\Level\TileLayer.h" />
     <ClInclude Include="..\src\Locators\AnimationDetailsManagerLocator.h" />
+    <ClInclude Include="..\src\Locators\AnimationNameConverterLocator.h" />
     <ClInclude Include="..\src\Locators\AudioClipManagerLocator.h" />
     <ClInclude Include="..\src\Locators\AudioPlayerLocator.h" />
     <ClInclude Include="..\src\Locators\EntityManagerLocator.h" />
@@ -227,15 +239,17 @@
     <ClInclude Include="..\src\Managers\TileSheetManager.h" />
     <ClInclude Include="..\src\States\StateBase.h" />
     <ClInclude Include="..\src\States\StateGame.h" />
+    <ClInclude Include="..\src\States\StateRoundFailed.h" />
     <ClInclude Include="..\src\States\StateType.h" />
     <ClInclude Include="..\src\States\StateRoundCompleted.h" />
     <ClInclude Include="..\src\States\StateGameCompleted.h" />
-    <ClInclude Include="..\src\Tile\AnimationPlayer.h" />
     <ClInclude Include="..\src\Tile\Tile.h" />
     <ClInclude Include="..\src\Tile\TileSheet.h" />
     <ClInclude Include="..\src\Tile\TileSheetDetails.h" />
+    <ClInclude Include="..\src\Utilities\AnimationNameConverter.h" />
     <ClInclude Include="..\src\Utilities\Base64.h" />
     <ClInclude Include="..\src\Utilities\FileDirectory.h" />
+    <ClInclude Include="..\src\Utilities\NameConverter.h" />
     <ClInclude Include="..\src\Utilities\tinyxml.h" />
     <ClInclude Include="..\src\Utilities\Utilities.h" />
     <ClInclude Include="..\src\Window.h" />

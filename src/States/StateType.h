@@ -4,5 +4,6 @@ enum class StateType
 {
 	Game = 0,
 	GameCompleted,
-	RoundCompleted
+	RoundCompleted,
+	RoundFailed
 };

@@ -9,7 +9,7 @@ class Window
 public:
 	Window(const std::string& name, const sf::Vector2i& size);
 		
-	sf::RenderWindow& getWindow();
+	sf::RenderWindow& getRenderWindow();
 	bool isOpen() const;
 	void draw(const sf::Drawable& drawable);
 	void update();

@@ -7,38 +7,39 @@
 #include <functional>
 #include <SFML\Graphics.hpp>
 #include <assert.h>
+#include <utility>
 
 class EntityManager
 {
 	class EntityInQueue
 	{
 	public:
-		EntityInQueue(std::string&& entityName, const sf::Vector2f& position)
-			: m_name(std::move(entityName)),
-			m_position(position)
+		EntityInQueue(const sf::Vector2f& position, const std::string& name)
+			: m_position(position),
+			m_name(std::move(name))
 		{}
 
-		const std::string m_name;
 		const sf::Vector2f m_position;
+		const std::string m_name;
 	};
 
 	class EntityFactory
 	{
 	public:
 		EntityFactory(EntityManager* entityManager);
-		std::unique_ptr<Entity> getEntity(const std::string& entityName, const sf::Vector2f& entityPosition, int entityID) const;
+		std::unique_ptr<Entity> getEntity(const std::string& name, const sf::Vector2f& entityPosition, int entityID) const;
 
 	private:
 		std::unordered_map<std::string, std::function<std::unique_ptr<Entity>(const std::string&, const sf::Vector2f&, int)>> m_entityFactory;
 	
 		template<class T>
-		void registerEntity(std::string&& entityName, EntityManager* entityManager)
+		void registerEntity(std::string&& name, EntityTag tag, EntityManager* entityManager)
 		{
-			assert(m_entityFactory.find(entityName) == m_entityFactory.cend());
-			m_entityFactory.emplace(std::move(entityName), [entityManager](const std::string& name, 
-				const sf::Vector2f& position, int entityID) -> std::unique_ptr<Entity>
+			assert(m_entityFactory.find(name) == m_entityFactory.cend());
+			m_entityFactory.emplace(std::move(name), [tag, entityManager]
+			(const std::string& name, const sf::Vector2f& position, int entityID) -> std::unique_ptr<Entity>
 			{
-				return std::make_unique<T>(name, position, *entityManager, entityID);
+				return std::make_unique<T>(name, tag, position, *entityManager, entityID);
 			});
 		}
 	};
@@ -48,14 +49,13 @@ public:
 	~EntityManager();
 
 	const std::vector<std::unique_ptr<Entity>>& getEntities() const;
-	void addEntity(std::string&& entityName, const sf::Vector2f& position);
-	void addEntity(std::string&& entityName, float xPosition, float yPosition);
+	void addEntity(const std::string& entityName, const sf::Vector2f& position);
 	void removeEntity(int entityID);
 	void draw(sf::RenderWindow& window);
 	void update(float deltaTime);
 
 private:
-	EntityFactory m_entityFactory;
+	const EntityFactory m_entityFactory;
 	std::vector<std::unique_ptr<Entity>> m_entities;
 	std::vector<EntityInQueue> m_entityQueue;
 	std::vector<int> m_removals;

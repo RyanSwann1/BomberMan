@@ -82,7 +82,7 @@ void parseEntities(const TiXmlElement & rootElement, EntityManager& entityManage
 			std::string entityName = entityElement->Attribute("name");
 
 			yPosition -= tileSize;
-			entityManager.addEntity(std::move(entityName), xPosition, yPosition);
+			entityManager.addEntity(std::move(entityName), sf::Vector2f(xPosition, yPosition));
 		}
 	}
 }
