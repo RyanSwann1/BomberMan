@@ -10,8 +10,7 @@ public:
 		m_entityManager = &entityManager;
 	}
 
-protected:
-	static EntityManager& getEntityManager()
+	static const EntityManager& getEntityManager()
 	{
 		assert(m_entityManager);
 		return *m_entityManager;

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="21" height="21" tilewidth="16" tileheight="16" nextobjectid="213">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="21" height="21" tilewidth="16" tileheight="16" nextobjectid="282">
  <tileset firstgid="1" name="bomb_party_v4" tilewidth="16" tileheight="16" tilecount="285" columns="15">
   <image source="bomb_party_v4.png" trans="aa0000" width="240" height="304"/>
  </tileset>
@@ -17,7 +17,6 @@
   </data>
  </layer>
  <objectgroup name="Entity Layer">
-  <object id="139" name="Player" gid="255" x="64" y="80" width="16" height="16"/>
   <object id="159" name="Crate" gid="205" x="128" y="128" width="16" height="16"/>
   <object id="160" name="Crate" gid="205" x="96" y="96" width="16" height="16"/>
   <object id="161" name="Crate" gid="205" x="96" y="128" width="16" height="16"/>
@@ -34,14 +33,55 @@
   <object id="172" name="Crate" gid="205" x="224" y="224" width="16" height="16"/>
   <object id="173" name="Crate" gid="205" x="224" y="96" width="16" height="16"/>
   <object id="174" name="Crate" gid="205" x="208" y="112" width="16" height="16"/>
-  <object id="175" name="Crate" gid="205" x="208" y="272" width="16" height="16"/>
   <object id="176" name="Crate" gid="205" x="256" y="256" width="16" height="16"/>
-  <object id="177" name="Crate" gid="205" x="240" y="80" width="16" height="16"/>
   <object id="178" name="Crate" gid="205" x="176" y="80" width="16" height="16"/>
   <object id="179" name="Crate" gid="205" x="160" y="160" width="16" height="16"/>
   <object id="180" name="Crate" gid="205" x="160" y="224" width="16" height="16"/>
-  <object id="181" name="Crate" gid="205" x="112" y="272" width="16" height="16"/>
   <object id="182" name="Enemy1" gid="242" x="64" y="272" width="16" height="16"/>
+  <object id="214" name="Crate" gid="205" x="96" y="176" width="16" height="16"/>
+  <object id="216" name="Crate" gid="205" x="96" y="256" width="16" height="16"/>
+  <object id="218" name="Crate" gid="205" x="160" y="95" width="16" height="16"/>
+  <object id="219" name="Crate" gid="205" x="112" y="112" width="16" height="16"/>
+  <object id="220" name="Crate" gid="205" x="128" y="96" width="16" height="16"/>
+  <object id="221" name="Crate" gid="205" x="80" y="112" width="16" height="16"/>
+  <object id="222" name="Crate" gid="205" x="112" y="144" width="16" height="16"/>
+  <object id="223" name="Crate" gid="205" x="96" y="208" width="16" height="16"/>
+  <object id="224" name="Crate" gid="205" x="112" y="208" width="16" height="16"/>
+  <object id="225" name="Crate" gid="205" x="64" y="144" width="16" height="16"/>
+  <object id="226" name="Crate" gid="205" x="128" y="224" width="16" height="16"/>
+  <object id="227" name="Crate" gid="205" x="96" y="160" width="16" height="16"/>
+  <object id="228" name="Crate" gid="205" x="144" y="144" width="16" height="16"/>
+  <object id="229" name="Crate" gid="205" x="224" y="240" width="16" height="16"/>
+  <object id="230" name="Crate" gid="205" x="224" y="128" width="16" height="16"/>
+  <object id="231" name="Crate" gid="205" x="256" y="144" width="16" height="16"/>
+  <object id="232" name="Crate" gid="205" x="224" y="160" width="16" height="16"/>
+  <object id="233" name="Crate" gid="205" x="224" y="192" width="16" height="16"/>
+  <object id="234" name="Crate" gid="205" x="240" y="176" width="16" height="16"/>
+  <object id="235" name="Crate" gid="205" x="192" y="208" width="16" height="16"/>
+  <object id="236" name="Crate" gid="205" x="192" y="112" width="16" height="16"/>
+  <object id="237" name="Crate" gid="205" x="160" y="112" width="16" height="16"/>
+  <object id="238" name="Crate" gid="205" x="112" y="272" width="16" height="16"/>
+  <object id="239" name="Crate" gid="205" x="160" y="240" width="16" height="16"/>
+  <object id="240" name="Crate" gid="205" x="160" y="208" width="16" height="16"/>
+  <object id="241" name="Crate" gid="205" x="240" y="112" width="16" height="16"/>
+  <object id="243" name="Crate" gid="205" x="112" y="80" width="16" height="16"/>
+  <object id="244" name="Crate" gid="205" x="144" y="80" width="16" height="16"/>
+  <object id="245" name="Crate" gid="205" x="64" y="112" width="16" height="16"/>
+  <object id="246" name="Crate" gid="205" x="192" y="176" width="16" height="16"/>
+  <object id="247" name="Crate" gid="205" x="64" y="192" width="16" height="16"/>
+  <object id="248" name="Crate" gid="205" x="160" y="272" width="16" height="16"/>
+  <object id="249" name="Crate" gid="205" x="240" y="208" width="16" height="16"/>
+  <object id="250" name="Crate" gid="205" x="128" y="176" width="16" height="16"/>
+  <object id="252" name="Crate" gid="205" x="176" y="144" width="16" height="16"/>
+  <object id="255" name="Crate" gid="205" x="256" y="112" width="16" height="16"/>
+  <object id="256" name="Crate" gid="205" x="256" y="224" width="16" height="16"/>
+  <object id="257" name="Crate" gid="205" x="128" y="256" width="16" height="16"/>
+  <object id="258" name="Crate" gid="205" x="176" y="176" width="16" height="16"/>
+  <object id="259" name="Crate" gid="205" x="208" y="80" width="16" height="16"/>
+  <object id="267" name="Crate" gid="205" x="192" y="272" width="16" height="16"/>
+  <object id="271" name="Player" gid="257" x="64" y="80" width="16" height="16"/>
+  <object id="280" name="Enemy1" gid="242" x="256" y="272" width="16" height="16"/>
+  <object id="281" name="Enemy1" gid="242" x="256" y="80" width="16" height="16"/>
  </objectgroup>
  <objectgroup name="Collision Layer" opacity="0.45">
   <object id="2" gid="286" x="48" y="64" width="16" height="16"/>

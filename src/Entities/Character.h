@@ -6,7 +6,7 @@
 class Character : public Entity
 {
 public:
-	Character(const std::string& name, const sf::Vector2f& position, EntityManager& entityManager, int entityID);
+	Character(const std::string& name, EntityTag tag, const sf::Vector2f& spawnPosition, EntityManager& entityManager, int ID);
 	virtual ~Character() {}
 
 	void update(float deltaTime) override;
@@ -15,11 +15,12 @@ public:
 protected:
 	sf::Vector2f m_speed;
 	sf::Vector2f m_velocity;
+	sf::Vector2f m_oldPosition;
 	Direction m_currentMoveDirection;
-	int m_lives;
 	Timer m_bombPlacementTimer;
+	int m_lives;
 	
-	void placeBomb();
+	virtual void placeBomb();
 
 private:
 	void handleDirection();	

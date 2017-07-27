@@ -33,7 +33,7 @@ void CollisionHandler::clampMovement(const sf::FloatRect& intersection, sf::Vect
 	}
 }
 
-bool CollisionHandler::isTileAtPosition(const sf::Vector2i & position)
+bool CollisionHandler::isCollidableTileAtPosition(const sf::Vector2i & position)
 {
 	const auto& currentLevel = LevelManagerLocator::getLevelManager().getCurrentLevel();
 	const int tileSize = currentLevel->getTileSize();
@@ -49,16 +49,17 @@ bool CollisionHandler::isTileAtPosition(const sf::Vector2i & position)
 	return false;
 }
 
-bool CollisionHandler::isEntityAtPosition(const std::string & entityName, const sf::Vector2f & position, const EntityManager & entityManager)
+bool CollisionHandler::isEntityAtPosition(EntityTag entityTag, const sf::Vector2f & position, const EntityManager & entityManager)
 {
 	for (const auto& entity : entityManager.getEntities())
 	{
-		if (entity->getName() != entityName)
+		if (entity->getTag() != entityTag)
 		{
 			continue;
 		}
 
-		if (entity->getPosition() == position)
+		const sf::FloatRect rect(position, sf::Vector2f(16, 16));
+		if (entity->getAABB().intersects(rect))
 		{
 			return true;
 		}
@@ -102,6 +103,8 @@ void checkForTileCollisions(const sf::Vector2f & entityPosition, sf::Vector2f & 
 		sf::FloatRect intersection;
 		const sf::FloatRect tileAABB(sf::Vector2f(collidableTile.x + 4, collidableTile.y + 4),
 			sf::Vector2f(tileSize / 2.0f, tileSize / 2.0f));
+		//const sf::FloatRect tileAABB(sf::Vector2f(collidableTile.x, collidableTile.y),
+		//	sf::Vector2f(tileSize, tileSize));
 		if (!movementAABB.intersects(tileAABB, intersection))
 		{
 			continue;

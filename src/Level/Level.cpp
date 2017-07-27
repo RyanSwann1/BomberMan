@@ -2,6 +2,7 @@
 #include <utility>
 #include <algorithm>
 #include <assert.h>
+#include <math.h>
 
 Level::Level(std::vector<TileLayer>&& tileLayers, std::vector<sf::Vector2i>&& collisionLayer,
 	const std::string& levelName, const sf::Vector2i& levelSize, int tileSize)

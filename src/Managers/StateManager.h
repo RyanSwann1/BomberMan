@@ -37,8 +37,8 @@ public:
 	StateManager(StateManager&&) = delete;
 	StateManager&& operator=(StateManager&&) = delete;
 
-	void removeState(StateType stateToRemove);
 	void switchToState(StateType stateToSwitch);
+	void switchToAndRemoveState(StateType stateToSwitchTo, StateType stateToRemove);
 	void update(float deltaTime);
 	void draw(sf::RenderWindow& window);
 
@@ -47,9 +47,10 @@ private:
 	std::vector<std::unique_ptr<StateBase>> m_states;
 	std::vector<StateType> m_stateQueue;
 	std::vector<StateType> m_removals;
-	StateBase* m_currentState;
+	std::unique_ptr<StateBase> m_tempStateToAdd;
 
 	void handleQueue();
 	void handleRemovals();
 	void createState(StateType stateToCreate);
+	void removeState(StateType stateToRemove);
 };

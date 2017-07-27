@@ -4,8 +4,8 @@
 #include <Managers\LevelManager.h>
 #include <Locators\LevelManagerLocator.h>
 
-Crate::Crate(const std::string & name, const sf::Vector2f & position, EntityManager & entityManager, int entityID)
-	: Entity(name, position, entityManager, entityID)
+Crate::Crate(const std::string& name, EntityTag tag, const sf::Vector2f & spawnPosition, EntityManager & entityManager, int ID)
+	: Entity(name, tag, spawnPosition, entityManager, ID)
 {
 }
 
@@ -16,7 +16,7 @@ void Crate::update(float deltaTime)
 
 void Crate::handleEntityCollision(const std::unique_ptr<Entity>& entity, const sf::FloatRect & intersection)
 {
-	if (entity->getName() == "Explosion")
+	if (entity->getTag() == EntityTag::Explosion)
 	{
 		m_entityManager.removeEntity(Entity::getID());
 	}

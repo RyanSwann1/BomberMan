@@ -6,7 +6,7 @@ Window::Window(const std::string & name, const sf::Vector2i & size)
 	m_window.setFramerateLimit(60);
 }
 
-sf::RenderWindow & Window::getWindow()
+sf::RenderWindow & Window::getRenderWindow()
 {
 	return m_window;
 }

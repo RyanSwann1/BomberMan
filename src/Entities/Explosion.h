@@ -5,7 +5,7 @@
 class Explosion : public Entity
 {
 public:
-	Explosion(const std::string& name, const sf::Vector2f& position, EntityManager& entityManager, int entityID);
+	Explosion(const std::string& name, EntityTag tag, const sf::Vector2f& spawnPosition, EntityManager& entityManager, int ID);
 
 	void update(float deltaTime) override;
 };

@@ -3,13 +3,17 @@
 #include <Locators\LevelManagerLocator.h>
 #include <Managers\LevelManager.h>
 #include <Managers\EntityManager.h>
+#include <Locators\AudioPlayerLocator.h>
+#include <Audio\AudioPlayer.h>
 
-Character::Character(const std::string & name, const sf::Vector2f & position, EntityManager & entityManager, int entityID)
-	: Entity(name, position, entityManager, entityID),
+Character::Character(const std::string& name, EntityTag tag, const sf::Vector2f & spawnPosition, EntityManager & entityManager, int ID)
+	: Entity(name, tag ,spawnPosition, entityManager, ID),
 	m_speed(50, 50),
+	m_velocity(),
+	m_oldPosition(),
 	m_currentMoveDirection(Direction::None),
-	m_bombPlacementTimer(1.25f),
-	m_lives(0)
+	m_bombPlacementTimer(0.5f, true),
+	m_lives(1)
 {}
 
 void Character::update(float deltaTime)
@@ -18,6 +22,7 @@ void Character::update(float deltaTime)
 	handleAnimation();
 	handleDirection();
 	CollisionHandler::handleCollisions(m_position, m_entityManager, m_velocity, *this);
+	m_oldPosition = m_position;
 	m_position += m_velocity;
 
 	m_velocity.x = 0;
@@ -28,14 +33,14 @@ void Character::update(float deltaTime)
 
 void Character::handleEntityCollision(const std::unique_ptr<Entity>& entity, const sf::FloatRect& intersection)
 {
-	if (entity->getName() == "Crate")
+	if (entity->getTag() == EntityTag::Crate)
 	{
 		CollisionHandler::clampMovement(intersection, m_velocity);
 	}
-	else if (entity->getName() == "Explosion")
+	else if (entity->getTag() == EntityTag::Explosion)
 	{
 		--m_lives;
-		if (m_lives <= 0)
+		if (!m_lives)
 		{
 			m_entityManager.removeEntity(Entity::getID());
 		}
@@ -81,27 +86,27 @@ void Character::handleAnimation()
 	{
 	case Direction::Right:
 	{
-		m_animationPlayer.play("WalkingRight", Direction::Right);
+		m_animationPlayer.play(AnimationName::WalkingRight, Direction::Right);
 		break;
 	}
 	case Direction::Left:
 	{
-		m_animationPlayer.play("WalkingLeft", Direction::Left);
+		m_animationPlayer.play(AnimationName::WalkingLeft, Direction::Left);
 		break;
 	}
 	case Direction::Up:
 	{
-		m_animationPlayer.play("WalkingUp", Direction::Up);
+		m_animationPlayer.play(AnimationName::WalkingUp, Direction::Up);
 		break;
-	}
+	}	
 	case Direction::Down:
 	{
-		m_animationPlayer.play("WalkingDown", Direction::Down);
+		m_animationPlayer.play(AnimationName::WalkingDown, Direction::Down);
 		break;
 	}
 	case Direction::None:
 	{
-		m_animationPlayer.play("Default");
+		m_animationPlayer.play(AnimationName::Default);
 		break;
 	}
 	}
@@ -114,6 +119,7 @@ void Character::placeBomb()
 		return;
 	}
 
+	AudioPlayerLocator::getAudioClipPlayer().playAudioClip(AudioClipName::PlaceBomb);
 	const int tileSize = LevelManagerLocator::getLevelManager().getCurrentLevel()->getTileSize();
 	sf::Vector2f bombSpawnPosition;
 	bombSpawnPosition.x = std::floor((m_position.x + tileSize / 2.0f) / tileSize);

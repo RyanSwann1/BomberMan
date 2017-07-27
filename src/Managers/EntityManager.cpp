@@ -2,8 +2,8 @@
 #include <Entities\Player.h>
 #include <Entities\Bomb.h>
 #include <Entities\Explosion.h>
-#include <Entities\Enemy.h>
 #include <Entities\Crate.h>
+#include <Entities\Enemy.h>
 #include <Locators\EntityManagerLocator.h>
 #include <Game\MessageHandler.h>
 #include <Locators\GameEventMessengerLocator.h>
@@ -12,20 +12,20 @@
 //EntityFactory
 EntityManager::EntityFactory::EntityFactory(EntityManager * entityManager)
 {
-	registerEntity<Player>("Player", entityManager);
-	registerEntity<Bomb>("Bomb", entityManager);
-	registerEntity<Explosion>("Explosion", entityManager);
-	registerEntity<Enemy>("Enemy1", entityManager);
-	registerEntity<Enemy>("Enemy2", entityManager);
-	registerEntity<Enemy>("Enemy3", entityManager);
-	registerEntity<Crate>("Crate", entityManager);
+	registerEntity<Player>("Player", EntityTag::Player, entityManager);
+	registerEntity<Bomb>("Bomb", EntityTag::Bomb, entityManager);
+	registerEntity<Explosion>("Explosion", EntityTag::Explosion, entityManager);
+	registerEntity<Enemy>("Enemy1", EntityTag::Enemy, entityManager);
+	registerEntity<Enemy>("Enemy2", EntityTag::Enemy, entityManager);
+	registerEntity<Enemy>("Enemy3", EntityTag::Enemy, entityManager);
+	registerEntity<Crate>("Crate", EntityTag::Crate, entityManager);
 }
 
-std::unique_ptr<Entity> EntityManager::EntityFactory::getEntity(const std::string & entityName, const sf::Vector2f & entityPosition, int entityID) const
+std::unique_ptr<Entity> EntityManager::EntityFactory::getEntity(const std::string& name, const sf::Vector2f & entityPosition, int entityID) const
 {
-	auto iter = m_entityFactory.find(entityName);
+	auto iter = m_entityFactory.find(name);
 	assert(iter != m_entityFactory.cend());
-	return iter->second(entityName, entityPosition, entityID);
+	return iter->second(name, entityPosition, entityID);
 }
 
 //EntityManager
@@ -50,15 +50,9 @@ const std::vector<std::unique_ptr<Entity>>& EntityManager::getEntities() const
 	return m_entities;
 }
 
-void EntityManager::addEntity(std::string && entityName, const sf::Vector2f & position)
+void EntityManager::addEntity(const std::string& name, const sf::Vector2f & position)
 {
-	m_entityQueue.emplace_back(std::move(entityName), position);
-	++m_entityCount;
-}
-
-void EntityManager::addEntity(std::string && entityName, float xPosition, float yPosition)
-{
-	m_entityQueue.emplace_back(std::move(entityName), sf::Vector2f(xPosition, yPosition));
+	m_entityQueue.emplace_back(position, name);
 	++m_entityCount;
 }
 
@@ -118,8 +112,12 @@ void EntityManager::removeActiveEntity(int entityID)
 
 void EntityManager::purgeEntities()
 {
-	m_entities.clear();
+	for (auto& entity : m_entities)
+	{
+		m_removals.push_back(entity->getID());
+	}
+
 	m_entityQueue.clear();
-	m_removals.clear();
 	m_entityCount = 0;
 }
+

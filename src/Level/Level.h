@@ -19,6 +19,5 @@ private:
 	const std::vector<sf::Vector2i> m_collisionLayer;
 	const std::string m_levelName;
 	const sf::Vector2i m_levelSize;
-	const sf::Vector2i m_playingAreaSize;
 	const int m_tileSize;
 };

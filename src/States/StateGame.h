@@ -6,6 +6,7 @@
 #include <Managers\EntityManager.h>
 #include <Managers\AnimationDetailsManager.h>
 #include <Managers\GameManager.h>
+#include <Utilities\AnimationNameConverter.h>
 
 class StateGame : public StateBase
 {
@@ -16,9 +17,10 @@ public:
 	void draw(sf::RenderWindow& window) override;
 
 private:
+	GameManager m_gameManager;
+	AnimationNameConverter m_animationNameConverter;
 	AnimationDetailsManager m_animationDetailsManager;
 	TileSheetManager m_tileSheetManager;
 	EntityManager m_entityManager;
 	LevelManager m_levelManager;
-	GameManager m_gameManager;
 };

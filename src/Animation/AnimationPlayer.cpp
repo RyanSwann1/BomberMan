@@ -4,12 +4,12 @@
 #include <Locators\AnimationDetailsManagerLocator.h>
 #include <Managers\AnimationDetailsManager.h>
 #include <Entities\Direction.h>
-#include "Tile.h"
+#include <Tile\Tile.h>
 #include <assert.h>
 
 //AnimationHorizontal
-AnimationPlayer::AnimationHorizontal::AnimationHorizontal(const std::string & tileSheetName, const std::string & animationName, int startID, int endID, float frameTime, bool repeatable, const sf::Vector2f & drawLocationSize, bool reversible)
-	: Animation(tileSheetName, animationName, startID, endID, frameTime, repeatable, drawLocationSize, reversible)
+AnimationPlayer::AnimationHorizontal::AnimationHorizontal(const std::string & tileSheetName, AnimationName name, int startID, int endID, float frameTime, bool repeatable, const sf::Vector2f & drawLocationSize, bool reversible)
+	: Animation(tileSheetName, name, startID, endID, frameTime, repeatable, drawLocationSize, reversible)
 {}
 
 void AnimationPlayer::AnimationHorizontal::update(float deltaTime)
@@ -46,8 +46,8 @@ void AnimationPlayer::AnimationHorizontal::update(float deltaTime)
 }
 
 //AnimationVertical
-AnimationPlayer::AnimationVertical::AnimationVertical(const std::string & tileSheetName, const std::string & animationName, int startID, int endID, float frameTime, bool repeatable, const sf::Vector2f & drawLocationSize, bool reversible)
-	: Animation(tileSheetName, animationName, startID, endID, frameTime, repeatable, drawLocationSize, reversible)
+AnimationPlayer::AnimationVertical::AnimationVertical(const std::string & tileSheetName, AnimationName name, int startID, int endID, float frameTime, bool repeatable, const sf::Vector2f & drawLocationSize, bool reversible)
+	: Animation(tileSheetName, name, startID, endID, frameTime, repeatable, drawLocationSize, reversible)
 {
 
 }
@@ -86,26 +86,26 @@ void AnimationPlayer::AnimationVertical::update(float deltaTime)
 	}
 }
 
-AnimationPlayer::Animation::Animation(const std::string & tileSheetName, const std::string & animationName,
+AnimationPlayer::Animation::Animation(const std::string & tileSheetName, AnimationName name,
 	int startID, int endID, float frameTime, bool repeatable, const sf::Vector2f & drawLocationSize, bool reversible)
 	: m_tileSheetName(tileSheetName),
 	m_startFrame(startID),
 	m_endFrame(endID),
 	m_currentFrame(m_startFrame),
 	m_animationFinished(false),
-	m_animationName(std::move(animationName)),
+	m_name(name),
 	m_animationRepeatable(repeatable),
 	m_drawLocationSize(drawLocationSize),
 	m_animationReversible(reversible),
 	m_proceedToNextFrame(false),
 	m_animationPlaying(true),
 	m_reverseAnimation(false),
-	m_frameTimer(frameTime)
+	m_frameTimer(frameTime, true)
 {}
 
-const std::string & AnimationPlayer::Animation::getName() const
+AnimationName  AnimationPlayer::Animation::getName() const
 {
-	return m_animationName;
+	return m_name;
 }
 
 bool AnimationPlayer::Animation::isFinished() const
@@ -211,14 +211,14 @@ AnimationPlayer::~AnimationPlayer()
 	m_tileSheet->releaseTileSheet();
 }
 
-void AnimationPlayer::play(const std::string& animationName, Direction moveDirection)
+void AnimationPlayer::play(AnimationName name, Direction moveDirection)
 {
 	if (moveDirection == Direction::Left)
 	{
 		m_sprite.setScale(-1, 1);
 	}
 	
-	switchToAnimation(animationName);
+	switchToAnimation(name);
 }
 
 void AnimationPlayer::update(float deltaTime)
@@ -243,26 +243,26 @@ void AnimationPlayer::draw(const sf::Vector2f& entityPosition, sf::RenderWindow 
 	m_sprite.setScale(1, 1);
 }
 
-void AnimationPlayer::switchToAnimation(const std::string & animationName)
+void AnimationPlayer::switchToAnimation(AnimationName name)
 {
 	if (m_currentAnimation)
 	{
-		if (m_currentAnimation->getName() == animationName)
+		if (m_currentAnimation->getName() == name)
 		{
 			return;
 		}
 		m_currentAnimation->reset();
 	}
 
-	auto iter = m_animations.find(animationName);
+	auto iter = m_animations.find(name);
 	assert(iter != m_animations.cend());
 	m_currentAnimation = iter->second.get();
 }
 
-const AnimationPlayer::Animation& AnimationPlayer::getCurrentAnimation(const std::string& animationName) const
+const AnimationPlayer::Animation& AnimationPlayer::getCurrentAnimation(AnimationName name) const
 {
 	assert(m_currentAnimation);
-	assert(m_currentAnimation->getName() == animationName);
+	assert(m_currentAnimation->getName() == name);
 	return *m_currentAnimation;
 }
 

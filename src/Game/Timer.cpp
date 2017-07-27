@@ -7,6 +7,11 @@ Timer::Timer(float expirationTime, bool active)
 {
 }
 
+float Timer::getElaspedTime() const
+{
+	return m_elaspedTime;
+}
+
 void Timer::update(float deltaTime)
 {
 	if (!m_active)
@@ -17,6 +22,11 @@ void Timer::update(float deltaTime)
 	m_elaspedTime += deltaTime;
 }
 
+bool Timer::isActive() const
+{
+	return m_active;
+}
+
 bool Timer::isExpired() const
 {
 	return m_elaspedTime >= m_expirationTime;
@@ -25,4 +35,14 @@ bool Timer::isExpired() const
 void Timer::reset()
 {
 	m_elaspedTime = 0;
+}
+
+void Timer::activate()
+{
+	m_active = true;
+}
+
+void Timer::deactivate()
+{
+	m_active = false;
 }

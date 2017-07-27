@@ -1,21 +1,24 @@
 #pragma once
 
+#include <Entities\EntityTag.h>
 #include <SFML\Graphics.hpp>
-#include <Tile\AnimationPlayer.h>
+#include <Animation\AnimationPlayer.h>
+#include <string>
 
 class EntityManager;
 class Entity
 {
 public:
-	Entity(const std::string& entityName, const sf::Vector2f& entityPosition, EntityManager& entityManager, int entityID);
+	Entity(const std::string& name, EntityTag tag, const sf::Vector2f& spawnPosition, EntityManager& entityManager, int ID);
 	virtual ~Entity() {}
 
+	EntityTag getTag() const;
 	const std::string& getName() const;
 	const sf::FloatRect& getAABB() const;
 	const sf::Vector2f& getPosition() const;
 	int getID() const;
 	
-	virtual void draw(sf::RenderWindow& window);
+	void draw(sf::RenderWindow& window);
 	virtual void update(float deltaTime);
 	virtual void handleEntityCollision(const std::unique_ptr<Entity>& entity, const sf::FloatRect& intersection) {}
 	
@@ -25,10 +28,12 @@ protected:
 	AnimationPlayer m_animationPlayer;
 	EntityManager& m_entityManager;
 
+	void setPosition(float x, float y);
+
 private:
 	const int m_ID;
+	const EntityTag m_tag;
 	const std::string m_name;
-	sf::RectangleShape m_debugRect;
 
 	void updateAABB();
 };

@@ -25,7 +25,6 @@ void StateRoundCompleted::update(float deltaTime)
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 	{
 		GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::ChangeToNextLevel);
-		m_stateManager.removeState(StateType::RoundCompleted);
-		m_stateManager.switchToState(StateType::Game);
+		m_stateManager.switchToAndRemoveState(StateType::Game, StateBase::getType());
 	}
 }

@@ -4,14 +4,17 @@
 #include <Locators\GameEventMessengerLocator.h>
 #include <Game\MessageHandler.h>
 #include <Game\GameEvent.h>
+#include <Game\GameLogic.h>
 #include <iostream>
 
 StateGame::StateGame(StateManager& stateManager, StateType stateType)
 	: StateBase(stateManager, stateType),
+	m_gameManager(),
+	m_animationNameConverter(),
+	m_animationDetailsManager(),
 	m_tileSheetManager(),
 	m_entityManager(),
-	m_levelManager(),
-	m_gameManager()
+	m_levelManager(m_entityManager)
 {
 	std::cout << "You have entered the game.\n";
 }
@@ -19,7 +22,6 @@ StateGame::StateGame(StateManager& stateManager, StateType stateType)
 void StateGame::update(float deltaTime)
 {
 	m_entityManager.update(deltaTime);
-	m_levelManager.update();
 }
 
 void StateGame::draw(sf::RenderWindow& window)
