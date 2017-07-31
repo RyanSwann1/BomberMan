@@ -3,7 +3,11 @@
 #include <States\StateGameCompleted.h>
 #include <States\StateRoundCompleted.h>
 #include <States\StateRoundFailed.h>
+#include <States\StateMainMenu.h>
+#include <States\StatePauseMenu.h>
 #include <Locators\StateManagerLocator.h>
+#include <Locators\GameEventMessengerLocator.h>
+#include <Game\MessageHandler.h>
 #include <algorithm>
 
 //StateFactory
@@ -13,9 +17,11 @@ StateManager::StateFactory::StateFactory(StateManager* stateManager)
 	registerState<StateGameCompleted>(stateManager, StateType::GameCompleted);
 	registerState<StateRoundCompleted>(stateManager, StateType::RoundCompleted);
 	registerState<StateRoundFailed>(stateManager, StateType::RoundFailed);
+	registerState<StateMainMenu>(stateManager, StateType::MainMenu);
+	registerState<StatePauseMenu>(stateManager, StateType::PauseMenu);
 }
 
-std::unique_ptr<StateBase> StateManager::StateFactory::getState(StateType stateType) const
+StateBase* StateManager::StateFactory::getState(StateType stateType) const
 {
 	auto iter = m_stateFactory.find(stateType);
 	assert(iter != m_stateFactory.cend());
@@ -28,9 +34,14 @@ StateManager::StateManager()
 	m_states(),
 	m_stateQueue(),
 	m_removals(),
-	m_tempStateToAdd()
+	m_stateToSwap()
 {
 	StateManagerLocator::provide(*this);
+}
+
+StateManager::~StateManager()
+{
+	purgeStates();
 }
 
 void StateManager::removeState(StateType stateToRemove)
@@ -38,20 +49,38 @@ void StateManager::removeState(StateType stateToRemove)
 	m_removals.push_back(stateToRemove);
 }
 
+void StateManager::purgeStates()
+{
+	for (auto& state : m_states)
+	{
+		delete state;
+		state = nullptr;
+	}
+
+	m_states.clear();
+}
+
+StateType StateManager::getCurrentStateType() const
+{
+	assert(!m_states.empty());
+	return m_states.back()->getType();
+}
+
 void StateManager::switchToState(StateType stateToSwitch)
 {
 	if (m_states.empty())
 	{
-		createState(stateToSwitch);
+		auto& newState = *m_stateFactory.getState(stateToSwitch);
+		m_states.push_back(&newState);
+		GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::NewState);
 		return;
 	}
 
-
 	for (auto iter = m_states.begin(); iter != m_states.end(); ++iter)
 	{
-		if (iter->get()->getType() == stateToSwitch)
+		if ((*iter)->getType() == stateToSwitch)
 		{
-			m_tempStateToAdd = std::move(*iter);
+			m_stateToSwap = std::make_unique<StateType>((*iter)->getType());
 			return;
 		}
 	}
@@ -73,6 +102,7 @@ void StateManager::update(float deltaTime)
 	}
 
 	handleQueue();
+	handleSwapState();
 	handleRemovals();
 }
 
@@ -88,15 +118,11 @@ void StateManager::handleQueue()
 {
 	for (auto iter = m_stateQueue.begin(); iter != m_stateQueue.end();)
 	{
-		createState(*iter);
+		auto& newState = *m_stateFactory.getState(*iter);
+		m_states.push_back(&newState);
 		iter = m_stateQueue.erase(iter);
-	}
-
-	if (m_tempStateToAdd)
-	{
-		m_states.emplace_back(std::move(m_tempStateToAdd));
-		m_tempStateToAdd.release();
-	}
+		GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::NewState);
+	}	
 }
 
 void StateManager::handleRemovals()
@@ -105,6 +131,8 @@ void StateManager::handleRemovals()
 	{
 		if (!*iter)
 		{
+			delete *iter;
+			*iter = nullptr;
 			iter = m_states.erase(iter);
 			continue;
 		}
@@ -114,7 +142,7 @@ void StateManager::handleRemovals()
 
 	for (auto iter = m_removals.begin(); iter != m_removals.end();)
 	{
-		auto state = std::find_if(m_states.begin(), m_states.end(), [iter](const auto& state) {return state.get()->getType() == *iter; });
+		auto state = std::find_if(m_states.begin(), m_states.end(), [iter](const auto& state) { return state->getType() == *iter; });
 		assert(state != m_states.cend());
 
 		m_states.erase(state);
@@ -122,8 +150,27 @@ void StateManager::handleRemovals()
 	}
 }
 
+void StateManager::handleSwapState()
+{
+	if (!m_stateToSwap)
+	{
+		return;
+	}
+
+	for (auto& state : m_states)
+	{
+		if (state->getType() == *m_stateToSwap)
+		{
+			std::swap(state, m_states.back());
+			GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::NewState);
+		}
+	}
+
+	m_stateToSwap.release();
+}
+
 void StateManager::createState(StateType stateToCreate)
 {
-	auto& newState = m_stateFactory.getState(stateToCreate);
-	m_states.emplace_back(std::move(newState));
+	auto& newState = *m_stateFactory.getState(stateToCreate);
+	m_states.push_front(&newState);
 }

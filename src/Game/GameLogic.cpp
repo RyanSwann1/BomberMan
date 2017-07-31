@@ -4,6 +4,11 @@
 #include <Entities\CollisionHandler.h>
 #include <Entities\EntityTag.h>
 
+void GameLogic::addCollidableTileToMap(const sf::Vector2f & position, EntityManager & entityManager)
+{
+	
+}
+
 const sf::Vector2f & GameLogic::getEntityPosition(const EntityManager & entityManager, EntityTag entityTag)
 {
 	const auto& entities = entityManager.getEntities();

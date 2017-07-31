@@ -52,5 +52,6 @@ const sf::Texture & TileSheet::getTexture() const
 
 void TileSheet::releaseTileSheet() const
 {
-	TextureManagerLocator::getTextureManager().releaseResource(m_name);
+	auto& textureManager = TextureManagerLocator::getTextureManager();
+	textureManager.releaseResource(m_name);
 }

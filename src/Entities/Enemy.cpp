@@ -80,7 +80,6 @@ void Enemy::update(float deltaTime)
 	if (!m_reachedTargetPoint)
 	{
 		moveToTargetPoint(graph, tileSize, opponentFound);
-		initializeGraph(opponentAtPoint, graph, opponentFound, tileSize);
 		if (reachedTargetPoint(graph, tileSize))
 		{
 			if (m_state != State::MovingToSafePoint)
@@ -253,6 +252,7 @@ void Enemy::initializeGraph(sf::Vector2i& opponentAtPoint, std::vector<Point>& g
 
 void Enemy::addNeighbouringPointsToFrontier(sf::Vector2i& opponentAtPoint, const Point& point, std::vector<Point>& graph, std::deque<Point>& frontier, int& pointID, bool& opponentFound, int tileSize)
 {
+	//x
 	for (int x = point.m_point.x - 1; x <= point.m_point.x + 1; x += 2)
 	{
 		if (CollisionHandler::isCollidableTileAtPosition(sf::Vector2i(x, point.m_point.y)))
@@ -266,14 +266,6 @@ void Enemy::addNeighbouringPointsToFrontier(sf::Vector2i& opponentAtPoint, const
 		}
 
 		if (CollisionHandler::isEntityAtPosition(EntityTag::Player, sf::Vector2f(x * tileSize, point.m_point.y * tileSize), m_entityManager))
-		{
-			opponentFound = true;
-			opponentAtPoint = sf::Vector2i(x, point.m_point.y);
-			addNewPoint(sf::Vector2i(x, point.m_point.y), graph, frontier, pointID, point.m_ID);
-			break;
-		}
-
-		if (CollisionHandler::isEntityAtPosition(EntityTag::Enemy, sf::Vector2f(x * tileSize, point.m_point.y * tileSize), m_entityManager))
 		{
 			opponentFound = true;
 			opponentAtPoint = sf::Vector2i(x, point.m_point.y);
@@ -300,6 +292,7 @@ void Enemy::addNeighbouringPointsToFrontier(sf::Vector2i& opponentAtPoint, const
 		addNewPoint(sf::Vector2i(x, point.m_point.y), graph, frontier, pointID, point.m_ID);
 	}
 
+	//y
 	for (int y = point.m_point.y - 1; y <= point.m_point.y + 1; y += 2)
 	{
 		if (CollisionHandler::isCollidableTileAtPosition(sf::Vector2i(point.m_point.x, y)))
@@ -313,14 +306,6 @@ void Enemy::addNeighbouringPointsToFrontier(sf::Vector2i& opponentAtPoint, const
 		}
 
 		if (CollisionHandler::isEntityAtPosition(EntityTag::Player, sf::Vector2f(point.m_point.x * tileSize, y * tileSize), m_entityManager))
-		{
-			opponentFound = true;
-			opponentAtPoint = sf::Vector2i(point.m_point.x, y);
-			addNewPoint(sf::Vector2i(point.m_point.x, y), graph, frontier, pointID, point.m_ID);
-			break;
-		}
-
-		if (CollisionHandler::isEntityAtPosition(EntityTag::Enemy, sf::Vector2f(point.m_point.x * tileSize, y * tileSize), m_entityManager))
 		{
 			opponentFound = true;
 			opponentAtPoint = sf::Vector2i(point.m_point.x, y);
@@ -612,7 +597,7 @@ bool Enemy::neighbouringCrateAtPoint(const std::vector<sf::Vector2i>& points, in
 void Enemy::setTargetPointAtSafePoint(const std::vector<Point>& graph, int tileSize)
 {
 	bool pointSafe = false;
-	const int maxSafePoints = 3;
+	const int maxSafePoints = 5;
 	std::vector<int> safePointsID;
 	int pointID = 0;
 
@@ -630,6 +615,11 @@ void Enemy::setTargetPointAtSafePoint(const std::vector<Point>& graph, int tileS
 
 	if (!safePointsID.empty())
 	{
+		if (safePointsID.size() >= 4)
+		{
+			int i = 0;
+		}
+
 		const auto randPointID = RandomNumberGenerator::getRandomNumber(1, safePointsID.size());
 		std::cout << randPointID << "\n";
 		
