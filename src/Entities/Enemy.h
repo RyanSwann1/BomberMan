@@ -17,7 +17,7 @@ class Enemy : public Character
 	enum class State
 	{
 		TargetOpponent = 0,
-		TargetCrates,
+		TargettingCrates,
 		setTargetPointAtCrate,
 		setTargetPointAtSafePoint,
 		InitializeState,
@@ -72,19 +72,19 @@ private:
 	void Enemy::addNeighbouringPointsToFrontier(sf::Vector2i& opponentAtPoint, const Point& point, std::vector<Point>& graph, std::deque<Point>& frontier, 
 		int& pointID, bool& opponentFound, int tileSize);	
 	void addNewPoint(const sf::Vector2i& position, std::vector<Point>& graph, std::deque<Point>& frontier, int& pointID, int cameFromID);
-	void initializeTargetPointAtCrate(const std::vector<Point>& graph, int tileSize);
+	void setTargetPointAtCrate(const std::vector<Point>& graph, int tileSize);
 	void moveToTargetPoint(const std::vector<Point>& graph, int tileSize, bool opponentFound);
 	void setNewTargetPoint(const sf::Vector2i& point);
 	bool reachedTargetPoint(const std::vector<Point>& graph, int tileSize) const;
-	bool isTargetAtTargetPoint(const std::vector<Point>& graph, EntityTag entityTag, int tileSize) const;
+	bool isTargetNeighbouringTargetPoint(const std::vector<Point>& graph, EntityTag entityTag, int tileSize) const;
 	bool isPointOnGraph(const std::vector<Point>& graph, const sf::Vector2i& point) const;
 
 	std::vector<sf::Vector2i> getNeighbouringPointsOnGraph(const sf::Vector2i& startingPoint, const std::vector<Point>& graph) const;
-	std::vector<sf::Vector2i> getNeighbouringPointsNotOnGraph(const sf::Vector2i& startingPoint) const;
+	std::vector<sf::Vector2i> getNeighbouringPointsOnCrates(const sf::Vector2i& startingPoint, int tileSize) const;
 	std::vector<sf::Vector2i> getNeighbouringPointsOnGraphContainingBomb(const sf::Vector2i& startingPoint, const std::vector<Point>& graph, int tileSize) const;
 	const Point& getPointOnGraph(const std::vector<Point>& graph, const sf::Vector2i& position) const;
 	const Point& getPointOnGraph(const std::vector<Point>& graph, int ID) const;
-	const Point& getNeighbouringPointOnGraph(const sf::Vector2i& point, const std::vector<Point>& graph) const;
+	const sf::Vector2i getNeighbouringPointOnGraph(const sf::Vector2i& point, const std::vector<Point>& graph) const;
 	bool isPointInRadiusOfHarm(const std::vector<Point>& graph, const Point& point, int tileSize) const;
 
 	void setTargetPointAtSafePoint(const std::vector<Point>& graph, int tileSize);
