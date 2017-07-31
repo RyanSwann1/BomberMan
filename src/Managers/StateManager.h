@@ -2,10 +2,11 @@
 
 #include <States\StateBase.h>
 #include <vector>
+#include <deque>
 #include <unordered_map>
-#include <memory>
 #include <functional>
 #include <assert.h>
+#include <memory>
 
 class StateManager
 {
@@ -14,43 +15,48 @@ class StateManager
 	public:
 		StateFactory(StateManager* stateManager);
 
-		std::unique_ptr<StateBase> getState(StateType stateType) const;
+		StateBase* getState(StateType stateType) const;
 
 	private:
-		std::unordered_map<StateType, std::function<std::unique_ptr<StateBase>()>> m_stateFactory;
+		std::unordered_map<StateType, std::function<StateBase*()>> m_stateFactory;
 
 		template <class State>
 		void registerState(StateManager* stateManager, StateType stateType)
 		{
 			assert(m_stateFactory.find(stateType) == m_stateFactory.cend());
-			m_stateFactory.emplace(stateType, [stateManager, stateType]() -> std::unique_ptr<StateBase>
+			m_stateFactory.emplace(stateType, [stateManager, stateType] () -> StateBase*
 			{
-				return std::make_unique<State>(*stateManager, stateType);
+				return new State(*stateManager, stateType);
 			});
 		}
 	};
 
 public:
 	StateManager();
+	~StateManager();
 	StateManager(const StateManager&) = delete;
 	StateManager& operator=(const StateManager&) = delete;
 	StateManager(StateManager&&) = delete;
 	StateManager&& operator=(StateManager&&) = delete;
 
+	StateType getCurrentStateType() const;
+
+	void createState(StateType stateToCreate);
+	void removeState(StateType stateToRemove);
 	void switchToState(StateType stateToSwitch);
 	void switchToAndRemoveState(StateType stateToSwitchTo, StateType stateToRemove);
 	void update(float deltaTime);
 	void draw(sf::RenderWindow& window);
 
 private:
-	StateFactory m_stateFactory;
-	std::vector<std::unique_ptr<StateBase>> m_states;
+	const StateFactory m_stateFactory;
+	std::deque<StateBase*> m_states;
 	std::vector<StateType> m_stateQueue;
 	std::vector<StateType> m_removals;
-	std::unique_ptr<StateBase> m_tempStateToAdd;
+	std::unique_ptr<StateType> m_stateToSwap;
 
 	void handleQueue();
 	void handleRemovals();
-	void createState(StateType stateToCreate);
-	void removeState(StateType stateToRemove);
+	void handleSwapState();
+	void purgeStates();
 };

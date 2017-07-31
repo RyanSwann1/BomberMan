@@ -8,6 +8,8 @@ class Entity;
 class EntityManager;
 namespace GameLogic
 {	
+	void addCollidableTileToMap(const sf::Vector2f& position, EntityManager& entityManager);
+
 	const sf::Vector2f& getEntityPosition(const EntityManager& entityManager, EntityTag entityTag);
 	const sf::Vector2f& getPlayerPosition(const EntityManager& entityManager);
 	bool isEntityAtPosition(const EntityManager& entityManager, const sf::Vector2i& position, EntityTag entityTag);

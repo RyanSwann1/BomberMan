@@ -9,9 +9,17 @@
 #include <Game\AILogic.h>
 #include <Game\GameLogic.h>
 #include <Game\DebugOverlay.h>
+#include <Entities\CollisionHandler.h>
+#include <Entities\Direction.h>
+
+int getNextRowSpawn(const sf::Vector2i& startingPoint, const sf::Vector2i& endingPoint, Direction searchDirection);
+int getNextColumnSpawn(const sf::Vector2i& startingPoint, const sf::Vector2i& endingPoint, Direction searchDirection);
 
 GameManager::GameManager()
-	: m_enemiesRemaining(3)
+	: m_enemiesRemaining(3),
+	m_totalGameTime(10.0f),
+	m_gameTimer(m_totalGameTime, true),
+	m_reduceMapSize(false)
 {
 	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
 	gameEventMessenger.subscribe(std::bind(&GameManager::winGame, this), "GameManager", GameEvent::WinGame);
@@ -27,6 +35,23 @@ GameManager::~GameManager()
 	gameEventMessenger.unsubscribe("GameManager", GameEvent::EnemyDeath);
 	gameEventMessenger.unsubscribe("GameManager", GameEvent::ClearMap);
 	gameEventMessenger.unsubscribe("GameManager", GameEvent::PlayerDeath);
+}
+
+void GameManager::update(float deltaTime)
+{
+	//m_gameTimer.update(deltaTime);
+
+	//if (m_reduceMapSize)
+	//{
+	//	reduceMapSize();
+	//}
+	//else
+	//{
+	//	if (m_gameTimer.getElaspedTime() >= (m_totalGameTime / 2.0f))
+	//	{
+	//		m_reduceMapSize = true;
+	//	}
+	//}
 }
 
 void GameManager::winGame()
@@ -57,4 +82,103 @@ void GameManager::onPlayerDeath()
 {
 	resetEnemyCount();	
 	getStateManager().switchToState(StateType::RoundFailed);
+}
+
+void GameManager::reduceMapSize()
+{
+	const auto& levelSize = LevelManagerLocator::getLevelManager().getCurrentLevel()->getSize();
+
+}
+
+int getNextRowSpawn(const sf::Vector2i& startingPoint, const sf::Vector2i& endingPoint, Direction searchDirection)
+{
+	bool rowFound = false;
+	int i = 0;
+	switch (searchDirection)
+	{
+	case Direction::Up :
+	{
+		for (int y = startingPoint.y; y >= endingPoint.y; --y)
+		{
+			if (!rowFound && CollisionHandler::isCollidableTileAtPosition(sf::Vector2i(startingPoint.x, y)))
+			{
+				rowFound = true;
+			}
+
+			if (rowFound && !CollisionHandler::isCollidableTileAtPosition(sf::Vector2i(startingPoint.x, y)))
+			{
+				i = y;
+				break;
+			}
+		}
+		break;
+	}
+	case Direction::Down :
+	{
+		for (int y = startingPoint.y; y <= endingPoint.y; ++y)
+		{
+			if (!rowFound && CollisionHandler::isCollidableTileAtPosition(sf::Vector2i(startingPoint.x, y)))
+			{
+				rowFound = true;
+			}
+
+			if (rowFound && !CollisionHandler::isCollidableTileAtPosition(sf::Vector2i(startingPoint.x, y)))
+			{
+				i = y;
+				break;
+			}
+		}
+		break;
+	}
+	}
+
+	assert(i != 0);
+	return i;
+}
+
+int getNextColumnSpawn(const sf::Vector2i & startingPoint, const sf::Vector2i & endingPoint, Direction searchDirection)
+{
+	bool columnFound = false;
+	int i = 0;
+	switch (searchDirection)
+	{
+	case Direction::Right :
+	{
+		for (int x = startingPoint.x; x <= endingPoint.x; ++x)
+		{
+			if (!columnFound && CollisionHandler::isCollidableTileAtPosition(sf::Vector2i(x, startingPoint.y)))
+			{
+				columnFound = true;
+			}
+
+			if (columnFound && !CollisionHandler::isCollidableTileAtPosition(sf::Vector2i(x, startingPoint.y)))
+			{
+				i = x;
+				break;
+			}
+		}
+		break;
+	}
+	case Direction::Left :
+	{
+		for (int x = startingPoint.x; x >= endingPoint.x; --x)
+		{
+			if (!columnFound && CollisionHandler::isCollidableTileAtPosition(sf::Vector2i(x, startingPoint.y)))
+			{
+				columnFound = true;
+			}
+
+			if (columnFound && !CollisionHandler::isCollidableTileAtPosition(sf::Vector2i(x, startingPoint.y)))
+			{
+				i = x;
+				break;
+			}
+		}
+
+		break;
+	}
+	}
+
+	assert(i != 0);
+	return i;
 }

@@ -12,6 +12,7 @@ class StateGame : public StateBase
 {
 public:
 	StateGame(StateManager& stateManager, StateType stateType);
+	~StateGame();
 
 	void update(float deltaTime) override;
 	void draw(sf::RenderWindow& window) override;
@@ -23,4 +24,8 @@ private:
 	TileSheetManager m_tileSheetManager;
 	EntityManager m_entityManager;
 	LevelManager m_levelManager;
+	bool m_gamePaused;
+
+	void pauseGame();
+	void unpauseGame();
 };

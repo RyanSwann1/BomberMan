@@ -51,7 +51,7 @@ class ResourceManager
 	};
 
 public:
-	ResourceManager(std::vector<FileDirectory>&& fileDirectories)
+	ResourceManager(std::vector<FileDirectory> fileDirectories)
 	: m_resources(),
 	m_fileDirectories(std::move(fileDirectories))
 	{

@@ -8,5 +8,9 @@ enum class GameEvent
 	ChangeToNextLevel,
 	WinGame,
 	EnemyDeath,
-	EnemyAggressive
+	EnemyAggressive,
+	NewState,
+	CloseWindow,
+	Pause,
+	Unpause
 };
