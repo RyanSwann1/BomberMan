@@ -12,14 +12,18 @@
 #include <Entities\CollisionHandler.h>
 #include <Entities\Direction.h>
 
-int getNextRowSpawn(const sf::Vector2i& startingPoint, const sf::Vector2i& endingPoint, Direction searchDirection);
-int getNextColumnSpawn(const sf::Vector2i& startingPoint, const sf::Vector2i& endingPoint, Direction searchDirection);
+int getNextRowSpawn(const sf::Vector2i& startingPoint, const sf::Vector2i& endingPoint, Direction searchDirection, int tileSize);
+int getNextColumnSpawn(const sf::Vector2i& startingPoint, const sf::Vector2i& endingPoint, Direction searchDirection, int tileSize);
 
-GameManager::GameManager()
+GameManager::GameManager(EntityManager& entityManager)
 	: m_enemiesRemaining(3),
+	m_entityManager(entityManager),
 	m_totalGameTime(10.0f),
 	m_gameTimer(m_totalGameTime, true),
-	m_reduceMapSize(false)
+	m_spawnTimer(0.25f, true),
+	m_reduceMapSize(false),
+	m_currentSpawnPosition(0, 0),
+	m_spawnDirection(Direction::Right)
 {
 	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
 	gameEventMessenger.subscribe(std::bind(&GameManager::winGame, this), "GameManager", GameEvent::WinGame);
@@ -39,8 +43,13 @@ GameManager::~GameManager()
 
 void GameManager::update(float deltaTime)
 {
-	//m_gameTimer.update(deltaTime);
+	/*m_spawnTimer.update(deltaTime);
+	if (m_spawnTimer.isExpired())
+	{
+		reduceMapSize();
+	}*/
 
+	//m_gameTimer.update(deltaTime);
 	//if (m_reduceMapSize)
 	//{
 	//	reduceMapSize();
@@ -86,11 +95,56 @@ void GameManager::onPlayerDeath()
 
 void GameManager::reduceMapSize()
 {
-	const auto& levelSize = LevelManagerLocator::getLevelManager().getCurrentLevel()->getSize();
+	const auto& levelSize = LevelManagerLocator::getLevelManager().getCurrentLevel()->getSize();	
+	switch (m_spawnDirection)
+	{
+	case Direction::Left :
+	{
+		if (m_currentSpawnPosition.x <= 0)
+		{
+			m_spawnDirection = Direction::Up;
+			break;
+		}
 
+		--m_currentSpawnPosition.x;
+		break;
+	}
+	case Direction::Right :
+	{
+		if (m_currentSpawnPosition.x == levelSize.x - 1)
+		{
+			m_spawnDirection = Direction::Down;
+			break;
+		}
+
+		++m_currentSpawnPosition.x;
+		break;
+	}
+	case Direction::Up :
+	{
+		
+
+		break;
+	}
+	case Direction::Down :
+	{
+		if (m_currentSpawnPosition.y >= levelSize.y - 1)
+		{
+			m_spawnDirection = Direction::Left;
+			break;
+		}
+
+		++m_currentSpawnPosition.y;
+		break;
+	}
+	}
+
+	const int tileSize = LevelManagerLocator::getLevelManager().getCurrentLevel()->getTileSize();
+	m_entityManager.addEntity("CollidableTile", sf::Vector2f(m_currentSpawnPosition.x * tileSize, m_currentSpawnPosition.y * tileSize));
+	m_spawnTimer.reset();
 }
 
-int getNextRowSpawn(const sf::Vector2i& startingPoint, const sf::Vector2i& endingPoint, Direction searchDirection)
+int getNextRowSpawn(const sf::Vector2i& startingPoint, const sf::Vector2i& endingPoint, Direction searchDirection, int tileSize)
 {
 	bool rowFound = false;
 	int i = 0;
@@ -100,12 +154,12 @@ int getNextRowSpawn(const sf::Vector2i& startingPoint, const sf::Vector2i& endin
 	{
 		for (int y = startingPoint.y; y >= endingPoint.y; --y)
 		{
-			if (!rowFound && CollisionHandler::isCollidableTileAtPosition(sf::Vector2i(startingPoint.x, y)))
+			if (!rowFound && CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(startingPoint.x, y), tileSize))
 			{
 				rowFound = true;
 			}
 
-			if (rowFound && !CollisionHandler::isCollidableTileAtPosition(sf::Vector2i(startingPoint.x, y)))
+			if (rowFound && !CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(startingPoint.x, y), tileSize))
 			{
 				i = y;
 				break;
@@ -117,12 +171,12 @@ int getNextRowSpawn(const sf::Vector2i& startingPoint, const sf::Vector2i& endin
 	{
 		for (int y = startingPoint.y; y <= endingPoint.y; ++y)
 		{
-			if (!rowFound && CollisionHandler::isCollidableTileAtPosition(sf::Vector2i(startingPoint.x, y)))
+			if (!rowFound && CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(startingPoint.x, y), tileSize))
 			{
 				rowFound = true;
 			}
 
-			if (rowFound && !CollisionHandler::isCollidableTileAtPosition(sf::Vector2i(startingPoint.x, y)))
+			if (rowFound && !CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(startingPoint.x, y), tileSize))
 			{
 				i = y;
 				break;
@@ -136,7 +190,7 @@ int getNextRowSpawn(const sf::Vector2i& startingPoint, const sf::Vector2i& endin
 	return i;
 }
 
-int getNextColumnSpawn(const sf::Vector2i & startingPoint, const sf::Vector2i & endingPoint, Direction searchDirection)
+int getNextColumnSpawn(const sf::Vector2i & startingPoint, const sf::Vector2i & endingPoint, Direction searchDirection, int tileSize)
 {
 	bool columnFound = false;
 	int i = 0;
@@ -146,12 +200,12 @@ int getNextColumnSpawn(const sf::Vector2i & startingPoint, const sf::Vector2i & 
 	{
 		for (int x = startingPoint.x; x <= endingPoint.x; ++x)
 		{
-			if (!columnFound && CollisionHandler::isCollidableTileAtPosition(sf::Vector2i(x, startingPoint.y)))
+			if (!columnFound && CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(x, startingPoint.y), tileSize))
 			{
 				columnFound = true;
 			}
 
-			if (columnFound && !CollisionHandler::isCollidableTileAtPosition(sf::Vector2i(x, startingPoint.y)))
+			if (columnFound && !CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(x, startingPoint.y), tileSize))
 			{
 				i = x;
 				break;
@@ -163,12 +217,12 @@ int getNextColumnSpawn(const sf::Vector2i & startingPoint, const sf::Vector2i & 
 	{
 		for (int x = startingPoint.x; x >= endingPoint.x; --x)
 		{
-			if (!columnFound && CollisionHandler::isCollidableTileAtPosition(sf::Vector2i(x, startingPoint.y)))
+			if (!columnFound && CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(x, startingPoint.y), tileSize))
 			{
 				columnFound = true;
 			}
 
-			if (columnFound && !CollisionHandler::isCollidableTileAtPosition(sf::Vector2i(x, startingPoint.y)))
+			if (columnFound && !CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(x, startingPoint.y), tileSize))
 			{
 				i = x;
 				break;
