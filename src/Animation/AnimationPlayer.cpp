@@ -101,7 +101,12 @@ AnimationPlayer::Animation::Animation(const std::string & tileSheetName, Animati
 	m_animationPlaying(true),
 	m_reverseAnimation(false),
 	m_frameTimer(frameTime, true)
-{}
+{
+	if (m_frameTimer.getExpirationTime() == 0.0f)
+	{
+		m_frameTimer.deactivate();
+	}
+}
 
 AnimationName  AnimationPlayer::Animation::getName() const
 {
@@ -128,18 +133,19 @@ void AnimationPlayer::Animation::update(float deltaTime)
 	{
 		return;
 	}
+
+	if (!m_frameTimer.isActive())
+	{
+		return;
+	}
 	
+
 	m_frameTimer.update(deltaTime);
 	if (!m_frameTimer.isExpired())
 	{
 		return;
 	}
-
-	//m_elaspedTime += deltaTime;
-	//if (m_elaspedTime < m_frameTime)
-	//{
-	//	return;
-	//}
+	
 
 	if (m_currentFrame == m_endFrame)
 	{

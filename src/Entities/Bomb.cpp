@@ -7,8 +7,8 @@
 #include <Locators\AudioPlayerLocator.h>
 #include <Audio\AudioPlayer.h>
 
-Bomb::Bomb(const std::string& name, EntityTag tag, const sf::Vector2f & position, EntityManager & entityManager, int entityID)
-	: Entity(name, tag, position, entityManager, entityID)
+Bomb::Bomb(const std::string& name, EntityTag tag, const sf::Vector2f & position, EntityManager & entityManager, int entityID, bool collidable)
+	: Entity(name, tag, position, entityManager, entityID, collidable)
 {}
 
 void Bomb::update(float deltaTime)
@@ -52,13 +52,13 @@ std::vector<sf::Vector2f> Bomb::getExplosionSpawnPositions() const
 	const int entityYPosition(std::floor(m_position.y / tileSize));
 	for (int x = entityXPosition; x <= entityXPosition + 2; ++x)
 	{
-		if (CollisionHandler::isEntityAtPosition(EntityTag::Crate, sf::Vector2f(x * tileSize, entityYPosition * tileSize), m_entityManager))
+		if (CollisionHandler::isEntityAtPosition(sf::Vector2f(x, entityYPosition), m_entityManager, EntityTag::Crate, tileSize))
 		{
 			explosionSpawnPositions.emplace_back(x * tileSize, entityYPosition * tileSize);
 			break;
 		}
 
-		if (!CollisionHandler::isCollidableTileAtPosition(sf::Vector2i(x, entityYPosition)))
+		if (!CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(x, entityYPosition), tileSize))
 		{
 			explosionSpawnPositions.emplace_back(x * tileSize, entityYPosition * tileSize);
 			continue;
@@ -69,13 +69,13 @@ std::vector<sf::Vector2f> Bomb::getExplosionSpawnPositions() const
 
 	for (int x = entityXPosition; x >= entityXPosition - 2; --x)
 	{
-		if (CollisionHandler::isEntityAtPosition(EntityTag::Crate, sf::Vector2f(x * tileSize, entityYPosition * tileSize), m_entityManager))
+		if (CollisionHandler::isEntityAtPosition(sf::Vector2f(x, entityYPosition), m_entityManager, EntityTag::Crate, tileSize))
 		{
 			explosionSpawnPositions.emplace_back(x * tileSize, entityYPosition * tileSize);
 			break;
 		}
 
-		if (!CollisionHandler::isCollidableTileAtPosition(sf::Vector2i(x, entityYPosition)))
+		if (!CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(x, entityYPosition), tileSize))
 		{
 			explosionSpawnPositions.emplace_back(x * tileSize, entityYPosition * tileSize);
 			continue;
@@ -87,13 +87,13 @@ std::vector<sf::Vector2f> Bomb::getExplosionSpawnPositions() const
 	//Get Y Axis spawn positions
 	for (int y = entityYPosition; y <= entityYPosition + 2; ++y)
 	{
-		if (CollisionHandler::isEntityAtPosition(EntityTag::Crate, sf::Vector2f(entityXPosition * tileSize, y * tileSize), m_entityManager))
+		if (CollisionHandler::isEntityAtPosition(sf::Vector2f(entityXPosition, y), m_entityManager, EntityTag::Crate, tileSize))
 		{
 			explosionSpawnPositions.emplace_back(entityXPosition * tileSize, y * tileSize);
 			break;
 		}
 
-		if (!CollisionHandler::isCollidableTileAtPosition(sf::Vector2i(entityXPosition, y)))
+		if (!CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(entityXPosition, y), tileSize))
 		{
 			explosionSpawnPositions.emplace_back(entityXPosition * tileSize, y * tileSize);
 			continue;
@@ -104,13 +104,13 @@ std::vector<sf::Vector2f> Bomb::getExplosionSpawnPositions() const
 
 	for (int y = entityYPosition; y >= entityYPosition - 2; --y)
 	{
-		if (CollisionHandler::isEntityAtPosition(EntityTag::Crate, sf::Vector2f(entityXPosition * tileSize, y * tileSize), m_entityManager))
+		if (CollisionHandler::isEntityAtPosition(sf::Vector2f(entityXPosition, y), m_entityManager, EntityTag::Crate, tileSize))
 		{
 			explosionSpawnPositions.emplace_back(entityXPosition * tileSize, y * tileSize);
 			break;
 		}
 
-		if (!CollisionHandler::isCollidableTileAtPosition(sf::Vector2i(entityXPosition, y)))
+		if (!CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(entityXPosition, y), tileSize))
 		{
 			explosionSpawnPositions.emplace_back(entityXPosition * tileSize, y * tileSize);
 			continue;

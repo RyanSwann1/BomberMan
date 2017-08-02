@@ -6,9 +6,9 @@
 #include <Locators\AudioPlayerLocator.h>
 #include <Audio\AudioPlayer.h>
 
-Character::Character(const std::string& name, EntityTag tag, const sf::Vector2f & spawnPosition, EntityManager & entityManager, int ID)
-	: Entity(name, tag ,spawnPosition, entityManager, ID),
-	m_speed(50, 50),
+Character::Character(const std::string& name, EntityTag tag, const sf::Vector2f & spawnPosition, EntityManager & entityManager, int ID, bool collidable)
+	: Entity(name, tag ,spawnPosition, entityManager, ID, collidable),
+	m_speed(35, 35),
 	m_velocity(),
 	m_oldPosition(),
 	m_currentMoveDirection(Direction::None),
@@ -33,7 +33,7 @@ void Character::update(float deltaTime)
 
 void Character::handleEntityCollision(const std::unique_ptr<Entity>& entity, const sf::FloatRect& intersection)
 {
-	if (entity->getTag() == EntityTag::Crate)
+	if (entity->isCollidable())
 	{
 		CollisionHandler::clampMovement(intersection, m_velocity);
 	}

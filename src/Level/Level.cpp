@@ -4,10 +4,8 @@
 #include <assert.h>
 #include <math.h>
 
-Level::Level(std::vector<TileLayer>&& tileLayers, std::vector<sf::Vector2i>&& collisionLayer,
-	const std::string& levelName, const sf::Vector2i& levelSize, int tileSize)
+Level::Level(std::vector<TileLayer>&& tileLayers, const std::string& levelName, const sf::Vector2i& levelSize, int tileSize)
 	: m_tileLayers(std::move(tileLayers)),
-	m_collisionLayer(std::move(collisionLayer)),
 	m_levelName(levelName),
 	m_levelSize(levelSize),
 	m_tileSize(tileSize)
@@ -33,10 +31,10 @@ const std::string & Level::getName() const
 	return m_levelName;
 }
 
-const std::vector<sf::Vector2i>& Level::getCollisionLayer() const
-{
-	return m_collisionLayer;
-}
+//const std::vector<sf::Vector2i>& Level::getCollisionLayer() const
+//{
+//	return m_collisionLayer;
+//}
 
 int Level::getTileSize() const
 {

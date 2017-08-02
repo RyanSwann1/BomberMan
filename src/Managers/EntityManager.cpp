@@ -12,13 +12,14 @@
 //EntityFactory
 EntityManager::EntityFactory::EntityFactory(EntityManager * entityManager)
 {
-	registerEntity<Player>("Player", EntityTag::Player, entityManager);
-	registerEntity<Bomb>("Bomb", EntityTag::Bomb, entityManager);
-	registerEntity<Explosion>("Explosion", EntityTag::Explosion, entityManager);
-	registerEntity<Enemy>("Enemy1", EntityTag::Enemy, entityManager);
-	registerEntity<Enemy>("Enemy2", EntityTag::Enemy, entityManager);
-	registerEntity<Enemy>("Enemy3", EntityTag::Enemy, entityManager);
-	registerEntity<Crate>("Crate", EntityTag::Crate, entityManager);
+	registerEntity<Player>("Player", EntityTag::Player, entityManager, false);
+	registerEntity<Bomb>("Bomb", EntityTag::Bomb, entityManager, false);
+	registerEntity<Explosion>("Explosion", EntityTag::Explosion, entityManager, false);
+	registerEntity<Enemy>("Enemy1", EntityTag::Enemy, entityManager, false);
+	registerEntity<Enemy>("Enemy2", EntityTag::Enemy, entityManager, false);
+	registerEntity<Enemy>("Enemy3", EntityTag::Enemy, entityManager, false);
+	registerEntity<Crate>("Crate", EntityTag::Crate, entityManager, true);
+	registerEntity<Entity>("CollidableTile", EntityTag::Solid, entityManager, true);
 }
 
 std::unique_ptr<Entity> EntityManager::EntityFactory::getEntity(const std::string& name, const sf::Vector2f & entityPosition, int entityID) const

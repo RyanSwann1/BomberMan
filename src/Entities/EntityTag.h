@@ -7,5 +7,6 @@ enum class EntityTag
 	Crate,
 	Explosion,
 	Bomb,
+	Solid,
 	None
 };

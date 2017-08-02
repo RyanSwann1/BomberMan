@@ -15,18 +15,18 @@ class StateManager
 	public:
 		StateFactory(StateManager* stateManager);
 
-		StateBase* getState(StateType stateType) const;
+		std::unique_ptr<StateBase> getState(StateType stateType) const;
 
 	private:
-		std::unordered_map<StateType, std::function<StateBase*()>> m_stateFactory;
+		std::unordered_map<StateType, std::function<std::unique_ptr<StateBase>()>> m_stateFactory;
 
 		template <class State>
 		void registerState(StateManager* stateManager, StateType stateType)
 		{
 			assert(m_stateFactory.find(stateType) == m_stateFactory.cend());
-			m_stateFactory.emplace(stateType, [stateManager, stateType] () -> StateBase*
+			m_stateFactory.emplace(stateType, [stateManager, stateType] () -> std::unique_ptr<StateBase>
 			{
-				return new State(*stateManager, stateType);
+				return std::make_unique<State>(*stateManager, stateType);
 			});
 		}
 	};
@@ -50,7 +50,7 @@ public:
 
 private:
 	const StateFactory m_stateFactory;
-	std::deque<StateBase*> m_states;
+	std::deque<std::unique_ptr<StateBase>> m_states;
 	std::vector<StateType> m_stateQueue;
 	std::vector<StateType> m_removals;
 	std::unique_ptr<StateType> m_stateToSwap;

@@ -4,8 +4,8 @@
 #include <Managers\LevelManager.h>
 #include <Locators\LevelManagerLocator.h>
 
-Crate::Crate(const std::string& name, EntityTag tag, const sf::Vector2f & spawnPosition, EntityManager & entityManager, int ID)
-	: Entity(name, tag, spawnPosition, entityManager, ID)
+Crate::Crate(const std::string& name, EntityTag tag, const sf::Vector2f & spawnPosition, EntityManager & entityManager, int ID, bool collidable)
+	: Entity(name, tag, spawnPosition, entityManager, ID, collidable)
 {
 }
 

@@ -6,8 +6,8 @@
 #include <Audio\AudioClipName.h>
 #include <math.h>
 
-Player::Player(const std::string& name, EntityTag tag, const sf::Vector2f & spawnPosition, EntityManager & entityManager, int ID)
-	: Character(name, tag, spawnPosition, entityManager, ID)
+Player::Player(const std::string& name, EntityTag tag, const sf::Vector2f & spawnPosition, EntityManager & entityManager, int ID, bool collidable)
+	: Character(name, tag, spawnPosition, entityManager, ID, collidable)
 {
 }
 

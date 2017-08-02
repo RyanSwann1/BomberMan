@@ -7,6 +7,11 @@ Timer::Timer(float expirationTime, bool active)
 {
 }
 
+float Timer::getExpirationTime() const
+{
+	return m_expirationTime;
+}
+
 float Timer::getElaspedTime() const
 {
 	return m_elaspedTime;

@@ -40,7 +40,7 @@ class Enemy : public Character
 	};
 
 public:
-	Enemy(const std::string& name, EntityTag tag, const sf::Vector2f& position, EntityManager& entityManager, int entityID);
+	Enemy(const std::string& name, EntityTag tag, const sf::Vector2f& position, EntityManager& entityManager, int entityID, bool collidable);
 	~Enemy();
 
 	void handleEntityCollision(const std::unique_ptr<Entity>& entity, const sf::FloatRect& intersection) override;
@@ -73,24 +73,24 @@ private:
 		int& pointID, bool& opponentFound, int tileSize);	
 	void addNewPoint(const sf::Vector2i& position, std::vector<Point>& graph, std::deque<Point>& frontier, int& pointID, int cameFromID);
 	void setTargetPointAtCrate(const std::vector<Point>& graph, int tileSize);
-	void moveToTargetPoint(const std::vector<Point>& graph, int tileSize, bool opponentFound);
+	void moveToTargetPoint(const std::vector<Point>& graph, int tileSize);
 	void setNewTargetPoint(const sf::Vector2i& point);
 	bool reachedTargetPoint(const std::vector<Point>& graph, int tileSize) const;
 	bool isTargetNeighbouringTargetPoint(const std::vector<Point>& graph, EntityTag entityTag, int tileSize) const;
 	bool isPointOnGraph(const std::vector<Point>& graph, const sf::Vector2i& point) const;
 
-	std::vector<sf::Vector2i> getNeighbouringPointsOnGraph(const sf::Vector2i& startingPoint, const std::vector<Point>& graph) const;
+	std::vector<sf::Vector2i> getNeighbouringPointsOnGraph(const sf::Vector2i& startingPoint, const std::vector<Point>& graph, int tileSize) const;
 	std::vector<sf::Vector2i> getNeighbouringPointsOnCrates(const sf::Vector2i& startingPoint, int tileSize) const;
 	std::vector<sf::Vector2i> getNeighbouringPointsOnGraphContainingBomb(const sf::Vector2i& startingPoint, const std::vector<Point>& graph, int tileSize) const;
 	const Point& getPointOnGraph(const std::vector<Point>& graph, const sf::Vector2i& position) const;
 	const Point& getPointOnGraph(const std::vector<Point>& graph, int ID) const;
-	const sf::Vector2i getNeighbouringPointOnGraph(const sf::Vector2i& point, const std::vector<Point>& graph) const;
+	const sf::Vector2i getNeighbouringPointOnGraph(const sf::Vector2i& point, const std::vector<Point>& graph, int tileSize) const;
 	bool isPointInRadiusOfHarm(const std::vector<Point>& graph, const Point& point, int tileSize) const;
 
 	void setTargetPointAtSafePoint(const std::vector<Point>& graph, int tileSize);
 	bool neighbouringCrateAtPoint(const std::vector<sf::Vector2i>& points, int tileSize) const;
 	bool isPointAppropriateDistanceAway(const std::vector<Point>& graph, const Point& requestedPoint, int tileSize) const;
 	bool isPointSafeFromBombsAtPoint(const std::vector<Point>& graph, const sf::Vector2i& point, int tileSize) const;
-	Point getCurrentPoint(const std::vector<Point>& graph, int tileSize) const;	
+	const Point& getCurrentPoint(const std::vector<Point>& graph, int tileSize) const;	
 	void setState(State newState);
 };

@@ -9,6 +9,8 @@ namespace CollisionHandler
 {
 	void handleCollisions(const sf::Vector2f& entityPosition, const EntityManager& entityManager, sf::Vector2f& movement, Entity& entity);
 	void clampMovement(const sf::FloatRect& intersection, sf::Vector2f& movement);
-	bool isCollidableTileAtPosition(const sf::Vector2i& position);
-	bool isEntityAtPosition(EntityTag entityTag, const sf::Vector2f& position, const EntityManager& entityManager);
+	bool isCollidableTileAtPosition(const sf::Vector2f& position, int tileSize);
+	bool isEntityAtPosition(const sf::Vector2f& position, const EntityManager& entityManager, EntityTag entityTag, int tileSize);
+	
+	//bool isCollidableTileAtPosition(const sf::Vector2f& position);
 }

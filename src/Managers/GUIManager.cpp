@@ -108,12 +108,14 @@ void GUIManager::GUIBase::activateButton(ButtonName name)
 		{
 			auto& stateManager = StateManagerLocator::getStateManager();
 			stateManager.switchToAndRemoveState(StateType::MainMenu, StateType::Game);
+			stateManager.removeState(StateType::PauseMenu);
 			break;
 		}
 		case ButtonName::StartGame :
 		{
 			auto& stateManager = StateManagerLocator::getStateManager();
 			stateManager.switchToAndRemoveState(StateType::Game, StateType::MainMenu);
+			stateManager.createState(StateType::PauseMenu);
 			break;
 		}
 		case ButtonName::NextLevel :

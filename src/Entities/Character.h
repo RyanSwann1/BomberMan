@@ -6,7 +6,7 @@
 class Character : public Entity
 {
 public:
-	Character(const std::string& name, EntityTag tag, const sf::Vector2f& spawnPosition, EntityManager& entityManager, int ID);
+	Character(const std::string& name, EntityTag tag, const sf::Vector2f& spawnPosition, EntityManager& entityManager, int ID, bool collidable);
 	virtual ~Character() {}
 
 	void update(float deltaTime) override;
