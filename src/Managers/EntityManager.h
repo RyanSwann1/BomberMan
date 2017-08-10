@@ -33,13 +33,13 @@ class EntityManager
 		std::unordered_map<std::string, std::function<std::unique_ptr<Entity>(const std::string&, const sf::Vector2f&, int)>> m_entityFactory;
 	
 		template<class T>
-		void registerEntity(std::string&& name, EntityTag tag, EntityManager* entityManager)
+		void registerEntity(std::string&& name, EntityTag tag, EntityManager* entityManager, bool collidable)
 		{
 			assert(m_entityFactory.find(name) == m_entityFactory.cend());
-			m_entityFactory.emplace(std::move(name), [tag, entityManager]
+			m_entityFactory.emplace(std::move(name), [tag, entityManager, collidable]
 			(const std::string& name, const sf::Vector2f& position, int entityID) -> std::unique_ptr<Entity>
 			{
-				return std::make_unique<T>(name, tag, position, *entityManager, entityID);
+				return std::make_unique<T>(name, tag, position, *entityManager, entityID, collidable);
 			});
 		}
 	};
@@ -48,6 +48,7 @@ public:
 	EntityManager();
 	~EntityManager();
 
+	const std::unique_ptr<Entity>& getEntity(int ID) const;
 	const std::vector<std::unique_ptr<Entity>>& getEntities() const;
 	void addEntity(const std::string& entityName, const sf::Vector2f& position);
 	void removeEntity(int entityID);

@@ -12,5 +12,6 @@ enum class GameEvent
 	NewState,
 	CloseWindow,
 	Pause,
-	Unpause
+	Unpause,
+	EnemySpawned
 };

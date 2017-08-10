@@ -9,9 +9,10 @@ class EntityManager;
 class Entity
 {
 public:
-	Entity(const std::string& name, EntityTag tag, const sf::Vector2f& spawnPosition, EntityManager& entityManager, int ID);
+	Entity(const std::string& name, EntityTag tag, const sf::Vector2f& spawnPosition, EntityManager& entityManager, int ID, bool collidable);
 	virtual ~Entity() {}
 
+	bool isCollidable() const;
 	EntityTag getTag() const;
 	const std::string& getName() const;
 	const sf::FloatRect& getAABB() const;
@@ -34,6 +35,7 @@ private:
 	const int m_ID;
 	const EntityTag m_tag;
 	const std::string m_name;
+	const bool m_collidable;
 
 	void updateAABB();
 };

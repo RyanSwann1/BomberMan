@@ -146,8 +146,8 @@ std::unique_ptr<Level> LevelParser::parseLevel(const std::string& fileDirectory,
 	parseTileSheets(*rootElement);
 	parseEntities(*rootElement, entityManager, levelDetails.m_tileSize);
 
-	return std::make_unique<Level>(parseTileLayers(*rootElement, levelDetails.m_levelSize), 
-		parseCollisionLayer(*rootElement, levelDetails.m_tileSize), levelName, levelDetails.m_levelSize, levelDetails.m_tileSize);
+	return std::make_unique<Level>(std::move(parseTileLayers(*rootElement, levelDetails.m_levelSize)), 
+	 levelName, levelDetails.m_levelSize, levelDetails.m_tileSize);
 }
 
 std::vector<TileLayer> parseTileLayers(const TiXmlElement & rootElement, const sf::Vector2i& levelSize)

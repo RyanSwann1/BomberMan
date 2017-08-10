@@ -4,6 +4,7 @@
 #include <Entities\Explosion.h>
 #include <Entities\Crate.h>
 #include <Entities\Enemy.h>
+#include <Entities\SpeedBoost.h>
 #include <Locators\EntityManagerLocator.h>
 #include <Game\MessageHandler.h>
 #include <Locators\GameEventMessengerLocator.h>
@@ -12,13 +13,15 @@
 //EntityFactory
 EntityManager::EntityFactory::EntityFactory(EntityManager * entityManager)
 {
-	registerEntity<Player>("Player", EntityTag::Player, entityManager);
-	registerEntity<Bomb>("Bomb", EntityTag::Bomb, entityManager);
-	registerEntity<Explosion>("Explosion", EntityTag::Explosion, entityManager);
-	registerEntity<Enemy>("Enemy1", EntityTag::Enemy, entityManager);
-	registerEntity<Enemy>("Enemy2", EntityTag::Enemy, entityManager);
-	registerEntity<Enemy>("Enemy3", EntityTag::Enemy, entityManager);
-	registerEntity<Crate>("Crate", EntityTag::Crate, entityManager);
+	registerEntity<Player>("Player", EntityTag::Player, entityManager, false);
+	registerEntity<Bomb>("Bomb", EntityTag::Bomb, entityManager, false);
+	registerEntity<Explosion>("Explosion", EntityTag::Explosion, entityManager, false);
+	registerEntity<Enemy>("Enemy1", EntityTag::Enemy, entityManager, false);
+	registerEntity<Enemy>("Enemy2", EntityTag::Enemy, entityManager, false);
+	registerEntity<Enemy>("Enemy3", EntityTag::Enemy, entityManager, false);
+	registerEntity<Crate>("Crate", EntityTag::Crate, entityManager, true);
+	registerEntity<Entity>("CollidableTile", EntityTag::Solid, entityManager, true);
+	registerEntity<SpeedBoost>("SpeedBoost", EntityTag::SpeedBoost, entityManager, false);
 }
 
 std::unique_ptr<Entity> EntityManager::EntityFactory::getEntity(const std::string& name, const sf::Vector2f & entityPosition, int entityID) const
@@ -43,6 +46,13 @@ EntityManager::~EntityManager()
 {
 	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
 	gameEventMessenger.unsubscribe("EntityManager", GameEvent::ClearMap);
+}
+
+const std::unique_ptr<Entity>& EntityManager::getEntity(int ID) const
+{
+	auto cIter = std::find_if(m_entities.cbegin(), m_entities.cend(), [ID](const auto& entity) { return entity->getID() == ID; });
+	assert(cIter != m_entities.cend());
+	return *cIter;
 }
 
 const std::vector<std::unique_ptr<Entity>>& EntityManager::getEntities() const

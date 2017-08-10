@@ -6,6 +6,7 @@ class Timer
 public:
 	Timer(float expirationTime, bool active);
 	
+	float getExpirationTime() const;
 	float getElaspedTime() const;
 	void update(float deltaTime);
 	bool isActive() const;

@@ -9,7 +9,7 @@
 
 StateGame::StateGame(StateManager& stateManager, StateType stateType)
 	: StateBase(stateManager, stateType),
-	m_gameManager(),
+	m_gameManager(m_entityManager),
 	m_animationNameConverter(),
 	m_animationDetailsManager(),
 	m_tileSheetManager(),
@@ -17,7 +17,6 @@ StateGame::StateGame(StateManager& stateManager, StateType stateType)
 	m_levelManager(m_entityManager),
 	m_gamePaused(false)
 {
-	m_stateManager.createState(StateType::PauseMenu);
 	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
 	gameEventMessenger.subscribe(std::bind(&StateGame::pauseGame, this), "StateGame", GameEvent::Pause);
 	gameEventMessenger.subscribe(std::bind(&StateGame::unpauseGame, this), "StateGame", GameEvent::Unpause);
@@ -28,7 +27,6 @@ StateGame::~StateGame()
 	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
 	gameEventMessenger.unsubscribe("StateGame", GameEvent::Pause);
 	gameEventMessenger.unsubscribe("StateGame", GameEvent::Unpause);
-	m_stateManager.removeState(StateType::PauseMenu);
 }
 
 void StateGame::update(float deltaTime)

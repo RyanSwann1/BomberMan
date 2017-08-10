@@ -10,7 +10,6 @@
 #include <assert.h>
 #include <utility>
 #include <algorithm>
-#include <iostream>
 
 LevelManager::LevelManager(EntityManager& entityManager)
 	: m_entityManager(entityManager),
@@ -68,5 +67,4 @@ void LevelManager::parseLevel()
 	const auto& fileDirectory = m_levelDirectories.at(m_currentLevelIndex - 1).m_fileDirectory;
 	const auto& fileName = m_levelDirectories.at(m_currentLevelIndex - 1).m_fileName;
 	m_level = LevelParser::parseLevel(fileDirectory, fileName, m_entityManager);
-	std::cout << "Level Parsed\n";
 }

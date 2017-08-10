@@ -6,14 +6,15 @@
 #include <Game\DebugOverlay.h>
 #include <math.h>
 
-Entity::Entity(const std::string& name, EntityTag tag, const sf::Vector2f& spawnPosition, EntityManager& entityManager, int ID)
+Entity::Entity(const std::string& name, EntityTag tag, const sf::Vector2f& spawnPosition, EntityManager& entityManager, int ID, bool collidable)
 	: m_position(spawnPosition),
 	m_AABB(),
 	m_animationPlayer(name),
 	m_entityManager(entityManager),
 	m_ID(ID),
 	m_tag(tag),
-	m_name(name)
+	m_name(name),
+	m_collidable(collidable)
 {
 	const auto& level = LevelManagerLocator::getLevelManager().getCurrentLevel();
 	const int tileSize = level->getTileSize();
@@ -46,6 +47,11 @@ void Entity::updateAABB()
 	m_AABB.top = m_position.y + 4;
 }
 
+bool Entity::isCollidable() const
+{
+	return m_collidable;
+}
+
 EntityTag Entity::getTag() const
 {
 	return m_tag;
@@ -65,7 +71,6 @@ const sf::Vector2f & Entity::getPosition() const
 {
 	const int tileSize = LevelManagerLocator::getLevelManager().getCurrentLevel()->getTileSize();
 	//Determine which tile entity is on
-
 	const sf::Vector2i tilePosition(m_position.x / tileSize, m_position.y / tileSize);
 
 	return m_position;

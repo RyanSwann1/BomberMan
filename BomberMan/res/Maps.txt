@@ -1,2 +1,1 @@
 Map1 res/Map1.tmx
-Map2 res/Map2.tmx
