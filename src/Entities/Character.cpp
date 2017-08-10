@@ -1,24 +1,20 @@
 #include "Character.h"
 #include "CollisionHandler.h"
-#include <Locators\LevelManagerLocator.h>
-#include <Managers\LevelManager.h>
 #include <Managers\EntityManager.h>
-#include <Locators\AudioPlayerLocator.h>
-#include <Audio\AudioPlayer.h>
+
 
 Character::Character(const std::string& name, EntityTag tag, const sf::Vector2f & spawnPosition, EntityManager & entityManager, int ID, bool collidable)
 	: Entity(name, tag ,spawnPosition, entityManager, ID, collidable),
+	m_maxSpeed(75, 75),
 	m_speed(35, 35),
 	m_velocity(),
 	m_oldPosition(),
 	m_currentMoveDirection(Direction::None),
-	m_bombPlacementTimer(0.5f, true),
 	m_lives(1)
 {}
 
 void Character::update(float deltaTime)
 {
-	m_bombPlacementTimer.update(deltaTime);
 	handleAnimation();
 	handleDirection();
 	CollisionHandler::handleCollisions(m_position, m_entityManager, m_velocity, *this);
@@ -37,13 +33,18 @@ void Character::handleEntityCollision(const std::unique_ptr<Entity>& entity, con
 	{
 		CollisionHandler::clampMovement(intersection, m_velocity);
 	}
-	else if (entity->getTag() == EntityTag::Explosion)
+
+	switch (entity->getTag())
+	{
+	case EntityTag::Explosion :
 	{
 		--m_lives;
 		if (!m_lives)
 		{
 			m_entityManager.removeEntity(Entity::getID());
 		}
+		break;
+	}
 	}
 }
 
@@ -112,21 +113,21 @@ void Character::handleAnimation()
 	}
 }
 
-void Character::placeBomb()
+void Character::resetVelocity()
 {
-	if (!m_bombPlacementTimer.isExpired())
+	m_velocity.x = 0;
+	m_velocity.y = 0;
+}
+
+void Character::increaseSpeed(float x, float y)
+{
+	if (m_speed.x + x < m_maxSpeed.x)
 	{
-		return;
+		m_speed.x += x;
 	}
 
-	AudioPlayerLocator::getAudioClipPlayer().playAudioClip(AudioClipName::PlaceBomb);
-	const int tileSize = LevelManagerLocator::getLevelManager().getCurrentLevel()->getTileSize();
-	sf::Vector2f bombSpawnPosition;
-	bombSpawnPosition.x = std::floor((m_position.x + tileSize / 2.0f) / tileSize);
-	bombSpawnPosition.y = std::floor((m_position.y + tileSize / 2.0f) / tileSize);
-
-	bombSpawnPosition.x *= tileSize;
-	bombSpawnPosition.y *= tileSize;
-	m_entityManager.addEntity("Bomb", bombSpawnPosition);
-	m_bombPlacementTimer.reset();
+	if (m_speed.y + y < m_maxSpeed.y)
+	{
+		m_speed.y += y;
+	}
 }

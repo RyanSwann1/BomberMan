@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="21" height="21" tilewidth="16" tileheight="16" nextobjectid="388">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="21" height="21" tilewidth="16" tileheight="16" nextobjectid="391">
  <tileset firstgid="1" name="bomb_party_v4" tilewidth="16" tileheight="16" tilecount="285" columns="15">
   <image source="bomb_party_v4.png" trans="aa0000" width="240" height="304"/>
  </tileset>
  <tileset firstgid="286" name="CollidableTile" tilewidth="16" tileheight="16" tilecount="4" columns="2">
   <image source="CollidableTile.png" trans="aa0000" width="32" height="32"/>
+ </tileset>
+ <tileset firstgid="290" name="SpeedBoost" tilewidth="16" tileheight="16" tilecount="5883" columns="111">
+  <image source="SpeedBoost.png" trans="aa0000" width="1786" height="861"/>
  </tileset>
  <layer name="Tile Layer 1" width="21" height="21">
   <data encoding="base64">

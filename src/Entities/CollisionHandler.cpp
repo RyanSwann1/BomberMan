@@ -73,10 +73,10 @@ bool CollisionHandler::isEntityAtPosition(const sf::Vector2f & position, const E
 
 void checkForEntityCollisions(const sf::Vector2f & entityPosition, const EntityManager & entityManager, const sf::Vector2f & movement, Entity & entity)
 {
-	const auto& level = LevelManagerLocator::getLevelManager().getCurrentLevel();
-	const int tileSize = level.get()->getTileSize();
+	const int tileSize = LevelManagerLocator::getLevelManager().getCurrentLevel()->getTileSize();
 	for (const auto& i : entityManager.getEntities())
 	{
+		//Dont check collision on self
 		if (i->getID() == entity.getID())
 		{
 			continue;
@@ -87,6 +87,7 @@ void checkForEntityCollisions(const sf::Vector2f & entityPosition, const EntityM
 		if (movementAABB.intersects(i->getAABB(), intersection))
 		{
 			entity.handleEntityCollision(i, intersection);
+			i->handleEntityCollision(entityManager.getEntity(entity.getID()), intersection);
 		}
 	}
 }

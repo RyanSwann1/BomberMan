@@ -27,7 +27,7 @@ void Bomb::handleEntityCollision(const std::unique_ptr<Entity>& entity, const sf
 {
 	if (entity->getTag() == EntityTag::Explosion)
 	{
-		explode();
+ 		explode();
 	}
 }
 

@@ -3,10 +3,17 @@
 #include <Managers\EntityManager.h>
 #include <Entities\CollisionHandler.h>
 #include <Entities\EntityTag.h>
+#include <Game\RandomNumberGenerator.h>
 
 void GameLogic::addCollidableTileToMap(const sf::Vector2f & position, EntityManager & entityManager)
 {
-	
+		
+}
+
+bool GameLogic::spawnPowerUp()
+{
+	const int randNumb = RandomNumberGenerator::getRandomNumber(0, 10);
+	return (randNumb >= 7 ? true : false);
 }
 
 const sf::Vector2f & GameLogic::getEntityPosition(const EntityManager & entityManager, EntityTag entityTag)

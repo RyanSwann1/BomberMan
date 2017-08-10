@@ -7,6 +7,7 @@
 #include <Managers\AnimationDetailsManager.h>
 #include <Managers\GameManager.h>
 #include <Utilities\AnimationNameConverter.h>
+#include <Game\EntityMessenger.h>
 
 class StateGame : public StateBase
 {
@@ -19,11 +20,13 @@ public:
 
 private:
 	GameManager m_gameManager;
+	EntityMessenger m_entityMessenger;
 	AnimationNameConverter m_animationNameConverter;
 	AnimationDetailsManager m_animationDetailsManager;
 	TileSheetManager m_tileSheetManager;
 	EntityManager m_entityManager;
 	LevelManager m_levelManager;
+	
 	bool m_gamePaused;
 
 	void pauseGame();

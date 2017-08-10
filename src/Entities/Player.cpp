@@ -7,7 +7,7 @@
 #include <math.h>
 
 Player::Player(const std::string& name, EntityTag tag, const sf::Vector2f & spawnPosition, EntityManager & entityManager, int ID, bool collidable)
-	: Character(name, tag, spawnPosition, entityManager, ID, collidable)
+	: BombCarrier(name, tag, spawnPosition, entityManager, ID, collidable)
 {
 }
 
@@ -35,7 +35,7 @@ void Player::update(float deltaTime)
 		placeBomb();	
 	}
 	
-	Character::update(deltaTime);
+	BombCarrier::update(deltaTime);
 }
 
 void Player::handleEntityCollision(const std::unique_ptr<Entity>& entity, const sf::FloatRect & intersection)
@@ -50,5 +50,14 @@ void Player::handleEntityCollision(const std::unique_ptr<Entity>& entity, const 
 	{
 		AudioPlayerLocator::getAudioClipPlayer().playAudioClip(AudioClipName::PlayerDeath);
 		GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::PlayerDeath);
+	}
+
+	switch (entity->getTag())
+	{
+	case EntityTag::SpeedBoost:
+	{
+		Character::increaseSpeed(2.5f, 2.5f);
+		break;
+	}
 	}
 }

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Character.h"
+#include "BombCarrier.h"
 
-class Player : public Character
+class Player : public BombCarrier
 {
 public:
 	Player(const std::string& name, EntityTag tag, const sf::Vector2f& spawnPosition, EntityManager& entityManager, int ID, bool collidable);

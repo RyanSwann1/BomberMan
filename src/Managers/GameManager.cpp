@@ -6,17 +6,18 @@
 #include <Managers\StateManager.h>
 #include <Locators\LevelManagerLocator.h>
 #include <Managers\LevelManager.h>
-#include <Game\AILogic.h>
-#include <Game\GameLogic.h>
-#include <Game\DebugOverlay.h>
 #include <Entities\CollisionHandler.h>
-#include <Entities\Direction.h>
+#include <Entities\Enemy.h>
+#include <Game\GameEvent.h>
+#include <Locators\EntityMessengerLocator.h>
+#include <Game\EntityMessenger.h>
 
 int getNextRowSpawn(const sf::Vector2i& startingPoint, const sf::Vector2i& endingPoint, Direction searchDirection, int tileSize);
 int getNextColumnSpawn(const sf::Vector2i& startingPoint, const sf::Vector2i& endingPoint, Direction searchDirection, int tileSize);
 
 GameManager::GameManager(EntityManager& entityManager)
-	: m_enemiesRemaining(3),
+	: m_maxEnemies(3),
+	m_enemiesRemaining(0),
 	m_entityManager(entityManager),
 	m_totalGameTime(10.0f),
 	m_gameTimer(m_totalGameTime, true),
@@ -28,8 +29,8 @@ GameManager::GameManager(EntityManager& entityManager)
 	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
 	gameEventMessenger.subscribe(std::bind(&GameManager::winGame, this), "GameManager", GameEvent::WinGame);
 	gameEventMessenger.subscribe(std::bind(&GameManager::onEnemyDeath, this), "GameManager", GameEvent::EnemyDeath);
-	gameEventMessenger.subscribe(std::bind(&GameManager::resetEnemyCount, this), "GameManager", GameEvent::ClearMap);
 	gameEventMessenger.subscribe(std::bind(&GameManager::onPlayerDeath, this), "GameManager", GameEvent::PlayerDeath);
+	gameEventMessenger.subscribe(std::bind(&GameManager::onEnemySpawn, this), "GameManager", GameEvent::EnemySpawned);
 }
 
 GameManager::~GameManager()
@@ -37,8 +38,8 @@ GameManager::~GameManager()
 	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
 	gameEventMessenger.unsubscribe("GameManager", GameEvent::WinGame);
 	gameEventMessenger.unsubscribe("GameManager", GameEvent::EnemyDeath);
-	gameEventMessenger.unsubscribe("GameManager", GameEvent::ClearMap);
 	gameEventMessenger.unsubscribe("GameManager", GameEvent::PlayerDeath);
+	gameEventMessenger.unsubscribe("GameManager", GameEvent::EnemySpawned);
 }
 
 void GameManager::update(float deltaTime)
@@ -70,11 +71,11 @@ void GameManager::winGame()
 
 void GameManager::onEnemyDeath()
 {
+	auto& entityMessenger = EntityMessengerLocator::getEntityMessenger();
+	EntityMessage entityMessage(EntityEvent::TurnAggressive, 1);
+	entityMessenger.broadcast(entityMessage);
+
 	--m_enemiesRemaining;
-	if (m_enemiesRemaining == 1)
-	{
-		GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::EnemyAggressive);
-	}
 
 	if (!m_enemiesRemaining)
 	{
@@ -82,14 +83,9 @@ void GameManager::onEnemyDeath()
 	}
 }
 
-void GameManager::resetEnemyCount()
-{
-	m_enemiesRemaining = 3;
-}
 
 void GameManager::onPlayerDeath()
 {
-	resetEnemyCount();	
 	getStateManager().switchToState(StateType::RoundFailed);
 }
 
@@ -142,6 +138,45 @@ void GameManager::reduceMapSize()
 	const int tileSize = LevelManagerLocator::getLevelManager().getCurrentLevel()->getTileSize();
 	m_entityManager.addEntity("CollidableTile", sf::Vector2f(m_currentSpawnPosition.x * tileSize, m_currentSpawnPosition.y * tileSize));
 	m_spawnTimer.reset();
+}
+
+void GameManager::assignEnemyToAggressive()
+{
+
+}
+
+void GameManager::onEnemySpawn()
+{
+	assert(m_enemiesRemaining < m_maxEnemies);
+	++m_enemiesRemaining;
+
+	if (m_enemiesRemaining != m_maxEnemies)
+	{
+		return;
+	}
+
+	bool isEnemyAggressive = false;
+	for (const auto& entity : EntityManagerLocator::getEntityManager().getEntities())
+	{
+		if (entity->getTag() != EntityTag::Enemy)
+		{
+			continue;
+		}
+
+		const Enemy* enemy = static_cast<Enemy*>(entity.get());
+		if (enemy->getType() == EnemyType::Aggressive)
+		{
+			isEnemyAggressive = true;
+			break;
+		}
+	}
+
+	if (!isEnemyAggressive)
+	{
+		EntityMessage entityMessage(EntityEvent::TurnAggressive, 1);
+		auto& entityMessenger = EntityMessengerLocator::getEntityMessenger();
+		entityMessenger.broadcast(entityMessage);
+	}
 }
 
 int getNextRowSpawn(const sf::Vector2i& startingPoint, const sf::Vector2i& endingPoint, Direction searchDirection, int tileSize)

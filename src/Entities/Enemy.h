@@ -1,19 +1,20 @@
 #pragma once
 
-#include "Character.h"
+#include "BombCarrier.h"
 #include <Game\Timer.h>
 #include <deque>
 #include <memory>
 
-class Enemy : public Character
+enum class EnemyType
 {
-	enum class Type
-	{
-		Passive = 0,
-		Aggressive,
-		Total
-	};
+	Passive = 0,
+	Aggressive,
+	Total
+};
 
+class EntityMessage;
+class Enemy : public BombCarrier
+{
 	enum class State
 	{
 		TargetOpponent = 0,
@@ -43,16 +44,12 @@ public:
 	Enemy(const std::string& name, EntityTag tag, const sf::Vector2f& position, EntityManager& entityManager, int entityID, bool collidable);
 	~Enemy();
 
+	EnemyType getType() const { return m_type; }
+
 	void handleEntityCollision(const std::unique_ptr<Entity>& entity, const sf::FloatRect& intersection) override;
 	void update(float deltaTime) override;
 
 private:
-
-	//afronym : my advice would be to change m_graph to a 2d array of all tiles
-	//afronym : you'd be storing the blocked tiles, but it should make some things easier
-	//afronym : finding the opponent's & enemy's tiles based on position would be super easy
-	//afronym : and visualizing it(for debugging) will be super easy
-
 	Timer m_movementTimer;
 	Timer m_stopMovementTimer;
 	Timer m_bombScannerTimer;
@@ -60,7 +57,7 @@ private:
 	bool m_reachedTargetPoint;
 	std::vector<sf::Vector2i> m_bombAtPoints;
 	State m_state;
-	Type m_type;
+	EnemyType m_type;
 
 	void setStateToTargetPlayer();
 	void checkExistingBombsAtPoints(int tileSize);
@@ -93,4 +90,6 @@ private:
 	bool isPointSafeFromBombsAtPoint(const std::vector<Point>& graph, const sf::Vector2i& point, int tileSize) const;
 	const Point& getCurrentPoint(const std::vector<Point>& graph, int tileSize) const;	
 	void setState(State newState);
+	void setTypeToAggressive(EntityMessage& entityMessage);
+	
 };

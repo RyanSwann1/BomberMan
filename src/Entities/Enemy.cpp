@@ -10,32 +10,43 @@
 #include <Audio\AudioPlayer.h>
 #include <Game\GameLogic.h>
 #include <Game\RandomNumberGenerator.h>
+#include <Entities\EntityMessage.h>
+#include <Locators\EntityMessengerLocator.h>
+#include <Game\EntityMessenger.h>
 #include <iostream>
 #include <random>
 
 Enemy::Enemy(const std::string& name, EntityTag tag, const sf::Vector2f & position, EntityManager & entityManager, int entityID, bool collidable)
-	: Character(name, tag, position, entityManager, entityID, collidable),
-	m_movementTimer(0.5f, true),
+	: BombCarrier(name, tag, position, entityManager, entityID, collidable),
+	m_movementTimer(0.75f, true),
 	m_stopMovementTimer(2.0f, false),
 	m_bombScannerTimer(1.0f, false),
 	m_targetPoint(),
 	m_reachedTargetPoint(false),
 	m_bombAtPoints(),
-	m_state(State::InitializeState),
-	m_type(Type::Aggressive)
+	m_state(State::InitializeState)
 {
-	//const int randNumb = RandomNumberGenerator::getRandomNumber(1, static_cast<int>(Type::Total));
-	//m_type = static_cast<Type>(randNumb - 1);
-	//m_type = Type::Aggressive;
+	const int randNumb = RandomNumberGenerator::getRandomNumber(static_cast<int>(EnemyType::Passive), static_cast<int>(EnemyType::Aggressive));
+	std::cout << "Random Number: " << randNumb << "\n";
+	m_type = static_cast<EnemyType>(randNumb);
 
 	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
+	void setStateToTargetPlayer();
 	gameEventMessenger.subscribe(std::bind(&Enemy::setStateToTargetPlayer, this), "Enemy", GameEvent::EnemyAggressive);
+	gameEventMessenger.broadcast(GameEvent::EnemySpawned);
+	
+	auto& entityMessenger = EntityMessengerLocator::getEntityMessenger();
+	void setTypeToAggressive(EntityMessage& entityMessage);
+	entityMessenger.subscribe(std::bind(&Enemy::setTypeToAggressive, this, std::placeholders::_1), "Enemy", EntityEvent::TurnAggressive);
 }
 
 Enemy::~Enemy()
 {
 	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
 	gameEventMessenger.unsubscribe("Enemy", GameEvent::EnemyAggressive);
+
+	auto& entityMessenger = EntityMessengerLocator::getEntityMessenger();
+	entityMessenger.unsubscribe("Enemy", EntityEvent::TurnAggressive);
 }
 
 void Enemy::handleEntityCollision(const std::unique_ptr<Entity>& entity, const sf::FloatRect& intersection)
@@ -51,11 +62,20 @@ void Enemy::handleEntityCollision(const std::unique_ptr<Entity>& entity, const s
 		AudioPlayerLocator::getAudioClipPlayer().playAudioClip(AudioClipName::EnemyDeath);
 		GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::EnemyDeath);
 	}
+
+	switch (entity->getTag())
+	{
+	case EntityTag::SpeedBoost :
+	{
+
+		break;
+	}
+	}
 }
 
 void Enemy::update(float deltaTime)
 {
-	Character::update(deltaTime);
+	BombCarrier::update(deltaTime);
 	m_stopMovementTimer.update(deltaTime);
 	m_movementTimer.update(deltaTime);
 	if (!m_movementTimer.isExpired())
@@ -148,11 +168,11 @@ void Enemy::handleStates(const std::vector<Point>& graph, const sf::Vector2i & o
 	{
 	case State::InitializeState :
 	{
-		if (m_type == Type::Aggressive)
+		if (m_type == EnemyType::Aggressive)
 		{
 			(opponentFound ? setState(State::TargetOpponent) : setTargetPointAtCrate(graph, tileSize));
 		}
-		else if (m_type == Type::Passive)
+		else if (m_type == EnemyType::Passive)
 		{
 			setTargetPointAtCrate(graph, tileSize);	
 		}
@@ -447,10 +467,10 @@ bool Enemy::isPointInRadiusOfHarm(const std::vector<Point>& graph, const Point& 
 	//x
 	for (int x = point.m_point.x - 2; x != point.m_point.x + 2; ++x)
 	{
-		if (CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(x, point.m_point.y), tileSize))
+		/*if (CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(x, point.m_point.y), tileSize))
 		{
 			continue;
-		}
+		}*/
 		
 		if (!isPointOnGraph(graph, point.m_point))
 		{
@@ -471,10 +491,10 @@ bool Enemy::isPointInRadiusOfHarm(const std::vector<Point>& graph, const Point& 
 	//y
 	for (int y = point.m_point.y - 2; y != point.m_point.y + 2; ++y)
 	{
-		if (CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(point.m_point.x, y), tileSize))
+	/*	if (CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(point.m_point.x, y), tileSize))
 		{
 			continue;
-		}
+		}*/
 
 		if (!isPointOnGraph(graph, point.m_point))
 		{
@@ -591,8 +611,8 @@ void Enemy::setTargetPointAtSafePoint(const std::vector<Point>& graph, int tileS
 
 	if (!safePointsID.empty())
 	{
-		const auto randPointID = RandomNumberGenerator::getRandomNumber(1, safePointsID.size());	
-		setNewTargetPoint(getPointOnGraph(graph, safePointsID[randPointID - 1]).m_point);
+		const auto randPointID = RandomNumberGenerator::getRandomNumber(0, safePointsID.size() - 1);	
+		setNewTargetPoint(getPointOnGraph(graph, safePointsID[randPointID]).m_point);
 		setState(State::MovingToSafePoint);
 	}
 	else
@@ -665,6 +685,17 @@ const Enemy::Point& Enemy::getCurrentPoint(const std::vector<Point>& graph, int 
 void Enemy::setState(State newState)
 {
 	m_state = newState;
+}
+
+void Enemy::setTypeToAggressive(EntityMessage & entityMessage)
+{
+	if (m_type == EnemyType::Aggressive)
+	{
+		return;
+	}
+
+	m_type = EnemyType::Aggressive;
+	entityMessage.decreaseCharge();
 }
 
 bool Enemy::reachedTargetPoint(const std::vector<Point>& graph, int tileSize) const
