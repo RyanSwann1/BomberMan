@@ -10,9 +10,9 @@ StateRoundCompleted::StateRoundCompleted(StateManager& stateManager, StateType s
 	: StateBase(stateManager, stateType)
 {
 	auto& audioPlayer = AudioPlayerLocator::getAudioClipPlayer();
-	audioPlayer.playAudioClip(AudioClipName::Victory);
 	audioPlayer.stopMusic();
-	std::cout << "Press 'Space' for the next level" << "\n";
+	audioPlayer.playAudioClip(AudioClipName::Victory);
+	GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::Pause);
 }
 
 void StateRoundCompleted::draw(sf::RenderWindow & window)

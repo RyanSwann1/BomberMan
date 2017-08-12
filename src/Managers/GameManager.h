@@ -27,10 +27,11 @@ private:
 	sf::Vector2i m_currentSpawnPosition;
 	Direction m_spawnDirection;
 
-	void winGame();
+	void onWinGame();
 	void onEnemyDeath();
 	void onPlayerDeath();
 	void reduceMapSize();
 	void assignEnemyToAggressive();
 	void onEnemySpawn();
+	void onLevelReload();
 };

@@ -20,6 +20,7 @@ StateGame::StateGame(StateManager& stateManager, StateType stateType)
 	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
 	gameEventMessenger.subscribe(std::bind(&StateGame::pauseGame, this), "StateGame", GameEvent::Pause);
 	gameEventMessenger.subscribe(std::bind(&StateGame::unpauseGame, this), "StateGame", GameEvent::Unpause);
+	gameEventMessenger.subscribe(std::bind(&StateGame::onNewLevel, this), "StateGame", GameEvent::StartedNewLevel);
 }
 
 StateGame::~StateGame()
@@ -27,6 +28,7 @@ StateGame::~StateGame()
 	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
 	gameEventMessenger.unsubscribe("StateGame", GameEvent::Pause);
 	gameEventMessenger.unsubscribe("StateGame", GameEvent::Unpause);
+	gameEventMessenger.unsubscribe("StateGame", GameEvent::StartedNewLevel);
 }
 
 void StateGame::update(float deltaTime)
@@ -49,11 +51,14 @@ void StateGame::draw(sf::RenderWindow& window)
 void StateGame::pauseGame()
 {
 	m_gamePaused = true;
-	m_stateManager.switchToState(StateType::PauseMenu);
 }
 
 void StateGame::unpauseGame()
 {
-	m_stateManager.switchToState(StateType::Game);
+	m_gamePaused = false;
+}
+
+void StateGame::onNewLevel()
+{
 	m_gamePaused = false;
 }

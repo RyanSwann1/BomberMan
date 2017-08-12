@@ -36,6 +36,7 @@ StateManager::StateManager()
 	m_stateToSwap()
 {
 	StateManagerLocator::provide(*this);
+
 }
 
 StateManager::~StateManager()
@@ -45,6 +46,9 @@ StateManager::~StateManager()
 
 void StateManager::removeState(StateType stateToRemove)
 {
+	assert(std::find_if(m_removals.cbegin(), m_removals.cend(), [stateToRemove]
+	(const auto& stateType) { return stateType == stateToRemove; }) == m_removals.cend());
+
 	m_removals.push_back(stateToRemove);
 }
 

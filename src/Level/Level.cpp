@@ -9,9 +9,7 @@ Level::Level(std::vector<TileLayer>&& tileLayers, const std::string& levelName, 
 	m_levelName(levelName),
 	m_levelSize(levelSize),
 	m_tileSize(tileSize)
-{
-
-}
+{}
 
 void Level::draw(sf::RenderWindow& window)
 {
@@ -30,11 +28,6 @@ const std::string & Level::getName() const
 {
 	return m_levelName;
 }
-
-//const std::vector<sf::Vector2i>& Level::getCollisionLayer() const
-//{
-//	return m_collisionLayer;
-//}
 
 int Level::getTileSize() const
 {

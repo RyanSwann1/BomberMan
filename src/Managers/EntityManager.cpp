@@ -95,7 +95,7 @@ void EntityManager::update(float deltaTime)
 
 void EntityManager::handleQueue()
 {
-	for (auto& entityInQueue : m_entityQueue)
+	for (const auto& entityInQueue : m_entityQueue)
 	{
 		m_entities.emplace_back(m_entityFactory.getEntity(entityInQueue.m_name, entityInQueue.m_position, m_entityCount));
 		++m_entityCount;
@@ -122,7 +122,7 @@ void EntityManager::removeActiveEntity(int entityID)
 
 void EntityManager::purgeEntities()
 {
-	for (auto& entity : m_entities)
+	for (const auto& entity : m_entities)
 	{
 		m_removals.push_back(entity->getID());
 	}
