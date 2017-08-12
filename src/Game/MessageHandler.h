@@ -31,7 +31,10 @@ public:
 	virtual void broadcast(MessageType message)
 	{
 		auto iter = m_listeners.find(message);
-		assert(iter != m_listeners.cend());
+		if (iter == m_listeners.cend())
+		{
+			return;
+		}
 		
 		for (const auto& listener : iter->second)
 		{

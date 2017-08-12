@@ -9,7 +9,7 @@ StateRoundFailed::StateRoundFailed(StateManager & stateManager, StateType stateT
 	: StateBase(stateManager, stateType),
 	m_nextRoundBeginTimer(3.0f, true)
 {
-	std::cout << "Press 'R' to retry.\n";
+	GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::Pause);
 }
 
 void StateRoundFailed::draw(sf::RenderWindow & window)

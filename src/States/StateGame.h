@@ -31,4 +31,5 @@ private:
 
 	void pauseGame();
 	void unpauseGame();
+	void onNewLevel();
 };

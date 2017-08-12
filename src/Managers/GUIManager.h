@@ -20,10 +20,42 @@ class GUIManager : private StateManagerLocator
 		NextLevel,
 		MainMenu,
 		Resume,
-		Pause
+		Pause,
+		Retry
 	};
 
-	class GUIButton
+	enum class ComponentType
+	{
+		Button = 0,
+		Text
+	};
+
+	class GUIComponent
+	{
+	public:
+		GUIComponent(ComponentType type)
+			: m_type(type)
+		{}
+
+		virtual ~GUIComponent() {}
+		virtual void draw(sf::RenderWindow& window) = 0;
+		const ComponentType m_type;
+	};
+
+	class GUIText : public GUIComponent
+	{
+	public:
+		GUIText(const std::string& text, const sf::Vector2f& position, FontManager& fontManager, int characterSize = 30);
+		GUIText(GUIText& orig);
+		~GUIText();
+
+		void draw(sf::RenderWindow& window);
+	private:
+		sf::Text m_text;
+		FontManager& m_fontManager;
+	};
+
+	class GUIButton : public GUIComponent
 	{
 	public:
 		GUIButton(const sf::Vector2f& position, const sf::Vector2f& size, const std::string& text, FontManager& fontManager, ButtonName name);
@@ -52,7 +84,9 @@ class GUIManager : private StateManagerLocator
 		
 	protected:
 		void addButton(const sf::Vector2f& position, const sf::Vector2f& size, const std::string& text,  FontManager& fontManager, ButtonName name);
-		std::vector<GUIButton> m_buttons;
+		void addText(const sf::Vector2f& position, const std::string& text, FontManager& fontManager, int characterSize);
+
+		std::vector<std::unique_ptr<GUIComponent>> m_components;
 
 	private:
 		void activateButton(ButtonName name);
@@ -74,6 +108,18 @@ class GUIManager : private StateManagerLocator
 	{
 	public:
 		GUIGame(FontManager& fontManager);
+	};
+
+	class GUIWinMenu : public GUIBase
+	{
+	public:
+		GUIWinMenu(FontManager& fontManager);
+	};
+
+	class GUIRetryMenu : public GUIBase
+	{
+	public:
+		GUIRetryMenu(FontManager& fontManager);
 	};
 
 public:

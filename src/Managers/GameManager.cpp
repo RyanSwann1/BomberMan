@@ -27,10 +27,11 @@ GameManager::GameManager(EntityManager& entityManager)
 	m_spawnDirection(Direction::Right)
 {
 	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
-	gameEventMessenger.subscribe(std::bind(&GameManager::winGame, this), "GameManager", GameEvent::WinGame);
+	gameEventMessenger.subscribe(std::bind(&GameManager::onWinGame, this), "GameManager", GameEvent::WinGame);
 	gameEventMessenger.subscribe(std::bind(&GameManager::onEnemyDeath, this), "GameManager", GameEvent::EnemyDeath);
 	gameEventMessenger.subscribe(std::bind(&GameManager::onPlayerDeath, this), "GameManager", GameEvent::PlayerDeath);
 	gameEventMessenger.subscribe(std::bind(&GameManager::onEnemySpawn, this), "GameManager", GameEvent::EnemySpawned);
+	gameEventMessenger.subscribe(std::bind(&GameManager::onLevelReload, this), "GameManager", GameEvent::ReloadCurrentLevel);
 }
 
 GameManager::~GameManager()
@@ -40,6 +41,7 @@ GameManager::~GameManager()
 	gameEventMessenger.unsubscribe("GameManager", GameEvent::EnemyDeath);
 	gameEventMessenger.unsubscribe("GameManager", GameEvent::PlayerDeath);
 	gameEventMessenger.unsubscribe("GameManager", GameEvent::EnemySpawned);
+	gameEventMessenger.unsubscribe("GameManager", GameEvent::ReloadCurrentLevel);
 }
 
 void GameManager::update(float deltaTime)
@@ -64,9 +66,9 @@ void GameManager::update(float deltaTime)
 	//}
 }
 
-void GameManager::winGame()
+void GameManager::onWinGame()
 {
-	getStateManager().switchToAndRemoveState(StateType::GameCompleted, StateType::Game);
+	getStateManager().switchToState(StateType::GameCompleted);
 }
 
 void GameManager::onEnemyDeath()
@@ -82,7 +84,6 @@ void GameManager::onEnemyDeath()
 		getStateManager().switchToState(StateType::RoundCompleted);
 	}
 }
-
 
 void GameManager::onPlayerDeath()
 {
@@ -177,6 +178,11 @@ void GameManager::onEnemySpawn()
 		auto& entityMessenger = EntityMessengerLocator::getEntityMessenger();
 		entityMessenger.broadcast(entityMessage);
 	}
+}
+
+void GameManager::onLevelReload()
+{
+	m_enemiesRemaining = 0;
 }
 
 int getNextRowSpawn(const sf::Vector2i& startingPoint, const sf::Vector2i& endingPoint, Direction searchDirection, int tileSize)

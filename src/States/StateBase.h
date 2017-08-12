@@ -10,13 +10,10 @@ public:
 	StateBase(StateManager& stateManager, StateType stateType)
 		: m_stateType(stateType),
 		m_stateManager(stateManager)
-	{
+	{}
 
-	}
 	virtual ~StateBase()
-	{
-
-	}
+	{}
 
 	StateType getType() const { return m_stateType; }
 

@@ -67,4 +67,5 @@ void LevelManager::parseLevel()
 	const auto& fileDirectory = m_levelDirectories.at(m_currentLevelIndex - 1).m_fileDirectory;
 	const auto& fileName = m_levelDirectories.at(m_currentLevelIndex - 1).m_fileName;
 	m_level = LevelParser::parseLevel(fileDirectory, fileName, m_entityManager);
+	gameEventMessenger.broadcast(GameEvent::StartedNewLevel);
 }

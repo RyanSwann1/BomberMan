@@ -13,5 +13,6 @@ enum class GameEvent
 	CloseWindow,
 	Pause,
 	Unpause,
-	EnemySpawned
+	EnemySpawned,
+	StartedNewLevel
 };
