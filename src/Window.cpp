@@ -1,6 +1,7 @@
 #include "Window.h"
 #include <Game\MessageHandler.h>
 #include <Locators\GameEventMessengerLocator.h>
+#include <Locators\WindowLocator.h>
 #include <Game\GameEvent.h>
 
 Window::Window(MessageHandler<GameEvent>& gameEventMessenger, const std::string & name, const sf::Vector2i & size)
@@ -8,6 +9,7 @@ Window::Window(MessageHandler<GameEvent>& gameEventMessenger, const std::string 
 {
 	m_window.setFramerateLimit(60);
 	gameEventMessenger.subscribe(std::bind(&Window::closeWindow, this), "Window", GameEvent::CloseWindow);
+	WindowLocator::provide(*this);
 }
 
 Window::~Window()

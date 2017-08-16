@@ -91,6 +91,15 @@ void StateManager::switchToAndRemoveState(StateType stateToSwitchTo, StateType s
 	removeState(stateToRemove);
 }
 
+void StateManager::switchToAndRemoveState(StateType stateToSwitchTo, std::vector<StateType> statesToRemove)
+{
+	switchToState(stateToSwitchTo);
+	for (const auto stateToRemove : statesToRemove)
+	{
+		removeState(stateToRemove);
+	}
+}
+
 void StateManager::update(float deltaTime)
 {
 	for (auto& state : m_states)

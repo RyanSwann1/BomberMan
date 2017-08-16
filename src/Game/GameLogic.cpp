@@ -5,10 +5,27 @@
 #include <Entities\EntityTag.h>
 #include <Game\RandomNumberGenerator.h>
 
-bool GameLogic::spawnPowerUp()
+void GameLogic::spawnPowerUp(const sf::Vector2f& position, EntityManager& entityManager)
 {
-	const int randNumb = RandomNumberGenerator::getRandomNumber(0, 10);
-	return (randNumb >= 7 ? true : false);
+	if (RandomNumberGenerator::getRandomNumber(0, 10) < 7)
+	{
+		return;
+	}
+
+	const int powerUpSpawnOption = RandomNumberGenerator::getRandomNumber(1, 2);
+ 	switch (powerUpSpawnOption)
+	{
+	case 1:
+	{
+		entityManager.addEntity("PowerUpSpeedBoost", position);
+		break;
+	}
+	case 2:
+	{
+		entityManager.addEntity("PowerUpExtraBomb", position);
+		break;
+	}
+	}
 }
 
 const sf::Vector2f & GameLogic::getEntityPosition(const EntityManager & entityManager, EntityTag entityTag)

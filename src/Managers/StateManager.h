@@ -45,6 +45,7 @@ public:
 	void removeState(StateType stateToRemove);
 	void switchToState(StateType stateToSwitch);
 	void switchToAndRemoveState(StateType stateToSwitchTo, StateType stateToRemove);
+	void switchToAndRemoveState(StateType stateToSwitchTo, std::vector<StateType> statesToRemove);
 	void update(float deltaTime);
 	void draw(sf::RenderWindow& window);
 

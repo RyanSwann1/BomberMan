@@ -20,9 +20,6 @@ void Crate::handleEntityCollision(const std::unique_ptr<Entity>& entity, const s
 	if (entity->getTag() == EntityTag::Explosion)
 	{
 		m_entityManager.removeEntity(Entity::getID());
-		if (GameLogic::spawnPowerUp())
-		{
-			m_entityManager.addEntity("SpeedBoost", m_position);
-		}
+		GameLogic::spawnPowerUp(m_position, m_entityManager);
 	}
 }

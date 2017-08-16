@@ -8,11 +8,10 @@ Game::Game()
 	: m_gameEventMessenger(),
 	m_window(m_gameEventMessenger, "BomberMan", sf::Vector2i(336, 336)),
 	m_textureManager(),
-	m_stateManager(),
 	m_fontManager(),
-	m_guiManager(m_gameEventMessenger, m_fontManager),
 	m_audioClipManager(),
 	m_audioClipPlayer(),
+	m_stateManager(),
 	m_clock(),
 	m_timeElasped()
 {
@@ -29,14 +28,12 @@ void Game::update()
 {
 	m_stateManager.update(m_timeElasped.asSeconds());
 	m_audioClipPlayer.update();
-	m_guiManager.update(m_window.getRenderWindow());
 	m_window.update();
 }
 
 void Game::draw()
 {
 	m_stateManager.draw(m_window.getRenderWindow());
-	m_guiManager.draw(m_window.getRenderWindow());
 	DebugOverlay::draw(m_window.getRenderWindow());
 	m_window.display();
 }

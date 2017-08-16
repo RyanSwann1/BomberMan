@@ -17,10 +17,13 @@ StateGame::StateGame(StateManager& stateManager, StateType stateType)
 	m_levelManager(m_entityManager),
 	m_gamePaused(false)
 {
+	m_gui.addButton(sf::Vector2f(250, 300), sf::Vector2f(50, 20), "Pause", GUIButtonName::Pause);
 	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
 	gameEventMessenger.subscribe(std::bind(&StateGame::pauseGame, this), "StateGame", GameEvent::Pause);
 	gameEventMessenger.subscribe(std::bind(&StateGame::unpauseGame, this), "StateGame", GameEvent::Unpause);
 	gameEventMessenger.subscribe(std::bind(&StateGame::onNewLevel, this), "StateGame", GameEvent::StartedNewLevel);
+
+	m_stateManager.createState(StateType::PauseMenu);
 }
 
 StateGame::~StateGame()
@@ -61,4 +64,16 @@ void StateGame::unpauseGame()
 void StateGame::onNewLevel()
 {
 	m_gamePaused = false;
+}
+
+void StateGame::activateButton(GUIButtonName buttonName)
+{
+	switch (buttonName)
+	{
+	case GUIButtonName::Pause :
+	{
+		m_stateManager.switchToState(StateType::PauseMenu);
+		break;
+	}
+	}
 }

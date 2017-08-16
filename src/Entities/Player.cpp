@@ -54,10 +54,14 @@ void Player::handleEntityCollision(const std::unique_ptr<Entity>& entity, const 
 
 	switch (entity->getTag())
 	{
-	case EntityTag::SpeedBoost:
+	case EntityTag::PowerUpSpeedBoost:
 	{
 		Character::increaseSpeed(2.5f, 2.5f);
 		break;
+	}
+	case EntityTag::PowerUpIncreaseBomb :
+	{
+		BombCarrier::increaseBombQuantity();
 	}
 	}
 }
