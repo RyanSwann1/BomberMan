@@ -6,28 +6,29 @@
 #include <Game\GameEvent.h>
 
 StateRoundFailed::StateRoundFailed(StateManager & stateManager, StateType stateType)
-	: StateBase(stateManager, stateType),
-	m_nextRoundBeginTimer(3.0f, true)
+	: StateBase(stateManager, stateType)
 {
 	GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::Pause);
+	m_gui.addText(sf::Vector2f(75, 20), "You Died!", 30);
+	m_gui.addButton(sf::Vector2f(150, 50), sf::Vector2f(100, 75), "Retry", GUIButtonName::Retry);
+	m_gui.addButton(sf::Vector2f(150, 150), sf::Vector2f(100, 75), "MainMenu", GUIButtonName::MainMenu);
 }
 
-void StateRoundFailed::draw(sf::RenderWindow & window)
+void StateRoundFailed::activateButton(GUIButtonName buttonName)
 {
-}
-
-void StateRoundFailed::update(float deltaTime)
-{
-	m_nextRoundBeginTimer.update(deltaTime);
-	if (!m_nextRoundBeginTimer.isExpired())
+	switch (buttonName)
 	{
-		return;
+	case GUIButtonName::Retry :
+	{
+		auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
+		gameEventMessenger.broadcast(GameEvent::ReloadCurrentLevel);
+		m_stateManager.switchToAndRemoveState(StateType::Game, StateType::RoundFailed);
+		break;
 	}
-
-	m_nextRoundBeginTimer.deactivate();
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+	case GUIButtonName::MainMenu :
 	{
-		GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::ReloadCurrentLevel);
-		m_stateManager.switchToAndRemoveState(StateType::Game, StateBase::getType());
+		m_stateManager.switchToAndRemoveState(StateType::MainMenu, { StateType::Game, StateType::PauseMenu, StateBase::getType() });
+		break;
+	}
 	}
 }

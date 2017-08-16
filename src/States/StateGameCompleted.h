@@ -7,9 +7,6 @@ class StateGameCompleted : public StateBase
 public:
 	StateGameCompleted(StateManager& stateManager, StateType stateType);
 
-	void update(float deltaTime) override;
-	void draw(sf::RenderWindow& window) override;
-
 private:
-
+	void activateButton(GUIButtonName buttonName) override;
 };

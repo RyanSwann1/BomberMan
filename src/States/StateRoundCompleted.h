@@ -7,6 +7,6 @@ class StateRoundCompleted : public StateBase
 public:
 	StateRoundCompleted(StateManager& stateManager, StateType stateType);
 
-	void draw(sf::RenderWindow& window) override;
-	void update(float deltaTime) override;
+private:
+	void activateButton(GUIButtonName buttonName) override;
 };

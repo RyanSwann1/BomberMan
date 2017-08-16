@@ -14,11 +14,14 @@ protected:
 	void increaseBombQuantity();
 
 private:
-	int m_maxBombQuantity;
+	const int m_maxBombQuantity;
+	int m_totalBombQuantity;
 	int m_currentBombQuantity;
+	Timer m_bombQuantityResetTimer;
 	Timer m_bombSpawnTimer;
 
-	void handleBombTimer(float deltaTime);
+	void handleBombSpawnTimer(float deltaTime);
+	void handleBombQuantityResetTimer(float deltaTime);
 
 	sf::Vector2f getBombSpawnPosition() const;
 };

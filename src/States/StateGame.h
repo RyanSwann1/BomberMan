@@ -32,4 +32,5 @@ private:
 	void pauseGame();
 	void unpauseGame();
 	void onNewLevel();
+	void activateButton(GUIButtonName buttonName) override;
 };

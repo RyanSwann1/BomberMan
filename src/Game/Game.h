@@ -6,7 +6,6 @@
 #include <Audio\AudioPlayer.h>
 #include <Managers\AudioClipManager.h>
 #include <managers\FontManager.h>
-#include <Managers\GUIManager.h>
 #include <Game\MessageHandler.h>
 #include <Game\GameEvent.h>
 #include <Managers\StateManager.h>
@@ -28,11 +27,10 @@ private:
 	MessageHandler<GameEvent> m_gameEventMessenger;
 	Window m_window;
 	TextureManager m_textureManager;
-	StateManager m_stateManager;
 	FontManager m_fontManager;
-	GUIManager m_guiManager;
 	AudioClipManager m_audioClipManager;
 	AudioPlayer m_audioClipPlayer;
+	StateManager m_stateManager;
 	sf::Clock m_clock;
 	sf::Time m_timeElasped;
 };

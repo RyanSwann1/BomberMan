@@ -65,7 +65,7 @@ void Enemy::handleEntityCollision(const std::unique_ptr<Entity>& entity, const s
 
 	switch (entity->getTag())
 	{
-	case EntityTag::SpeedBoost :
+	case EntityTag::PowerUpSpeedBoost :
 	{
 
 		break;

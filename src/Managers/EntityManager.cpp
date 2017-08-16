@@ -4,7 +4,7 @@
 #include <Entities\Explosion.h>
 #include <Entities\Crate.h>
 #include <Entities\Enemy.h>
-#include <Entities\SpeedBoost.h>
+#include <Entities\PowerUp.h>
 #include <Locators\EntityManagerLocator.h>
 #include <Game\MessageHandler.h>
 #include <Locators\GameEventMessengerLocator.h>
@@ -21,7 +21,8 @@ EntityManager::EntityFactory::EntityFactory(EntityManager * entityManager)
 	registerEntity<Enemy>("Enemy3", EntityTag::Enemy, entityManager, false);
 	registerEntity<Crate>("Crate", EntityTag::Crate, entityManager, true);
 	registerEntity<Entity>("CollidableTile", EntityTag::Solid, entityManager, true);
-	registerEntity<SpeedBoost>("SpeedBoost", EntityTag::SpeedBoost, entityManager, false);
+	registerEntity<PowerUp>("PowerUpSpeedBoost", EntityTag::PowerUpSpeedBoost, entityManager, false);
+	registerEntity<PowerUp>("PowerUpExtraBomb", EntityTag::PowerUpIncreaseBomb, entityManager, false);
 }
 
 std::unique_ptr<Entity> EntityManager::EntityFactory::getEntity(const std::string& name, const sf::Vector2f & entityPosition, int entityID) const
@@ -130,4 +131,3 @@ void EntityManager::purgeEntities()
 	m_entityQueue.clear();
 	m_entityCount = 0;
 }
-

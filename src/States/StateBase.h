@@ -1,27 +1,28 @@
 #pragma once
 
 #include "StateType.h"
+#include <GUI\GUI.h>
 #include <Window.h>
-
+enum class GUIButtonName;
 class StateManager;
 class StateBase
 {
+	friend class GUI;
 public:
-	StateBase(StateManager& stateManager, StateType stateType)
-		: m_stateType(stateType),
-		m_stateManager(stateManager)
-	{}
+	StateBase(StateManager& stateManager, StateType stateType);
 
-	virtual ~StateBase()
-	{}
+	virtual ~StateBase();
 
-	StateType getType() const { return m_stateType; }
+	StateType getType();
 
-	virtual void update(float deltaTime) = 0;
-	virtual void draw(sf::RenderWindow& window) = 0;
+	virtual void update(float deltaTime);
+	virtual void draw(sf::RenderWindow& window);
 
 protected:
 	StateManager& m_stateManager;
+	GUI m_gui;
+
+	virtual void activateButton(GUIButtonName) = 0;
 
 private:
 	const StateType m_stateType;
