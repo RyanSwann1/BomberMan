@@ -11,8 +11,8 @@ BombCarrier::BombCarrier(const std::string & name, EntityTag tag, const sf::Vect
 	m_maxBombQuantity(5),
 	m_totalBombQuantity(1),
 	m_currentBombQuantity(m_totalBombQuantity),
-	m_bombQuantityResetTimer(2.0f, true),
-	m_bombSpawnTimer(1.0f, false)
+	m_bombQuantityResetTimer(3.0f, true),
+	m_bombSpawnTimer(0.5f, false)
 {}
 
 void BombCarrier::update(float deltaTime)
@@ -30,6 +30,11 @@ void BombCarrier::placeBomb()
 		return;
 	}
 
+	if (m_bombSpawnTimer.isActive() && !m_bombSpawnTimer.isExpired())
+	{
+		return;
+	}
+
 	AudioPlayerLocator::getAudioClipPlayer().playAudioClip(AudioClipName::PlaceBomb);
 	--m_currentBombQuantity;
 	m_bombSpawnTimer.activate();
@@ -42,6 +47,7 @@ void BombCarrier::increaseBombQuantity()
 	if (m_totalBombQuantity < m_maxBombQuantity)
 	{
 		++m_totalBombQuantity;
+		++m_currentBombQuantity;
 	}
 }
 

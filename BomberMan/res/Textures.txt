@@ -1,2 +1,3 @@
 bomb_party_v4 res/bomb_party_v4.png
 SpeedBoost res/SpeedBoost.png
+ExtraBomb res/ExtraBomb.png
