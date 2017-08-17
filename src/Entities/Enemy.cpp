@@ -13,7 +13,6 @@
 #include <Entities\EntityMessage.h>
 #include <Locators\EntityMessengerLocator.h>
 #include <Game\EntityMessenger.h>
-#include <iostream>
 #include <random>
 
 Enemy::Enemy(const std::string& name, EntityTag tag, const sf::Vector2f & position, EntityManager & entityManager, int entityID, bool collidable)
@@ -27,7 +26,6 @@ Enemy::Enemy(const std::string& name, EntityTag tag, const sf::Vector2f & positi
 	m_state(State::InitializeState)
 {
 	const int randNumb = RandomNumberGenerator::getRandomNumber(static_cast<int>(EnemyType::Passive), static_cast<int>(EnemyType::Aggressive));
-	std::cout << "Random Number: " << randNumb << "\n";
 	m_type = static_cast<EnemyType>(randNumb);
 
 	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
@@ -67,7 +65,7 @@ void Enemy::handleEntityCollision(const std::unique_ptr<Entity>& entity, const s
 	{
 	case EntityTag::PowerUpSpeedBoost :
 	{
-
+		
 		break;
 	}
 	}
@@ -278,17 +276,6 @@ void Enemy::addNeighbouringPointsToFrontier(sf::Vector2i& opponentAtPoint, const
 			break;
 		}
 
-		//if (CollisionHandler::isEntityAtPosition(EntityTag::Enemy, sf::Vector2f(x * tileSize, point.m_position.y * tileSize), m_entityManager))
-		//{
-		//	opponentFound = true;
-		//	addNewPoint(sf::Vector2i(x, point.m_position.y), graph, frontier, pointID, point.m_ID);
-		//	//Set Target Point to opponent here?
-		//	//
-		//	//
-		//	//
-		//	break;
-		//}
-
 		addNewPoint(sf::Vector2i(x, point.m_point.y), graph, frontier, pointID, point.m_ID);
 	}
 
@@ -391,7 +378,7 @@ std::vector<sf::Vector2i> Enemy::getNeighbouringPointsOnGraphContainingBomb(cons
 {
 	std::vector<sf::Vector2i> points;
 	//x
-	for (int x = startingPoint.x - 4; x <= startingPoint.x + 4; ++x)
+	for (int x = startingPoint.x - 5; x <= startingPoint.x + 5; ++x)
 	{
 		if (!isPointOnGraph(graph, sf::Vector2i(x, startingPoint.y)))
 		{
@@ -405,7 +392,7 @@ std::vector<sf::Vector2i> Enemy::getNeighbouringPointsOnGraphContainingBomb(cons
 		}
 	}
 	//y
-	for (int y = startingPoint.y - 4; y <= startingPoint.y + 4; ++y)
+	for (int y = startingPoint.y - 5; y <= startingPoint.y + 5; ++y)
 	{
 		if (!isPointOnGraph(graph, sf::Vector2i(startingPoint.x, y)))
 		{
@@ -432,6 +419,7 @@ void Enemy::addNewPoint(const sf::Vector2i & position, std::vector<Point>& graph
 
 const Enemy::Point& Enemy::getPointOnGraph(const std::vector<Point>& graph, const sf::Vector2i & position) const
 {
+	//if(m_position)
 	auto cIter = std::find_if(graph.cbegin(), graph.cend(), [&position](const auto& point) { return point.m_point == position; });
 	assert(cIter != graph.cend());
 	return *cIter;
@@ -454,13 +442,8 @@ const sf::Vector2i Enemy::getNeighbouringPointOnGraph(const sf::Vector2i & point
 bool Enemy::isPointInRadiusOfHarm(const std::vector<Point>& graph, const Point& point, int tileSize) const
 {
 	//x
-	for (int x = point.m_point.x - 2; x != point.m_point.x + 2; ++x)
+	for (int x = point.m_point.x - 5; x != point.m_point.x + 5; ++x)
 	{
-		/*if (CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(x, point.m_point.y), tileSize))
-		{
-			continue;
-		}*/
-		
 		if (!isPointOnGraph(graph, point.m_point))
 		{
 			continue;
@@ -470,21 +453,11 @@ bool Enemy::isPointInRadiusOfHarm(const std::vector<Point>& graph, const Point& 
 		{
 			return true;
 		}
-
-		//if (CollisionHandler::isEntityAtPosition(sf::Vector2f(x, point.m_point.y), m_entityManager, EntityTag::Explosion, tileSize))
-		//{
-		//	return true;
-		//}
 	}
 
 	//y
-	for (int y = point.m_point.y - 2; y != point.m_point.y + 2; ++y)
+	for (int y = point.m_point.y - 5; y != point.m_point.y + 5; ++y)
 	{
-	/*	if (CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(point.m_point.x, y), tileSize))
-		{
-			continue;
-		}*/
-
 		if (!isPointOnGraph(graph, point.m_point))
 		{
 			continue;
@@ -494,11 +467,6 @@ bool Enemy::isPointInRadiusOfHarm(const std::vector<Point>& graph, const Point& 
 		{
 			return true;
 		}
-
-		//if (CollisionHandler::isEntityAtPosition(sf::Vector2f(point.m_point.x, y), m_entityManager, EntityTag::Explosion, tileSize))
-		//{
- 	//		return true;
-		//}
 	}
 
 	return false;

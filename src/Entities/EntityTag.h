@@ -10,5 +10,6 @@ enum class EntityTag
 	Solid,
 	PowerUpSpeedBoost,
 	PowerUpIncreaseBomb,
+	PowerUpIncreaseBombPower,
 	IncreaseBombQuantity
 };

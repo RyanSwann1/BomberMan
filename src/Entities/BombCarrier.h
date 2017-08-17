@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Entities\Character.h>
+#include <Entities\BombPower.h>
 
 class BombCarrier : public Character
 {
@@ -12,6 +13,7 @@ public:
 protected:
 	virtual void placeBomb();
 	void increaseBombQuantity();
+	void increaseBombPower();
 
 private:
 	const int m_maxBombQuantity;
@@ -19,6 +21,8 @@ private:
 	int m_currentBombQuantity;
 	Timer m_bombQuantityResetTimer;
 	Timer m_bombSpawnTimer;
+	BombPower m_bombPower;
+	
 
 	void handleBombSpawnTimer(float deltaTime);
 	void handleBombQuantityResetTimer(float deltaTime);

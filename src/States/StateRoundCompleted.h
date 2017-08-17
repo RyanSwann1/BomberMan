@@ -11,4 +11,5 @@ public:
 private:
 	void activateButton(GUIButtonName buttonName) override;
 	void onWinGame();
+	void onPlayerDeath();
 };

@@ -12,7 +12,8 @@ BombCarrier::BombCarrier(const std::string & name, EntityTag tag, const sf::Vect
 	m_totalBombQuantity(1),
 	m_currentBombQuantity(m_totalBombQuantity),
 	m_bombQuantityResetTimer(3.0f, true),
-	m_bombSpawnTimer(0.5f, false)
+	m_bombSpawnTimer(0.5f, false),
+	m_bombPower(BombPower::Low)
 {}
 
 void BombCarrier::update(float deltaTime)
@@ -39,7 +40,24 @@ void BombCarrier::placeBomb()
 	--m_currentBombQuantity;
 	m_bombSpawnTimer.activate();
 	std::cout << "Spawn Bomb\n";
-	m_entityManager.addEntity("Bomb", getBombSpawnPosition());
+	switch (m_bombPower)
+	{
+	case BombPower::Low :
+	{
+		m_entityManager.addEntity("BombLowPower", getBombSpawnPosition());
+		break;
+	}
+	case BombPower::Medium :
+	{
+		m_entityManager.addEntity("BombMediumPower", getBombSpawnPosition());
+		break;
+	}
+	case BombPower::High :
+	{
+		m_entityManager.addEntity("BombHighPower", getBombSpawnPosition());
+		break;
+	}
+	}
 }
 
 void BombCarrier::increaseBombQuantity()
@@ -48,6 +66,25 @@ void BombCarrier::increaseBombQuantity()
 	{
 		++m_totalBombQuantity;
 		++m_currentBombQuantity;
+	}
+}
+
+void BombCarrier::increaseBombPower()
+{
+	switch (m_bombPower)
+	{
+	case BombPower::Low :
+	{
+		m_bombPower = BombPower::Medium;
+		break;
+	}
+	case BombPower::Medium :
+	{
+		m_bombPower = BombPower::High;
+		break;
+	}
+	default:
+		break;
 	}
 }
 

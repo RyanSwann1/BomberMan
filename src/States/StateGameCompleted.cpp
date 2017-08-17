@@ -8,6 +8,7 @@ StateGameCompleted::StateGameCompleted(StateManager& stateManager, StateType sta
 {
 	m_gui.addText(sf::Vector2f(75, 20), "You Win!", 30);
 	m_gui.addButton(sf::Vector2f(150, 150), sf::Vector2f(100, 75), "MainMenu", GUIButtonName::MainMenu);
+	GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::WinStateEntered);
 }
 
 void StateGameCompleted::activateButton(GUIButtonName buttonName)

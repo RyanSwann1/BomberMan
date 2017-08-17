@@ -144,6 +144,9 @@
     <ClCompile Include="..\src\Audio\AudioPlayer.cpp" />
     <ClCompile Include="..\src\Entities\Bomb.cpp" />
     <ClCompile Include="..\src\Entities\BombCarrier.cpp" />
+    <ClCompile Include="..\src\Entities\BombHighPower.cpp" />
+    <ClCompile Include="..\src\Entities\BombLowPower.cpp" />
+    <ClCompile Include="..\src\Entities\BombMediumPower.cpp" />
     <ClCompile Include="..\src\Entities\Character.cpp" />
     <ClCompile Include="..\src\Entities\CollisionHandler.cpp" />
     <ClCompile Include="..\src\Entities\Crate.cpp" />
@@ -209,6 +212,10 @@
     <ClInclude Include="..\src\Audio\AudioPlayer.h" />
     <ClInclude Include="..\src\Entities\Bomb.h" />
     <ClInclude Include="..\src\Entities\BombCarrier.h" />
+    <ClInclude Include="..\src\Entities\BombHighPower.h" />
+    <ClInclude Include="..\src\Entities\BombLowPower.h" />
+    <ClInclude Include="..\src\Entities\BombMediumPower.h" />
+    <ClInclude Include="..\src\Entities\BombPower.h" />
     <ClInclude Include="..\src\Entities\Character.h" />
     <ClInclude Include="..\src\Entities\CollisionHandler.h" />
     <ClInclude Include="..\src\Entities\Crate.h" />

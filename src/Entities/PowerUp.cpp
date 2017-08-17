@@ -6,6 +6,11 @@ PowerUp::PowerUp(const std::string & name, EntityTag tag, const sf::Vector2f & s
 {
 }
 
+void PowerUp::update(float deltaTime)
+{
+	
+}
+
 void PowerUp::handleEntityCollision(const std::unique_ptr<Entity>& entity, const sf::FloatRect & intersection)
 {
 	switch (entity->getTag())

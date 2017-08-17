@@ -5,6 +5,9 @@
 #include <Entities\Crate.h>
 #include <Entities\Enemy.h>
 #include <Entities\PowerUp.h>
+#include <Entities\BombLowPower.h>
+#include <Entities\BombMediumPower.h>
+#include <Entities\BombHighPower.h>
 #include <Locators\EntityManagerLocator.h>
 #include <Game\MessageHandler.h>
 #include <Locators\GameEventMessengerLocator.h>
@@ -14,7 +17,7 @@
 EntityManager::EntityFactory::EntityFactory(EntityManager * entityManager)
 {
 	registerEntity<Player>("Player", EntityTag::Player, entityManager, false);
-	registerEntity<Bomb>("Bomb", EntityTag::Bomb, entityManager, false);
+	//registerEntity<Bomb>("Bomb", EntityTag::Bomb, entityManager, false);
 	registerEntity<Explosion>("Explosion", EntityTag::Explosion, entityManager, false);
 	registerEntity<Enemy>("Enemy1", EntityTag::Enemy, entityManager, false);
 	registerEntity<Enemy>("Enemy2", EntityTag::Enemy, entityManager, false);
@@ -23,6 +26,10 @@ EntityManager::EntityFactory::EntityFactory(EntityManager * entityManager)
 	registerEntity<Entity>("CollidableTile", EntityTag::Solid, entityManager, true);
 	registerEntity<PowerUp>("PowerUpSpeedBoost", EntityTag::PowerUpSpeedBoost, entityManager, false);
 	registerEntity<PowerUp>("PowerUpExtraBomb", EntityTag::PowerUpIncreaseBomb, entityManager, false);
+	registerEntity<PowerUp>("PowerUpIncreaseBombPower", EntityTag::PowerUpIncreaseBombPower, entityManager, false);
+	registerEntity<BombLowPower>("BombLowPower", EntityTag::Bomb, entityManager, false);
+	registerEntity<BombMediumPower>("BombMediumPower", EntityTag::Bomb, entityManager, false);
+	registerEntity<BombHighPower>("BombHighPower", EntityTag::Bomb, entityManager, false);
 }
 
 std::unique_ptr<Entity> EntityManager::EntityFactory::getEntity(const std::string& name, const sf::Vector2f & entityPosition, int entityID) const

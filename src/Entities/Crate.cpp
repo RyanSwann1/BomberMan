@@ -12,7 +12,7 @@ Crate::Crate(const std::string& name, EntityTag tag, const sf::Vector2f & spawnP
 
 void Crate::update(float deltaTime)
 {
-	CollisionHandler::handleCollisions(m_position, m_entityManager, sf::Vector2f(), *this);
+	CollisionHandler::checkForEntityCollisions(m_position, m_entityManager, sf::Vector2f(), *this);
 }
 
 void Crate::handleEntityCollision(const std::unique_ptr<Entity>& entity, const sf::FloatRect & intersection)

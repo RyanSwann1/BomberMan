@@ -24,7 +24,8 @@ GameManager::GameManager(EntityManager& entityManager)
 	m_spawnTimer(0.25f, true),
 	m_reduceMapSize(false),
 	m_currentSpawnPosition(0, 0),
-	m_spawnDirection(Direction::Right)
+	m_spawnDirection(Direction::Right),
+	m_nextRoundTimer(2.0f, false)
 {
 	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
 	gameEventMessenger.subscribe(std::bind(&GameManager::onWinGame, this), "GameManager", GameEvent::WinGame);
@@ -44,26 +45,20 @@ GameManager::~GameManager()
 	gameEventMessenger.unsubscribe("GameManager", GameEvent::ReloadCurrentLevel);
 }
 
+void GameManager::increaseEntityBombExplosiveRadius(const std::unique_ptr<Entity>& entity, int entityID)
+{
+
+}
+
 void GameManager::update(float deltaTime)
 {
-	/*m_spawnTimer.update(deltaTime);
-	if (m_spawnTimer.isExpired())
+	m_nextRoundTimer.update(deltaTime);
+	if (m_nextRoundTimer.isExpired())
 	{
-		reduceMapSize();
-	}*/
-
-	//m_gameTimer.update(deltaTime);
-	//if (m_reduceMapSize)
-	//{
-	//	reduceMapSize();
-	//}
-	//else
-	//{
-	//	if (m_gameTimer.getElaspedTime() >= (m_totalGameTime / 2.0f))
-	//	{
-	//		m_reduceMapSize = true;
-	//	}
-	//}
+		getStateManager().switchToState(StateType::RoundCompleted);
+		m_nextRoundTimer.reset();
+		m_nextRoundTimer.deactivate();
+	}
 }
 
 void GameManager::onWinGame()
@@ -73,21 +68,24 @@ void GameManager::onWinGame()
 
 void GameManager::onEnemyDeath()
 {
+	--m_enemiesRemaining;
+	if (!m_enemiesRemaining)
+	{
+		m_nextRoundTimer.activate();
+		return;
+	}
+
 	auto& entityMessenger = EntityMessengerLocator::getEntityMessenger();
 	EntityMessage entityMessage(EntityEvent::TurnAggressive, 1);
 	entityMessenger.broadcast(entityMessage);
 
-	--m_enemiesRemaining;
-
-	if (!m_enemiesRemaining)
-	{
-		getStateManager().switchToState(StateType::RoundCompleted);
-	}
 }
 
 void GameManager::onPlayerDeath()
 {
 	getStateManager().switchToState(StateType::RoundFailed);
+	m_nextRoundTimer.reset();
+	m_nextRoundTimer.deactivate();
 }
 
 void GameManager::reduceMapSize()

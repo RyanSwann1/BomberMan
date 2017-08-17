@@ -63,5 +63,9 @@ void Player::handleEntityCollision(const std::unique_ptr<Entity>& entity, const 
 	{
 		BombCarrier::increaseBombQuantity();
 	}
+	case EntityTag::PowerUpIncreaseBombPower :
+	{
+		BombCarrier::increaseBombPower();
+	}
 	}
 }
