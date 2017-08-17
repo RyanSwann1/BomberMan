@@ -7,10 +7,9 @@ class EntityManager;
 class Entity;
 namespace CollisionHandler
 {
-	void handleCollisions(const sf::Vector2f& entityPosition, const EntityManager& entityManager, sf::Vector2f& movement, Entity& entity);
+	void checkForEntityCollisions(const sf::Vector2f & entityPosition, const EntityManager & entityManager, sf::Vector2f & movement, Entity & entity);
+	//void checkForTileCollisions(const sf::Vector2f & entityPosition, sf::Vector2f & movement);
 	void clampMovement(const sf::FloatRect& intersection, sf::Vector2f& movement);
 	bool isCollidableTileAtPosition(const sf::Vector2f& position, int tileSize);
 	bool isEntityAtPosition(const sf::Vector2f& position, const EntityManager& entityManager, EntityTag entityTag, int tileSize);
-	
-	//bool isCollidableTileAtPosition(const sf::Vector2f& position);
 }

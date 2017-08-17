@@ -16,6 +16,7 @@ StateRoundCompleted::StateRoundCompleted(StateManager& stateManager, StateType s
 	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
 	gameEventMessenger.broadcast(GameEvent::Pause);
 	gameEventMessenger.subscribe(std::bind(&StateRoundCompleted::onWinGame, this), "StateRoundCompleted", GameEvent::WinGame);
+	gameEventMessenger.subscribe(std::bind(&StateRoundCompleted::onPlayerDeath, this), "StateRoundCompleted", GameEvent::PlayerDeath);
 	
 	m_gui.addText(sf::Vector2f(30, 30), "Round Completed!", 30);
 	m_gui.addButton(sf::Vector2f(175, 50), sf::Vector2f(100, 75), "Next Level", GUIButtonName::NextLevel);
@@ -25,6 +26,7 @@ StateRoundCompleted::StateRoundCompleted(StateManager& stateManager, StateType s
 StateRoundCompleted::~StateRoundCompleted()
 {
 	GameEventMessengerLocator::getGameEventMessenger().unsubscribe("StateRoundCompleted", GameEvent::WinGame);
+	GameEventMessengerLocator::getGameEventMessenger().unsubscribe("StateRoundCompleted", GameEvent::PlayerDeath);
 }
 
 void StateRoundCompleted::activateButton(GUIButtonName buttonName)
@@ -46,6 +48,11 @@ void StateRoundCompleted::activateButton(GUIButtonName buttonName)
 }
 
 void StateRoundCompleted::onWinGame()
+{
+	m_stateManager.removeState(StateBase::getType());
+}
+
+void StateRoundCompleted::onPlayerDeath()
 {
 	m_stateManager.removeState(StateBase::getType());
 }

@@ -7,7 +7,9 @@ class StateRoundFailed : public StateBase
 {
 public:
 	StateRoundFailed(StateManager& stateManager, StateType stateType);
+	~StateRoundFailed();
 
 private:
 	void activateButton(GUIButtonName buttonName) override;
+	void onEnteringWinState();
 };

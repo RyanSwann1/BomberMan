@@ -8,10 +8,18 @@
 StateRoundFailed::StateRoundFailed(StateManager & stateManager, StateType stateType)
 	: StateBase(stateManager, stateType)
 {
-	GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::Pause);
+	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
+	gameEventMessenger.broadcast(GameEvent::Pause);
+	gameEventMessenger.subscribe(std::bind(&StateRoundFailed::onEnteringWinState, this), "StateRoundFailed", GameEvent::WinStateEntered);
+
 	m_gui.addText(sf::Vector2f(75, 20), "You Died!", 30);
 	m_gui.addButton(sf::Vector2f(150, 50), sf::Vector2f(100, 75), "Retry", GUIButtonName::Retry);
 	m_gui.addButton(sf::Vector2f(150, 150), sf::Vector2f(100, 75), "MainMenu", GUIButtonName::MainMenu);
+}
+
+StateRoundFailed::~StateRoundFailed()
+{
+	GameEventMessengerLocator::getGameEventMessenger().unsubscribe("StateRoundFailed", GameEvent::WinStateEntered);
 }
 
 void StateRoundFailed::activateButton(GUIButtonName buttonName)
@@ -31,4 +39,9 @@ void StateRoundFailed::activateButton(GUIButtonName buttonName)
 		break;
 	}
 	}
+}
+
+void StateRoundFailed::onEnteringWinState()
+{
+	m_stateManager.removeState(StateBase::getType());
 }

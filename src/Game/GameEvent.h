@@ -14,5 +14,6 @@ enum class GameEvent
 	Pause,
 	Unpause,
 	EnemySpawned,
-	StartedNewLevel
+	StartedNewLevel,
+	WinStateEntered
 };

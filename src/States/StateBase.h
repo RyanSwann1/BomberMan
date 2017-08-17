@@ -10,7 +10,6 @@ class StateBase
 	friend class GUI;
 public:
 	StateBase(StateManager& stateManager, StateType stateType);
-
 	virtual ~StateBase();
 
 	StateType getType();
