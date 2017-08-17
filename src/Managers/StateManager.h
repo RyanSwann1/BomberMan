@@ -43,6 +43,7 @@ public:
 
 	void createState(StateType stateToCreate);
 	void removeState(StateType stateToRemove);
+	void removeState(const std::vector<StateType>& statesToRemove);
 	void switchToState(StateType stateToSwitch);
 	void switchToAndRemoveState(StateType stateToSwitchTo, StateType stateToRemove);
 	void switchToAndRemoveState(StateType stateToSwitchTo, std::vector<StateType> statesToRemove);

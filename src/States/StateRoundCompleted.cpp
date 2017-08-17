@@ -13,10 +13,18 @@ StateRoundCompleted::StateRoundCompleted(StateManager& stateManager, StateType s
 	audioPlayer.stopMusic();
 	audioPlayer.playAudioClip(AudioClipName::Victory);
 	GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::Pause);
+	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
+	gameEventMessenger.broadcast(GameEvent::Pause);
+	gameEventMessenger.subscribe(std::bind(&StateRoundCompleted::onWinGame, this), "StateRoundCompleted", GameEvent::WinGame);
 	
 	m_gui.addText(sf::Vector2f(30, 30), "Round Completed!", 30);
-	m_gui.addButton(sf::Vector2f(175, 50), sf::Vector2f(100, 75), "Resume", GUIButtonName::Resume);
+	m_gui.addButton(sf::Vector2f(175, 50), sf::Vector2f(100, 75), "Next Level", GUIButtonName::NextLevel);
 	m_gui.addButton(sf::Vector2f(50, 50), sf::Vector2f(100, 75), "Main Menu", GUIButtonName::MainMenu);
+}
+
+StateRoundCompleted::~StateRoundCompleted()
+{
+	GameEventMessengerLocator::getGameEventMessenger().unsubscribe("StateRoundCompleted", GameEvent::WinGame);
 }
 
 void StateRoundCompleted::activateButton(GUIButtonName buttonName)
@@ -35,4 +43,9 @@ void StateRoundCompleted::activateButton(GUIButtonName buttonName)
 		break;
 	}
 	}
+}
+
+void StateRoundCompleted::onWinGame()
+{
+	m_stateManager.removeState(StateBase::getType());
 }

@@ -440,26 +440,15 @@ const Enemy::Point& Enemy::getPointOnGraph(const std::vector<Point>& graph, cons
 const Enemy::Point & Enemy::getPointOnGraph(const std::vector<Point>& graph, int ID) const
 {
 	return graph[ID];
-
-	//auto cIter = std::find_if(graph.cbegin(), graph.cend(), [ID](const auto& point) { return point.m_ID == ID; });
-	//assert(cIter != graph.cend());
-	//return *cIter;
 }
 
 const sf::Vector2i Enemy::getNeighbouringPointOnGraph(const sf::Vector2i & point, const std::vector<Point>& graph, int tileSize) const
 {
-	//auto cIter = std::find_if(graph.cbegin(), graph.cend(), [&point](const auto& existingPoint) { return existingPoint.m_point == point; });
-	//assert(cIter != graph.cend());
 	const auto neighbouringPoints = getNeighbouringPointsOnGraph(point, graph, tileSize);
 	assert(!neighbouringPoints.empty());
 	
 	const auto randomPointPosition = neighbouringPoints[RandomNumberGenerator::getRandomNumber(0, neighbouringPoints.size() - 1)];
 	return randomPointPosition;
-//	
-//s	const auto neighbouringPoint = std::find_if(graph.cbegin(), graph.cend(), 
-//		[&randomPointPosition](const auto& point) { return point.m_point == randomPointPosition; });
-//	assert(neighbouringPoint != graph.cend());
-//	return *neighbouringPoint;
 }
 
 bool Enemy::isPointInRadiusOfHarm(const std::vector<Point>& graph, const Point& point, int tileSize) const
@@ -657,24 +646,6 @@ bool Enemy::isPointSafeFromBombsAtPoint(const std::vector<Point>& graph, const s
 	}
 
 	return pointSafe;
-
-	//int moveSpacesAway = 3;
-	//int moveToPointID = .m_ID;
-	//while (moveToPointID != furtherstPoint.m_ID)
-	//{
-	//	const auto& point = graph[moveToPointID];
-	//	if(point.m_ID == furtherstPoint.m_ID)
-	//	{
-	//		break;
-	//	}
-	//	moveToPointID = point.m_cameFromID;
-	//	--moveSpacesAway;
-	//	if (moveSpacesAway <= 0)
-	//	{
-	//		break;
-	//	}
-	//}
-	//return (moveSpacesAway <= 0 ? true : false);
 }
 
 const Enemy::Point& Enemy::getCurrentPoint(const std::vector<Point>& graph, int tileSize) const
