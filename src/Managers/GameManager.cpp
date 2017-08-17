@@ -68,7 +68,7 @@ void GameManager::update(float deltaTime)
 
 void GameManager::onWinGame()
 {
-	getStateManager().switchToState(StateType::GameCompleted);
+	getStateManager().switchToAndRemoveState(StateType::GameCompleted, { StateType::Game, StateType::PauseMenu });
 }
 
 void GameManager::onEnemyDeath()
