@@ -6,7 +6,8 @@
 #include <Game\DebugOverlay.h>
 #include <math.h>
 
-Entity::Entity(const std::string& name, EntityTag tag, const sf::Vector2f& spawnPosition, EntityManager& entityManager, int ID, bool collidable)
+Entity::Entity(const std::string& name, EntityTag tag, const sf::Vector2f& spawnPosition, 
+	EntityManager& entityManager, int ID, bool collidable)
 	: m_position(spawnPosition),
 	m_AABB(),
 	m_animationPlayer(name),

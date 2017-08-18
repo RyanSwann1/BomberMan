@@ -8,4 +8,7 @@ public:
 
 	void update(float deltaTime) override;
 	void handleEntityCollision(const std::unique_ptr<Entity>& entity, const sf::FloatRect& intersection) override;
+
+private:
+	Timer m_spawnImmunityTimer;
 };

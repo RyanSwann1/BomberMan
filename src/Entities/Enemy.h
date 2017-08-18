@@ -91,5 +91,4 @@ private:
 	const Point& getCurrentPoint(const std::vector<Point>& graph, int tileSize) const;	
 	void setState(State newState);
 	void setTypeToAggressive(EntityMessage& entityMessage);
-	
 };

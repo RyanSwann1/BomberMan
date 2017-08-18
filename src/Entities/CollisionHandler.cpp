@@ -78,7 +78,6 @@ void CollisionHandler::checkForEntityCollisions(const sf::Vector2f & entityPosit
 		if (movementAABB.intersects(i->getAABB(), intersection))
 		{
 			entity.handleEntityCollision(i, intersection);
-			i->handleEntityCollision(entityManager.getEntity(entity.getID()), intersection);
 
 			if (i->isCollidable())
 			{
@@ -87,30 +86,3 @@ void CollisionHandler::checkForEntityCollisions(const sf::Vector2f & entityPosit
 		}
 	}
 }
-
-//void CollisionHandler::checkForTileCollisions(const sf::Vector2f & entityPosition, sf::Vector2f & movement)
-//{
-//	if (movement.x == 0 && movement.y == 0)
-//	{
-//		return;
-//	}
-//
-//	const int tileSize = LevelManagerLocator::getLevelManager().getCurrentLevel()->getTileSize();
-//	const sf::FloatRect movementAABB(entityPosition + movement, sf::Vector2f(tileSize, tileSize));
-//	for (const auto& entity : EntityManagerLocator::getEntityManager().getEntities())
-//	{
-//		if (!entity->isCollidable())
-//		{
-//			continue;
-//		}
-//
-//		sf::FloatRect intersection;
-//		if (!entity->getAABB().intersects(movementAABB, intersection))
-//		{
-//			continue;
-//		}
-//
-//		
-//		break;
-//	}
-//}
