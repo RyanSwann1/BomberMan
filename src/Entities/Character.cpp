@@ -18,7 +18,6 @@ void Character::update(float deltaTime)
 	handleAnimation();
 	handleDirection();
 	CollisionHandler::checkForEntityCollisions(m_position, m_entityManager, m_velocity, *this);
-	//CollisionHandler::handleCollisions(m_position, m_entityManager, m_velocity, *this);
 	m_oldPosition = m_position;
 	m_position += m_velocity;
 

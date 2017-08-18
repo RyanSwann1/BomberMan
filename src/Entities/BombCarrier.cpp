@@ -4,7 +4,6 @@
 #include <Locators\AudioPlayerLocator.h>
 #include <Audio\AudioPlayer.h>
 #include <Managers\EntityManager.h>
-#include <iostream>
 
 BombCarrier::BombCarrier(const std::string & name, EntityTag tag, const sf::Vector2f & spawnPosition, EntityManager & entityManager, int ID, bool collidable)
 	: Character(name, tag, spawnPosition, entityManager, ID, collidable),
@@ -39,7 +38,6 @@ void BombCarrier::placeBomb()
 	AudioPlayerLocator::getAudioClipPlayer().playAudioClip(AudioClipName::PlaceBomb);
 	--m_currentBombQuantity;
 	m_bombSpawnTimer.activate();
-	std::cout << "Spawn Bomb\n";
 	switch (m_bombPower)
 	{
 	case BombPower::Low :
@@ -83,8 +81,6 @@ void BombCarrier::increaseBombPower()
 		m_bombPower = BombPower::High;
 		break;
 	}
-	default:
-		break;
 	}
 }
 

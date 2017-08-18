@@ -13,6 +13,7 @@
 #include <Entities\EntityMessage.h>
 #include <Locators\EntityMessengerLocator.h>
 #include <Game\EntityMessenger.h>
+#include <iostream>
 #include <random>
 
 Enemy::Enemy(const std::string& name, EntityTag tag, const sf::Vector2f & position, EntityManager & entityManager, int entityID, bool collidable)
@@ -26,15 +27,14 @@ Enemy::Enemy(const std::string& name, EntityTag tag, const sf::Vector2f & positi
 	m_state(State::InitializeState)
 {
 	const int randNumb = RandomNumberGenerator::getRandomNumber(static_cast<int>(EnemyType::Passive), static_cast<int>(EnemyType::Aggressive));
+	std::cout << randNumb << "\n";
 	m_type = static_cast<EnemyType>(randNumb);
 
 	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
-	void setStateToTargetPlayer();
 	gameEventMessenger.subscribe(std::bind(&Enemy::setStateToTargetPlayer, this), "Enemy", GameEvent::EnemyAggressive);
 	gameEventMessenger.broadcast(GameEvent::EnemySpawned);
 	
 	auto& entityMessenger = EntityMessengerLocator::getEntityMessenger();
-	void setTypeToAggressive(EntityMessage& entityMessage);
 	entityMessenger.subscribe(std::bind(&Enemy::setTypeToAggressive, this, std::placeholders::_1), "Enemy", EntityEvent::TurnAggressive);
 }
 
@@ -63,9 +63,9 @@ void Enemy::handleEntityCollision(const std::unique_ptr<Entity>& entity, const s
 
 	switch (entity->getTag())
 	{
-	case EntityTag::PowerUpSpeedBoost :
+	case EntityTag::PowerUpIncreaseBombPower :
 	{
-		
+		//BombCarrier::increaseBombPower();
 		break;
 	}
 	}
@@ -120,7 +120,6 @@ void Enemy::checkExistingBombsAtPoints(int tileSize)
 {
 	for (auto iter = m_bombAtPoints.begin(); iter != m_bombAtPoints.end();)
 	{
-		//const auto point = sf::Vector2f(iter->x * tileSize, iter->y * tileSize);
 		if (!CollisionHandler::isEntityAtPosition(sf::Vector2f(iter->x, iter->y), m_entityManager, EntityTag::Bomb, tileSize))
 		{
 			iter = m_bombAtPoints.erase(iter);
@@ -272,8 +271,6 @@ void Enemy::addNeighbouringPointsToFrontier(sf::Vector2i& opponentAtPoint, const
 		{
 			opponentFound = true;
 			opponentAtPoint = sf::Vector2i(x, point.m_point.y);
-			addNewPoint(sf::Vector2i(x, point.m_point.y), graph, frontier, pointID, point.m_ID);
-			break;
 		}
 
 		addNewPoint(sf::Vector2i(x, point.m_point.y), graph, frontier, pointID, point.m_ID);
@@ -296,16 +293,7 @@ void Enemy::addNeighbouringPointsToFrontier(sf::Vector2i& opponentAtPoint, const
 		{
 			opponentFound = true;
 			opponentAtPoint = sf::Vector2i(point.m_point.x, y);
-			addNewPoint(sf::Vector2i(point.m_point.x, y), graph, frontier, pointID, point.m_ID);
-			break;
 		}
-
-		//if (CollisionHandler::isEntityAtPosition(EntityTag::Enemy, sf::Vector2f(point.m_position.x * tileSize, y * tileSize), m_entityManager))
-		//{
-		//	opponentFound = true;
-		//	addNewPoint(sf::Vector2i(point.m_position.x, y), graph, frontier, pointID, point.m_ID);
-		//	break;
-		//}
 
 		addNewPoint(sf::Vector2i(point.m_point.x, y), graph, frontier, pointID, point.m_ID);		
 	}
@@ -361,7 +349,6 @@ std::vector<sf::Vector2i> Enemy::getNeighbouringPointsOnCrates(const sf::Vector2
 		{
 			continue;
 		}
-
 
 		if (CollisionHandler::isEntityAtPosition(sf::Vector2f(startingPoint.x, y), m_entityManager, EntityTag::Solid, tileSize))
 		{
@@ -550,7 +537,7 @@ bool Enemy::neighbouringCrateAtPoint(const std::vector<sf::Vector2i>& points, in
 void Enemy::setTargetPointAtSafePoint(const std::vector<Point>& graph, int tileSize)
 {
 	bool pointSafe = false;
-	const int maxSafePoints = 5;
+	const int maxSafePoints = 3;
 	std::vector<int> safePointsID;
 	int pointID = 0;
 
