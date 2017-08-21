@@ -24,9 +24,9 @@ EntityManager::EntityFactory::EntityFactory(EntityManager * entityManager)
 	registerEntity<Enemy>("Enemy3", EntityTag::Enemy, entityManager, false);
 	registerEntity<Crate>("Crate", EntityTag::Crate, entityManager, true);
 	registerEntity<Entity>("CollidableTile", EntityTag::Solid, entityManager, true);
-	registerEntity<PowerUp>("PowerUpSpeedBoost", EntityTag::PowerUpSpeedBoost, entityManager, false);
-	registerEntity<PowerUp>("PowerUpExtraBomb", EntityTag::PowerUpIncreaseBomb, entityManager, false);
-	registerEntity<PowerUp>("PowerUpIncreaseBombPower", EntityTag::PowerUpIncreaseBombPower, entityManager, false);
+	registerEntity<PowerUp>("PowerUpSpeedBoost", EntityTag::PowerUp, entityManager, false);
+	registerEntity<PowerUp>("PowerUpExtraBomb", EntityTag::PowerUp, entityManager, false);
+	registerEntity<PowerUp>("PowerUpIncreaseBombPower", EntityTag::PowerUp, entityManager, false);
 	registerEntity<BombLowPower>("BombLowPower", EntityTag::Bomb, entityManager, false);
 	registerEntity<BombMediumPower>("BombMediumPower", EntityTag::Bomb, entityManager, false);
 	registerEntity<BombHighPower>("BombHighPower", EntityTag::Bomb, entityManager, false);

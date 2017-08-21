@@ -9,4 +9,5 @@ public:
 
 	void update(float deltaTime) override;
 	void handleEntityCollision(const std::unique_ptr<Entity>& entity, const sf::FloatRect& intersection) override;
+	void handlePowerUpCollision(const std::unique_ptr<Entity>& entity);
 };

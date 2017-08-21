@@ -37,6 +37,14 @@ bool Timer::isExpired() const
 	return m_elaspedTime >= m_expirationTime;
 }
 
+void Timer::reduceExpirationTime(float i)
+{
+	if (m_expirationTime - i > 0.0f)
+	{
+		m_expirationTime -= i;
+	}
+}
+
 void Timer::reset()
 {
 	m_elaspedTime = 0;
