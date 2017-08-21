@@ -14,6 +14,7 @@ protected:
 	virtual void placeBomb();
 	void increaseBombQuantity();
 	void increaseBombPower();
+	bool isMoreBombs() const;
 
 private:
 	const int m_maxBombQuantity;
