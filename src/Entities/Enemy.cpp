@@ -25,10 +25,8 @@ Enemy::Enemy(const std::string& name, EntityTag tag, const sf::Vector2f & positi
 	m_bombAtPoints(),
 	m_state(State::InitializeState)
 {
-	//const int randNumb = RandomNumberGenerator::getRandomNumber(static_cast<int>(EnemyType::Passive), static_cast<int>(EnemyType::Aggressive));
-	//std::cout << randNumb << "\n";
-	//m_type = static_cast<EnemyType>(randNumb);
-	m_type = EnemyType::Aggressive;
+	const int randNumb = RandomNumberGenerator::getRandomNumber(static_cast<int>(EnemyType::Passive), static_cast<int>(EnemyType::Aggressive));
+	m_type = static_cast<EnemyType>(randNumb);
 
 	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
 	gameEventMessenger.subscribe(std::bind(&Enemy::setStateToTargetPlayer, this), "Enemy", GameEvent::EnemyAggressive);
@@ -61,24 +59,20 @@ void Enemy::handleEntityCollision(const std::unique_ptr<Entity>& entity, const s
 		GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::EnemyDeath);
 	}
 
-	if (entity->getTag() != EntityTag::PowerUp)
+	if (entity->getTag() == EntityTag::PowerUp)
 	{
-		return;
+		if (entity->getName() == "PowerUpSpeedBoost")
+		{
+			if (m_movementTimer.getExpirationTime() >= 0.35f)
+			{
+				m_movementTimer.reduceExpirationTime(0.05f);
+			}
+		}
+		else if (entity->getName() == "PowerUpIncreaseBombPower")
+		{
+			BombCarrier::increaseBombPower();
+		}
 	}
-
-	//switch (entity->getTag())
-	//{
-	//case EntityTag::PowerUpSpeedBoost :
-	//{
-	//	m_movementTimer.reduceExpirationTime(0.05f);
-	//	break;
-	//}
-	//case EntityTag::PowerUpIncreaseBombPower :
-	//{
-	//	//BombCarrier::increaseBombPower();
-	//	break;
-	//}
-	//}
 }
 
 void Enemy::update(float deltaTime)
@@ -109,8 +103,11 @@ void Enemy::update(float deltaTime)
 		{
 			if (m_state != State::MovingToSafePoint && m_state != State::TargettingPowerUp)
 			{
-				placeBomb();
-				setState(State::MovingToSafePoint);
+				BombCarrier::placeBomb();
+				if (BombCarrier::isMoreBombs())
+				{
+					setState(State::SetNewBombLocation);
+				}
 				return;
 			}
 			
@@ -187,13 +184,6 @@ void Enemy::handleStates(const std::vector<Point>& graph, const sf::Vector2i& po
 	{
 	case State::InitializeState :
 	{
-		//if (!powerUpPoints.empty())
-		//{
-		//	int i = 0;
-		//	//prioritise power up over crate
-		//}
-
-		DebugOverlay::printMessage("Initialize State");
 		if (opponentFound && m_type == EnemyType::Aggressive)
 		{
 			setState(State::SetTargetPointAtOpponent);
@@ -242,6 +232,24 @@ void Enemy::handleStates(const std::vector<Point>& graph, const sf::Vector2i& po
 	{
 		setNewTargetPoint(powerUpAtPoint);
 		setState(State::TargettingPowerUp);
+		break;
+	}
+	case State::SetNewBombLocation :
+	{
+		if (powerUpFound)
+		{
+			setState(State::SetTargetPointAtPowerUp);
+			break;
+		}
+
+		if (opponentFound)
+		{
+			setState(State::SetTargetPointAtOpponent);
+			break;
+		}
+
+
+		
 		break;
 	}
 	}
@@ -459,7 +467,6 @@ void Enemy::addNewPoint(const sf::Vector2i & position, std::vector<Point>& graph
 
 const Enemy::Point& Enemy::getPointOnGraph(const std::vector<Point>& graph, const sf::Vector2i & position) const
 {
-	//if(m_position)
 	auto cIter = std::find_if(graph.cbegin(), graph.cend(), [&position](const auto& point) { return point.m_point == position; });
 	assert(cIter != graph.cend());
 	return *cIter;
@@ -586,7 +593,7 @@ bool Enemy::neighbouringCrateAtPoint(const std::vector<sf::Vector2i>& points, in
 void Enemy::setTargetPointAtSafePoint(const std::vector<Point>& graph, int tileSize)
 {
 	bool pointSafe = false;
-	const int maxSafePoints = 3;
+	const int maxSafePoints = 2;
 	std::vector<int> safePointsID;
 	int pointID = 0;
 
