@@ -8,8 +8,5 @@ enum class EntityTag
 	Explosion,
 	Bomb,
 	Solid,
-	PowerUpSpeedBoost,
-	PowerUpIncreaseBomb,
-	PowerUpIncreaseBombPower,
-	IncreaseBombQuantity
+	PowerUp,
 };

@@ -8,15 +8,16 @@ public:
 	
 	float getExpirationTime() const;
 	float getElaspedTime() const;
-	void update(float deltaTime);
 	bool isActive() const;
 	bool isExpired() const;
+	void reduceExpirationTime(float i);
+	void update(float deltaTime);
 	void reset();
 	void activate();
 	void deactivate();
 
 private:
-	const float m_expirationTime;
+	float m_expirationTime;
 	float m_elaspedTime;
 	bool m_active;
 };

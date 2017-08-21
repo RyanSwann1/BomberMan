@@ -52,22 +52,24 @@ void Player::handleEntityCollision(const std::unique_ptr<Entity>& entity, const 
 		GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::PlayerDeath);
 	}
 
-	switch (entity->getTag())
+	if (entity->getTag() == EntityTag::PowerUp)
 	{
-	case EntityTag::PowerUpSpeedBoost:
+		handlePowerUpCollision(entity);
+	}
+}
+
+void Player::handlePowerUpCollision(const std::unique_ptr<Entity>& entity)
+{
+	if (entity->getName() == "PowerUpSpeedBoost")
 	{
 		Character::increaseSpeed(2.5f, 2.5f);
-		break;
 	}
-	case EntityTag::PowerUpIncreaseBomb :
+	else if (entity->getName() == "PowerUpIncreaseBomb")
 	{
 		BombCarrier::increaseBombQuantity();
-		break;
 	}
-	case EntityTag::PowerUpIncreaseBombPower :
+	else if (entity->getName() == "PowerUpIncreaseBombPower")
 	{
 		BombCarrier::increaseBombPower();
-		break;
-	}
 	}
 }

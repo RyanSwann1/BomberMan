@@ -1,6 +1,7 @@
 #include "DebugOverlay.h"
 #include <Locators\LevelManagerLocator.h>
 #include <Managers\LevelManager.h>
+#include <iostream>
 
 std::vector<sf::RectangleShape> m_rects;
 
@@ -19,4 +20,9 @@ void DebugOverlay::addRect(const sf::Vector2f & position)
 	rect.setPosition(sf::Vector2f(position.x * tileSize, position.y * tileSize));
 	rect.setFillColor(sf::Color::Red);
 	m_rects.push_back(rect);
+}
+
+void DebugOverlay::printMessage(const std::string & message)
+{
+	std::cout << message << "\n";
 }
