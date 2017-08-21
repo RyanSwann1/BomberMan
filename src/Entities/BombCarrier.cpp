@@ -84,6 +84,11 @@ void BombCarrier::increaseBombPower()
 	}
 }
 
+bool BombCarrier::isMoreBombs() const
+{
+	return (m_currentBombQuantity ? true : false);
+}
+
 void BombCarrier::handleBombSpawnTimer(float deltaTime)
 {
 	m_bombSpawnTimer.update(deltaTime);

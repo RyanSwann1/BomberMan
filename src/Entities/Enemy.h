@@ -26,7 +26,8 @@ class Enemy : public BombCarrier
 		SetTargetPointAtPowerUp,
 		InitializeState,
 		MovingToSafePoint,
-		StopMovement
+		StopMovement,
+		SetNewBombLocation
 	};
 
 	class Point
@@ -55,7 +56,6 @@ public:
 private:
 	Timer m_movementTimer;
 	Timer m_stopMovementTimer;
-	//Timer m_bombScannerTimer;
 	sf::Vector2i m_targetPoint;
 	bool m_reachedTargetPoint;
 	std::vector<sf::Vector2i> m_bombAtPoints;

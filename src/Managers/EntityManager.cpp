@@ -17,7 +17,6 @@
 EntityManager::EntityFactory::EntityFactory(EntityManager * entityManager)
 {
 	registerEntity<Player>("Player", EntityTag::Player, entityManager, false);
-	//registerEntity<Bomb>("Bomb", EntityTag::Bomb, entityManager, false);
 	registerEntity<Explosion>("Explosion", EntityTag::Explosion, entityManager, false);
 	registerEntity<Enemy>("Enemy1", EntityTag::Enemy, entityManager, false);
 	registerEntity<Enemy>("Enemy2", EntityTag::Enemy, entityManager, false);
