@@ -27,7 +27,6 @@ Enemy::Enemy(const std::string& name, EntityTag tag, const sf::Vector2f & positi
 {
 	const int randNumb = RandomNumberGenerator::getRandomNumber(static_cast<int>(EnemyType::Passive), static_cast<int>(EnemyType::Aggressive));
 	m_type = static_cast<EnemyType>(randNumb);
-	m_type = EnemyType::Passive;
 
 	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
 	gameEventMessenger.subscribe(std::bind(&Enemy::setStateToTargetPlayer, this), "Enemy", GameEvent::EnemyAggressive);
@@ -72,10 +71,6 @@ void Enemy::handleEntityCollision(const std::unique_ptr<Entity>& entity, const s
 		else if (entity->getName() == "PowerUpIncreaseBombPower")
 		{
 			BombCarrier::increaseBombPower();
-		}
-		else if (entity->getName() == "PowerUpExtraBomb")
-		{
-			increaseBombQuantity();
 		}
 	}
 }
@@ -289,18 +284,8 @@ void Enemy::addNeighbouringPointsToFrontier(sf::Vector2i& powerUpAtPoint, sf::Ve
 	std::vector<Point>& graph, std::deque<Point>& frontier, int& pointID, bool& opponentFound, bool& powerUpFound, int tileSize)
 {
 	//x
-	for (int x = point.m_point.x - 1; x <= point.m_point.x + 1; x++)
+	for (int x = point.m_point.x - 1; x <= point.m_point.x + 1; x += 2)
 	{
-		if (x == point.m_point.x)
-		{
-			if(CollisionHandler::isEntityAtPosition(sf::Vector2f(x, point.m_point.y), m_entityManager, EntityTag::Player, tileSize))
-			{
-				opponentFound = true;
-				opponentAtPoint = sf::Vector2i(x, point.m_point.y);
-			}
-			continue;
-		}
-
 		if (CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(x, point.m_point.y), tileSize))
 		{
 			continue;
@@ -311,7 +296,7 @@ void Enemy::addNeighbouringPointsToFrontier(sf::Vector2i& powerUpAtPoint, sf::Ve
 			continue;
 		}
 
-		if (CollisionHandler::isEntityAtPosition(sf::Vector2f(x, point.m_point.y), m_entityManager, EntityTag::Player, tileSize))
+		if (!opponentFound && CollisionHandler::isEntityAtPosition(sf::Vector2f(x, point.m_point.y), m_entityManager, EntityTag::Player, tileSize))
 		{
 			opponentFound = true;
 			opponentAtPoint = sf::Vector2i(x, point.m_point.y);
@@ -327,18 +312,8 @@ void Enemy::addNeighbouringPointsToFrontier(sf::Vector2i& powerUpAtPoint, sf::Ve
 	}
 
 	//y
-	for (int y = point.m_point.y - 1; y <= point.m_point.y + 1; y++)
+	for (int y = point.m_point.y - 1; y <= point.m_point.y + 1; y += 2)
 	{
-		if (y == point.m_point.y)
-		{
-			if (CollisionHandler::isEntityAtPosition(sf::Vector2f(point.m_point.x, y), m_entityManager, EntityTag::Player, tileSize))
-			{
-				opponentFound = true;
-				opponentAtPoint = sf::Vector2i(point.m_point.x, y);
-			}
-			continue;
-		}
-
 		if (CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(point.m_point.x, y), tileSize))
 		{
 			continue;
@@ -349,7 +324,7 @@ void Enemy::addNeighbouringPointsToFrontier(sf::Vector2i& powerUpAtPoint, sf::Ve
 			continue;
 		}
 
-		if (CollisionHandler::isEntityAtPosition(sf::Vector2f(point.m_point.x, y), m_entityManager, EntityTag::Player, tileSize))
+		if (!opponentFound && CollisionHandler::isEntityAtPosition(sf::Vector2f(point.m_point.x, y), m_entityManager, EntityTag::Player, tileSize))
 		{
 			opponentFound = true;
 			opponentAtPoint = sf::Vector2i(point.m_point.x, y);
