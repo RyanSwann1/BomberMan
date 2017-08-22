@@ -27,6 +27,7 @@ Enemy::Enemy(const std::string& name, EntityTag tag, const sf::Vector2f & positi
 {
 	const int randNumb = RandomNumberGenerator::getRandomNumber(static_cast<int>(EnemyType::Passive), static_cast<int>(EnemyType::Aggressive));
 	m_type = static_cast<EnemyType>(randNumb);
+	m_type = EnemyType::Passive;
 
 	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
 	gameEventMessenger.subscribe(std::bind(&Enemy::setStateToTargetPlayer, this), "Enemy", GameEvent::EnemyAggressive);
@@ -72,6 +73,10 @@ void Enemy::handleEntityCollision(const std::unique_ptr<Entity>& entity, const s
 		{
 			BombCarrier::increaseBombPower();
 		}
+		else if (entity->getName() == "PowerUpExtraBomb")
+		{
+			increaseBombQuantity();
+		}
 	}
 }
 
@@ -95,33 +100,7 @@ void Enemy::update(float deltaTime)
 	initializeGraph(powerUpAtPoint, opponentAtPoint, graph, opponentFound, powerUpFound, tileSize);
 	handleBombAtPoints(graph, tileSize);
 	handleStates(graph, powerUpAtPoint, opponentAtPoint, opponentFound, powerUpFound, tileSize);
-
-	if (!m_reachedTargetPoint)
-	{
-		moveToTargetPoint(graph, tileSize);
-		if (reachedTargetPoint(graph, tileSize))
-		{
-			if (m_state != State::MovingToSafePoint && m_state != State::TargettingPowerUp)
-			{
-				BombCarrier::placeBomb();
-				if (BombCarrier::isMoreBombs())
-				{
-					setState(State::SetNewBombLocation);
-				}
-				return;
-			}
-			
-			if (m_state == State::MovingToSafePoint)
-			{
-				setState(State::StopMovement);
-			}
-
-			if (m_state == State::TargettingPowerUp)
-			{
-				setState(State::InitializeState);
-			}
-		}
-	}
+	handleMovement(graph, tileSize);
 }
 
 void Enemy::setStateToTargetPlayer()
@@ -190,7 +169,7 @@ void Enemy::handleStates(const std::vector<Point>& graph, const sf::Vector2i& po
 			break;
 		}
 
-		(powerUpFound ? setState(State::SetTargetPointAtPowerUp) : setState(State::SetTargetPointAtCrate));
+		(powerUpFound ? setState(State::SetTargetPointAtPowerUp) : setState(State::SetTargetPointBesideCrate));
 		break;
 	}
 	case State::SetTargetPointAtOpponent:
@@ -203,9 +182,9 @@ void Enemy::handleStates(const std::vector<Point>& graph, const sf::Vector2i& po
 		setState(State::TargettingOpponent);
 		break;
 	}
-	case State::SetTargetPointAtCrate:
+	case State::SetTargetPointBesideCrate:
 	{
-		setTargetPointAtCrate(graph, tileSize);
+		setTargetPointBesideCrate(graph, tileSize);
 		break;
 	}
 	case State::SetTargetPointAtSafePoint :
@@ -234,24 +213,7 @@ void Enemy::handleStates(const std::vector<Point>& graph, const sf::Vector2i& po
 		setState(State::TargettingPowerUp);
 		break;
 	}
-	case State::SetNewBombLocation :
-	{
-		if (powerUpFound)
-		{
-			setState(State::SetTargetPointAtPowerUp);
-			break;
-		}
 
-		if (opponentFound)
-		{
-			setState(State::SetTargetPointAtOpponent);
-			break;
-		}
-
-
-		
-		break;
-	}
 	}
 }
 
@@ -264,15 +226,47 @@ void Enemy::handleBombAtPoints(const std::vector<Point>& graph, int tileSize)
 		
 	checkExistingBombsAtPoints(tileSize);
 
+	bool newBombDiscovered = false;
 	for (const auto neighbouringPoint : getNeighbouringPointsOnGraphContainingBomb(getPointAtPosition(graph, tileSize).m_point, graph, tileSize))
 	{
 		auto cIter = std::find_if(m_bombAtPoints.cbegin(), m_bombAtPoints.cend(), [&neighbouringPoint](const auto& point) { return point == neighbouringPoint; });
 		if (cIter == m_bombAtPoints.cend())
 		{
-			m_bombAtPoints.push_back(neighbouringPoint);
-			setState(State::SetTargetPointAtSafePoint);
+			m_bombAtPoints.emplace_back(neighbouringPoint);
+			newBombDiscovered = true;
 			m_stopMovementTimer.reset();
 			m_stopMovementTimer.deactivate();
+			break;
+		}
+	}
+
+	if (newBombDiscovered)
+	{
+		setState(State::SetTargetPointAtSafePoint);
+	}
+}
+
+void Enemy::handleMovement(const std::vector<Point>& graph, int tileSize)
+{
+	if (!m_reachedTargetPoint)
+	{
+		moveToTargetPoint(graph, tileSize);
+		if (reachedTargetPoint(graph, tileSize))
+		{
+			if (m_state != State::MovingToSafePoint && m_state != State::TargettingPowerUp)
+			{
+				BombCarrier::placeBomb();
+			}
+
+			if (m_state == State::MovingToSafePoint)
+			{
+				setState(State::StopMovement);
+			}
+
+			if (m_state == State::TargettingPowerUp)
+			{
+				setState(State::InitializeState);
+			}
 		}
 	}
 }
@@ -510,14 +504,14 @@ bool Enemy::isPointInRadiusOfHarm(const std::vector<Point>& graph, const Point& 
 	return false;
 }
 
-void Enemy::setTargetPointAtCrate(const std::vector<Point>& graph, int tileSize)
+void Enemy::setTargetPointBesideCrate(const std::vector<Point>& graph, int tileSize)
 {
-	int cratesToChoose = 3;
+	int cratesToChoose = 2;
 	std::vector<int> neighbouringPointsOnCrate;
 	for (const auto& point : graph)
 	{
 		const auto neighbouringPointsOnCrates = getNeighbouringPointsOnEntity(point.m_point, tileSize, EntityTag::Crate);
-		for (const auto neighbouringPoint : neighbouringPointsOnCrates)
+		if (!neighbouringPointsOnCrates.empty())
 		{
 			--cratesToChoose;
 			neighbouringPointsOnCrate.push_back(point.m_ID);
@@ -525,11 +519,6 @@ void Enemy::setTargetPointAtCrate(const std::vector<Point>& graph, int tileSize)
 			{
 				break;
 			}
-		}
-
-		if (neighbouringPointsOnCrate.size() == cratesToChoose)
-		{
-			break;
 		}
 	}
 
@@ -599,7 +588,7 @@ void Enemy::setTargetPointAtSafePoint(const std::vector<Point>& graph, int tileS
 
 	for (const auto& point : graph)
 	{
-		if (isPointSafeFromBombsAtPoint(graph, point.m_point, tileSize))
+		if (isPointSafeFromBombsAtPoint(point.m_point, tileSize))
 		{
 			safePointsID.push_back(point.m_ID);
 			if (safePointsID.size() == maxSafePoints)
@@ -629,7 +618,6 @@ bool Enemy::isPointAppropriateDistanceAway(const std::vector<Point>& graph, cons
 		return true;
 	}
 
-	//Change relative to what enemies bomb power is
 	int moveSpacesAway = 3;
 	int nextPointID = requestedPoint.m_ID;
 	while (nextPointID != pointAtPosition.m_ID)
@@ -646,18 +634,17 @@ bool Enemy::isPointAppropriateDistanceAway(const std::vector<Point>& graph, cons
 	return (moveSpacesAway <= 0 ? true : false);
 }
 
-bool Enemy::isPointSafeFromBombsAtPoint(const std::vector<Point>& graph, const sf::Vector2i& point, int tileSize) const
+bool Enemy::isPointSafeFromBombsAtPoint(const sf::Vector2i& point, int tileSize) const
 {
-	bool pointSafe = false;
 	for (const auto& bombAtPoint : m_bombAtPoints)
 	{
 		if (point.x != bombAtPoint.x && point.y != bombAtPoint.y)
 		{
-			pointSafe = true;
+			return true;
 		}
 	}
 
-	return pointSafe;
+	return false;
 }
 
 const Enemy::Point& Enemy::getPointAtPosition(const std::vector<Point>& graph, int tileSize) const
@@ -672,13 +659,11 @@ void Enemy::setState(State newState)
 
 void Enemy::setTypeToAggressive(EntityMessage & entityMessage)
 {
-	if (m_type == EnemyType::Aggressive)
+	if (m_type != EnemyType::Aggressive)
 	{
-		return;
+		m_type = EnemyType::Aggressive;
+		entityMessage.decreaseCharge();
 	}
-
-	m_type = EnemyType::Aggressive;
-	entityMessage.decreaseCharge();
 }
 
 bool Enemy::reachedTargetPoint(const std::vector<Point>& graph, int tileSize) const

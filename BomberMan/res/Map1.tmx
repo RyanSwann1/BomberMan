@@ -181,8 +181,6 @@
   <object id="385" name="CollidableTile" gid="266" x="240" y="128" width="16" height="16"/>
   <object id="386" name="CollidableTile" gid="266" x="240" y="192" width="16" height="16"/>
   <object id="387" name="CollidableTile" gid="266" x="240" y="224" width="16" height="16"/>
-  <object id="391" name="Enemy1" gid="242" x="256" y="272" width="16" height="16"/>
-  <object id="393" name="Enemy1" gid="242" x="64" y="272" width="16" height="16"/>
  </objectgroup>
  <objectgroup name="Collision Layer" visible="0" opacity="0.45">
   <object id="2" gid="286" x="48" y="64" width="16" height="16"/>

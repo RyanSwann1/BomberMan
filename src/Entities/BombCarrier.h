@@ -12,9 +12,10 @@ public:
 
 protected:
 	virtual void placeBomb();
-	void increaseBombQuantity();
+	virtual void increaseBombQuantity();
 	void increaseBombPower();
 	bool isMoreBombs() const;
+	int getTotalBombQuantity() const;
 
 private:
 	const int m_maxBombQuantity;

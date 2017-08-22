@@ -64,7 +64,7 @@ void Player::handlePowerUpCollision(const std::unique_ptr<Entity>& entity)
 	{
 		Character::increaseSpeed(2.5f, 2.5f);
 	}
-	else if (entity->getName() == "PowerUpIncreaseBomb")
+	else if (entity->getName() == "PowerUpExtraBomb")
 	{
 		BombCarrier::increaseBombQuantity();
 	}
