@@ -89,6 +89,11 @@ bool BombCarrier::isMoreBombs() const
 	return (m_currentBombQuantity ? true : false);
 }
 
+int BombCarrier::getTotalBombQuantity() const
+{
+	return m_totalBombQuantity;
+}
+
 void BombCarrier::handleBombSpawnTimer(float deltaTime)
 {
 	m_bombSpawnTimer.update(deltaTime);

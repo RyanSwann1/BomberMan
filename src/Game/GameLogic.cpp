@@ -12,25 +12,34 @@ void GameLogic::spawnPowerUp(const sf::Vector2f& position, EntityManager& entity
 		return;
 	}
 
-	const int powerUpSpawnOption = RandomNumberGenerator::getRandomNumber(1, 3);
- 	switch (powerUpSpawnOption)
+	const int powerUpSpawnOption = RandomNumberGenerator::getRandomNumber(1, 1);
+	switch (powerUpSpawnOption)
 	{
 	case 1:
-	{
-		entityManager.addEntity("PowerUpSpeedBoost", position);
-		break;
-	}
-	case 2:
 	{
 		entityManager.addEntity("PowerUpExtraBomb", position);
 		break;
 	}
-	case 3:
-	{
-		entityManager.addEntity("PowerUpIncreaseBombPower", position);
-		break;
 	}
-	}
+
+ //	switch (powerUpSpawnOption)
+	//{
+	//case 1:
+	//{
+	//	entityManager.addEntity("PowerUpSpeedBoost", position);
+	//	break;
+	//}
+	//case 2:
+	//{
+	//	entityManager.addEntity("PowerUpExtraBomb", position);
+	//	break;
+	//}
+	//case 3:
+	//{
+	//	entityManager.addEntity("PowerUpIncreaseBombPower", position);
+	//	break;
+	//}
+	//}
 }
 
 const sf::Vector2f & GameLogic::getEntityPosition(const EntityManager & entityManager, EntityTag entityTag)
