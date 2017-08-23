@@ -129,12 +129,9 @@ void EntityManager::handleRemovals()
 
 void EntityManager::removeActiveEntity(int entityID)
 {
-	m_entities.erase(std::remove_if(m_entities.begin(), m_entities.end(), 
-		[entityID](const auto& entity) {return entity->getID() == entityID; }), m_entities.end());
-
-	/*auto iter = std::find_if(m_entities.begin(), m_entities.end(), [entityID](const auto& entity) {return entity.get()->getID() == entityID; });
+	auto iter = std::find_if(m_entities.begin(), m_entities.end(), [entityID](const auto& entity) {return entity.get()->getID() == entityID; });
 	assert(iter != m_entities.cend());
-	m_entities.erase(iter);*/
+	m_entities.erase(iter);
 }	
 
 void EntityManager::purgeEntities()
