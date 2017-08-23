@@ -33,20 +33,9 @@ void GameLogic::spawnPowerUp(const sf::Vector2f& position, EntityManager& entity
 	}
 }
 
-const sf::Vector2f & GameLogic::getEntityPosition(const EntityManager & entityManager, EntityTag entityTag)
-{
-	const auto& entities = entityManager.getEntities();
-	auto iter = std::find_if(entities.cbegin(), entities.cend(), [entityTag](const auto& entity) {return entity->getTag() == entityTag; });
-	assert(iter != entities.cend());
-	return iter->get()->getPosition();
-}
-
 const sf::Vector2f & GameLogic::getPlayerPosition(const EntityManager & entityManager)
 {
-	const auto& entities = entityManager.getEntities();
-	auto iter = std::find_if(entities.cbegin(), entities.cend(), [](const auto& entity) { return entity->getTag() == EntityTag::Player; });
-	assert(iter != entities.cend());
-	return iter->get()->getPosition();
+	return entityManager.getEntity(EntityTag::Player)->getPosition();
 }
 
 bool GameLogic::isEntityAtPosition(const EntityManager & entityManager, const sf::Vector2i & position, EntityTag entityTag)
