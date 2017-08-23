@@ -17,8 +17,7 @@ Entity::Entity(const std::string& name, EntityTag tag, const sf::Vector2f& spawn
 	m_name(name),
 	m_collidable(collidable)
 {
-	const auto& level = LevelManagerLocator::getLevelManager().getCurrentLevel();
-	const int tileSize = level->getTileSize();
+	const int tileSize = LevelManagerLocator::getLevelManager().getCurrentLevel()->getTileSize();
 	m_AABB.width = tileSize / 2;
 	m_AABB.height = tileSize / 2;
 

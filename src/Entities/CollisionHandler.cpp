@@ -29,12 +29,7 @@ bool CollisionHandler::isCollidableTileAtPosition(const sf::Vector2f & position,
 {
 	for (const auto& entity : EntityManagerLocator::getEntityManager().getEntities())
 	{
-		if (!entity->isCollidable())
-		{
-			continue;
-		}
-
-		if (entity->getPosition() == sf::Vector2f(position.x * tileSize, position.y * tileSize))
+		if (entity->isCollidable() && entity->getPosition() == sf::Vector2f(position.x * tileSize, position.y * tileSize))
 		{
 			return true;
 		}

@@ -55,6 +55,13 @@ EntityManager::~EntityManager()
 	gameEventMessenger.unsubscribe("EntityManager", GameEvent::ClearMap);
 }
 
+const std::unique_ptr<Entity>& EntityManager::getEntity(EntityTag entityTag) const
+{
+	auto cIter = std::find_if(m_entities.cbegin(), m_entities.cend(), [entityTag](const auto& entity) { return entity->getTag() == entityTag; });
+	assert(cIter != m_entities.cend());
+	return *cIter;
+}
+
 const std::unique_ptr<Entity>& EntityManager::getEntity(int ID) const
 {
 	auto cIter = std::find_if(m_entities.cbegin(), m_entities.cend(), [ID](const auto& entity) { return entity->getID() == ID; });
@@ -62,7 +69,7 @@ const std::unique_ptr<Entity>& EntityManager::getEntity(int ID) const
 	return *cIter;
 }
 
-const std::vector<std::unique_ptr<Entity>>& EntityManager::getEntities() const
+const std::list<std::unique_ptr<Entity>>& EntityManager::getEntities() const
 {
 	return m_entities;
 }
@@ -122,10 +129,13 @@ void EntityManager::handleRemovals()
 
 void EntityManager::removeActiveEntity(int entityID)
 {
-	auto iter = std::find_if(m_entities.begin(), m_entities.end(), [entityID](const auto& entity) {return entity.get()->getID() == entityID; });
+	m_entities.erase(std::remove_if(m_entities.begin(), m_entities.end(), 
+		[entityID](const auto& entity) {return entity->getID() == entityID; }), m_entities.end());
+
+	/*auto iter = std::find_if(m_entities.begin(), m_entities.end(), [entityID](const auto& entity) {return entity.get()->getID() == entityID; });
 	assert(iter != m_entities.cend());
-	m_entities.erase(iter);
-}
+	m_entities.erase(iter);*/
+}	
 
 void EntityManager::purgeEntities()
 {

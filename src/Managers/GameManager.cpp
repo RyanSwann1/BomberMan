@@ -157,13 +157,7 @@ void GameManager::onEnemySpawn()
 	bool isEnemyAggressive = false;
 	for (const auto& entity : EntityManagerLocator::getEntityManager().getEntities())
 	{
-		if (entity->getTag() != EntityTag::Enemy)
-		{
-			continue;
-		}
-
-		const Enemy* enemy = static_cast<Enemy*>(entity.get());
-		if (enemy->getType() == EnemyType::Aggressive)
+		if (entity->getTag() == EntityTag::Enemy && static_cast<Enemy*>(entity.get())->getType() == EnemyType::Aggressive)
 		{
 			isEnemyAggressive = true;
 			break;

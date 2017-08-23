@@ -2,6 +2,7 @@
 
 #include <Entities\Entity.h>
 #include <vector>
+#include <list>
 #include <memory>
 #include <unordered_map>
 #include <functional>
@@ -48,8 +49,9 @@ public:
 	EntityManager();
 	~EntityManager();
 
+	const std::unique_ptr<Entity>& getEntity(EntityTag entityTag) const;
 	const std::unique_ptr<Entity>& getEntity(int ID) const;
-	const std::vector<std::unique_ptr<Entity>>& getEntities() const;
+	const std::list<std::unique_ptr<Entity>>& getEntities() const;
 	void addEntity(const std::string& entityName, const sf::Vector2f& position);
 	void removeEntity(int entityID);
 	void draw(sf::RenderWindow& window);
@@ -57,7 +59,7 @@ public:
 
 private:
 	const EntityFactory m_entityFactory;
-	std::vector<std::unique_ptr<Entity>> m_entities;
+	std::list<std::unique_ptr<Entity>> m_entities;
 	std::vector<EntityInQueue> m_entityQueue;
 	std::vector<int> m_removals;
 	int m_entityCount;
