@@ -8,6 +8,8 @@
 #include <Locators\StateManagerLocator.h>
 #include <Locators\GameEventMessengerLocator.h>
 #include <Game\MessageHandler.h>
+#include <Managers\StateManager.h>
+#include <iostream>
 
 //StateFactory
 StateManager::StateFactory::StateFactory(StateManager* stateManager)
@@ -32,8 +34,7 @@ StateManager::StateManager()
 	: m_stateFactory(this),
 	m_states(),
 	m_stateQueue(),
-	m_removals(),
-	m_stateToSwap()
+	m_removals()
 {
 	StateManagerLocator::provide(*this);
 }
@@ -54,14 +55,17 @@ void StateManager::removeState(StateType stateToRemove)
 	m_removals.push_back(stateToRemove);
 }
 
-void StateManager::removeState(const std::vector<StateType>& statesToRemove)
-{
-	
-}
-
 void StateManager::purgeStates()
 {
 	m_states.clear();
+}
+
+void StateManager::addStateToQueue(StateType newStateType)
+{
+	assert(std::find_if(m_stateQueue.cbegin(), m_stateQueue.cend(), 
+		[newStateType](const auto stateType) { return newStateType == stateType; }) == m_stateQueue.cend());
+	
+	m_stateQueue.push_back(newStateType);
 }
 
 StateType StateManager::getCurrentStateType() const
@@ -74,22 +78,11 @@ void StateManager::switchToState(StateType stateToSwitch)
 {
 	if (m_states.empty())
 	{
-		auto newState = m_stateFactory.getState(stateToSwitch);
-		m_states.push_back(std::move(newState));
-		GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::NewState);
+		m_states.emplace_back(m_stateFactory.getState(stateToSwitch));
 		return;
 	}
 
-	for (auto iter = m_states.begin(); iter != m_states.end(); ++iter)
-	{
-		if ((*iter)->getType() == stateToSwitch)
-		{
-			m_stateToSwap = std::make_unique<StateType>((*iter)->getType());
-			return;
-		}
-	}
-	
-	m_stateQueue.push_back(stateToSwitch);
+	addStateToQueue(stateToSwitch);
 }
 
 void StateManager::switchToAndRemoveState(StateType stateToSwitchTo, StateType stateToRemove)
@@ -115,7 +108,6 @@ void StateManager::update(float deltaTime)
 	}
 
 	handleQueue();
-	handleSwapState();
 	handleRemovals();
 }
 
@@ -129,13 +121,35 @@ void StateManager::draw(sf::RenderWindow & window)
 
 void StateManager::handleQueue()
 {
-	for (auto iter = m_stateQueue.begin(); iter != m_stateQueue.end();)
+	while (!m_stateQueue.empty())
 	{
-		auto newState = m_stateFactory.getState(*iter);
-		m_states.push_back(std::move(newState));
-		iter = m_stateQueue.erase(iter);
-		GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::NewState);
-	}	
+		for (auto iter = m_stateQueue.begin(); iter != m_stateQueue.end();)
+		{
+			bool stateAlreadyExists = false;
+			for (auto& state : m_states)
+			{
+				if (state->getType() != *iter)
+				{
+					continue;
+				}
+
+				state.swap(m_states.back());
+				stateAlreadyExists = true;
+				iter = m_stateQueue.erase(iter);
+				if (m_stateQueue.empty())
+				{
+					return;
+				}
+			}
+
+			if (!stateAlreadyExists)
+			{
+				m_states.push_back(m_stateFactory.getState(*iter));
+				iter = m_stateQueue.erase(iter);
+				continue;
+			}
+		}
+	}
 }
 
 void StateManager::handleRemovals()
@@ -148,26 +162,6 @@ void StateManager::handleRemovals()
 	}
 
 	m_removals.clear();
-}
-
-void StateManager::handleSwapState()
-{
-	if (!m_stateToSwap)
-	{
-		return;
-	}
-
-	for (auto& state : m_states)
-	{
-		if (state->getType() == *m_stateToSwap)
-		{
-			state.swap(m_states.back());
-			GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::NewState);
-			break;
-		}
-	}
-
-	m_stateToSwap.release();
 }
 
 void StateManager::createState(StateType stateToCreate)

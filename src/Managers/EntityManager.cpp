@@ -69,7 +69,7 @@ const std::unique_ptr<Entity>& EntityManager::getEntity(int ID) const
 	return *cIter;
 }
 
-const std::list<std::unique_ptr<Entity>>& EntityManager::getEntities() const
+const std::vector<std::unique_ptr<Entity>>& EntityManager::getEntities() const
 {
 	return m_entities;
 }

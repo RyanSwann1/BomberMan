@@ -1,10 +1,9 @@
 #pragma once
 
-
 class Timer
 {
 public:
-	Timer(float expirationTime, bool active);
+	Timer(float expirationTime, bool active, bool reversal = false, float startingTime = 0);
 	
 	float getExpirationTime() const;
 	float getElaspedTime() const;
@@ -17,6 +16,8 @@ public:
 	void deactivate();
 
 private:
+	const bool m_reversalTimer;
+	const float m_startingTime;
 	float m_expirationTime;
 	float m_elaspedTime;
 	bool m_active;

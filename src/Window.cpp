@@ -4,8 +4,9 @@
 #include <Locators\WindowLocator.h>
 #include <Game\GameEvent.h>
 
-Window::Window(MessageHandler<GameEvent>& gameEventMessenger, const std::string & name, const sf::Vector2i & size)
-	: m_window(sf::VideoMode(size.x, size.y), name, sf::Style::Default)
+Window::Window(const StateManager& stateManager, MessageHandler<GameEvent>& gameEventMessenger, const std::string & name, const sf::Vector2i & size)
+	: m_window(sf::VideoMode(size.x, size.y), name, sf::Style::Default),
+	m_eventManager(stateManager)
 {
 	m_window.setFramerateLimit(60);
 	gameEventMessenger.subscribe(std::bind(&Window::closeWindow, this), "Window", GameEvent::CloseWindow);
@@ -57,5 +58,9 @@ void Window::update()
 			break;
 		}
 		}
+
+		m_eventManager.update(sfmlEvent);
 	}
+
+	m_eventManager.handleCallbacks();
 }

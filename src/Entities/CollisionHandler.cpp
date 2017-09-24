@@ -57,6 +57,20 @@ bool CollisionHandler::isEntityAtPosition(const sf::Vector2f & position, const E
 	return false;
 }
 
+bool CollisionHandler::isEntityAtPosition(const sf::Vector2f & position, const EntityManager & entityManager, int tileSize)
+{
+	for (const auto& entity : entityManager.getEntities())
+	{
+		const sf::FloatRect rect(sf::Vector2f(position.x * tileSize, position.y * tileSize), sf::Vector2f(tileSize, tileSize));
+		if (entity->getAABB().intersects(rect))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void CollisionHandler::checkForEntityCollisions(const sf::Vector2f & entityPosition, const EntityManager & entityManager, sf::Vector2f & movement, Entity & entity)
 {
 	const int tileSize = LevelManagerLocator::getLevelManager().getCurrentLevel()->getTileSize();
@@ -76,7 +90,7 @@ void CollisionHandler::checkForEntityCollisions(const sf::Vector2f & entityPosit
 
 			if (i->isCollidable())
 			{
-				CollisionHandler::clampMovement(intersection, movement);
+				clampMovement(intersection, movement);
 			}
 		}
 	}

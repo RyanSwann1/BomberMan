@@ -10,22 +10,17 @@
 #include <Entities\Enemy.h>
 #include <Game\GameEvent.h>
 #include <Locators\EntityMessengerLocator.h>
+#include <Locators\CollidableBoxSpawnerLocator.h>
+#include <Game\CollidableBoxSpawner.h>
 #include <Game\EntityMessenger.h>
+#include <Game\GameLogic.h>
+#include <GUI\GUI.h>
+#include <iostream>
 
-int getNextRowSpawn(const sf::Vector2i& startingPoint, const sf::Vector2i& endingPoint, Direction searchDirection, int tileSize);
-int getNextColumnSpawn(const sf::Vector2i& startingPoint, const sf::Vector2i& endingPoint, Direction searchDirection, int tileSize);
-
-GameManager::GameManager(EntityManager& entityManager)
+GameManager::GameManager()
 	: m_maxEnemies(3),
 	m_enemiesRemaining(0),
-	m_entityManager(entityManager),
-	m_totalGameTime(10.0f),
-	m_gameTimer(m_totalGameTime, true),
-	m_spawnTimer(0.25f, true),
-	m_reduceMapSize(false),
-	m_currentSpawnPosition(0, 0),
-	m_spawnDirection(Direction::Right),
-	m_nextRoundTimer(2.0f, false)
+	m_gameTimer(0.0f, true, true, 80.0f)
 {
 	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
 	gameEventMessenger.subscribe(std::bind(&GameManager::onWinGame, this), "GameManager", GameEvent::WinGame);
@@ -33,6 +28,7 @@ GameManager::GameManager(EntityManager& entityManager)
 	gameEventMessenger.subscribe(std::bind(&GameManager::onPlayerDeath, this), "GameManager", GameEvent::PlayerDeath);
 	gameEventMessenger.subscribe(std::bind(&GameManager::onEnemySpawn, this), "GameManager", GameEvent::EnemySpawned);
 	gameEventMessenger.subscribe(std::bind(&GameManager::onLevelReload, this), "GameManager", GameEvent::ReloadCurrentLevel);
+	gameEventMessenger.subscribe(std::bind(&GameManager::onLevelReload, this), "GameManager", GameEvent::ClearMap);
 }
 
 GameManager::~GameManager()
@@ -43,21 +39,22 @@ GameManager::~GameManager()
 	gameEventMessenger.unsubscribe("GameManager", GameEvent::PlayerDeath);
 	gameEventMessenger.unsubscribe("GameManager", GameEvent::EnemySpawned);
 	gameEventMessenger.unsubscribe("GameManager", GameEvent::ReloadCurrentLevel);
+	gameEventMessenger.unsubscribe("GameManager", GameEvent::ClearMap);
 }
 
-void GameManager::increaseEntityBombExplosiveRadius(const std::unique_ptr<Entity>& entity, int entityID)
+const Timer & GameManager::getGameTimer() const
 {
-
+	return m_gameTimer;
 }
 
 void GameManager::update(float deltaTime)
 {
-	m_nextRoundTimer.update(deltaTime);
-	if (m_nextRoundTimer.isExpired())
+	m_gameTimer.update(deltaTime);
+	handleGameTimer();
+	if (m_gameTimer.isExpired())
 	{
-		getStateManager().switchToState(StateType::RoundCompleted);
-		m_nextRoundTimer.reset();
-		m_nextRoundTimer.deactivate();
+		m_gameTimer.reset();
+		m_gameTimer.deactivate();
 	}
 }
 
@@ -69,79 +66,21 @@ void GameManager::onWinGame()
 void GameManager::onEnemyDeath()
 {
 	--m_enemiesRemaining;
-	if (!m_enemiesRemaining)
+
+	if (!m_enemiesRemaining && GameLogic::isPlayerAlive())
 	{
-		m_nextRoundTimer.activate();
+		GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::ChangeToNextLevel);
 		return;
 	}
-
+	
 	auto& entityMessenger = EntityMessengerLocator::getEntityMessenger();
 	EntityMessage entityMessage(EntityEvent::TurnAggressive, 1);
 	entityMessenger.broadcast(entityMessage);
-
 }
 
 void GameManager::onPlayerDeath()
 {
 	getStateManager().switchToState(StateType::RoundFailed);
-	m_nextRoundTimer.reset();
-	m_nextRoundTimer.deactivate();
-}
-
-void GameManager::reduceMapSize()
-{
-	const auto& levelSize = LevelManagerLocator::getLevelManager().getCurrentLevel()->getSize();	
-	switch (m_spawnDirection)
-	{
-	case Direction::Left :
-	{
-		if (m_currentSpawnPosition.x <= 0)
-		{
-			m_spawnDirection = Direction::Up;
-			break;
-		}
-
-		--m_currentSpawnPosition.x;
-		break;
-	}
-	case Direction::Right :
-	{
-		if (m_currentSpawnPosition.x == levelSize.x - 1)
-		{
-			m_spawnDirection = Direction::Down;
-			break;
-		}
-
-		++m_currentSpawnPosition.x;
-		break;
-	}
-	case Direction::Up :
-	{
-		
-
-		break;
-	}
-	case Direction::Down :
-	{
-		if (m_currentSpawnPosition.y >= levelSize.y - 1)
-		{
-			m_spawnDirection = Direction::Left;
-			break;
-		}
-
-		++m_currentSpawnPosition.y;
-		break;
-	}
-	}
-
-	const int tileSize = LevelManagerLocator::getLevelManager().getCurrentLevel()->getTileSize();
-	m_entityManager.addEntity("CollidableTile", sf::Vector2f(m_currentSpawnPosition.x * tileSize, m_currentSpawnPosition.y * tileSize));
-	m_spawnTimer.reset();
-}
-
-void GameManager::assignEnemyToAggressive()
-{
-
 }
 
 void GameManager::onEnemySpawn()
@@ -149,7 +88,7 @@ void GameManager::onEnemySpawn()
 	assert(m_enemiesRemaining < m_maxEnemies);
 	++m_enemiesRemaining;
 
-	if (m_enemiesRemaining != m_maxEnemies)
+	if (m_enemiesRemaining < m_maxEnemies)
 	{
 		return;
 	}
@@ -157,7 +96,8 @@ void GameManager::onEnemySpawn()
 	bool isEnemyAggressive = false;
 	for (const auto& entity : EntityManagerLocator::getEntityManager().getEntities())
 	{
-		if (entity->getTag() == EntityTag::Enemy && static_cast<Enemy*>(entity.get())->getType() == EnemyType::Aggressive)
+		if (entity->getTag() == EntityTag::Enemy 
+			&& static_cast<Enemy*>(entity.get())->getType() == EnemyType::Aggressive)
 		{
 			isEnemyAggressive = true;
 			break;
@@ -175,97 +115,22 @@ void GameManager::onEnemySpawn()
 void GameManager::onLevelReload()
 {
 	m_enemiesRemaining = 0;
+	m_gameTimer.reset();
 }
 
-int getNextRowSpawn(const sf::Vector2i& startingPoint, const sf::Vector2i& endingPoint, Direction searchDirection, int tileSize)
+void GameManager::handleGameTimer()
 {
-	bool rowFound = false;
-	int i = 0;
-	switch (searchDirection)
+	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
+	if (!CollidableBoxSpawnerLocator::getCollidableBoxSpawner().isActive())
 	{
-	case Direction::Up :
-	{
-		for (int y = startingPoint.y; y >= endingPoint.y; --y)
+		if (m_gameTimer.getElaspedTime() < 45.0f)
 		{
-			if (!rowFound && CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(startingPoint.x, y), tileSize))
-			{
-				rowFound = true;
-			}
-
-			if (rowFound && !CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(startingPoint.x, y), tileSize))
-			{
-				i = y;
-				break;
-			}
+			gameEventMessenger.broadcast(GameEvent::SpawnCollidableBoxes);
 		}
-		break;
 	}
-	case Direction::Down :
+
+	else if (m_gameTimer.getElaspedTime() <= 0.0f)
 	{
-		for (int y = startingPoint.y; y <= endingPoint.y; ++y)
-		{
-			if (!rowFound && CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(startingPoint.x, y), tileSize))
-			{
-				rowFound = true;
-			}
-
-			if (rowFound && !CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(startingPoint.x, y), tileSize))
-			{
-				i = y;
-				break;
-			}
-		}
-		break;
+		getStateManager().switchToState(StateType::RoundFailed);
 	}
-	}
-
-	assert(i != 0);
-	return i;
-}
-
-int getNextColumnSpawn(const sf::Vector2i & startingPoint, const sf::Vector2i & endingPoint, Direction searchDirection, int tileSize)
-{
-	bool columnFound = false;
-	int i = 0;
-	switch (searchDirection)
-	{
-	case Direction::Right :
-	{
-		for (int x = startingPoint.x; x <= endingPoint.x; ++x)
-		{
-			if (!columnFound && CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(x, startingPoint.y), tileSize))
-			{
-				columnFound = true;
-			}
-
-			if (columnFound && !CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(x, startingPoint.y), tileSize))
-			{
-				i = x;
-				break;
-			}
-		}
-		break;
-	}
-	case Direction::Left :
-	{
-		for (int x = startingPoint.x; x >= endingPoint.x; --x)
-		{
-			if (!columnFound && CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(x, startingPoint.y), tileSize))
-			{
-				columnFound = true;
-			}
-
-			if (columnFound && !CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(x, startingPoint.y), tileSize))
-			{
-				i = x;
-				break;
-			}
-		}
-
-		break;
-	}
-	}
-
-	assert(i != 0);
-	return i;
 }

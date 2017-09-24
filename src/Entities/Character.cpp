@@ -2,7 +2,6 @@
 #include "CollisionHandler.h"
 #include <Managers\EntityManager.h>
 
-
 Character::Character(const std::string& name, EntityTag tag, const sf::Vector2f & spawnPosition, EntityManager & entityManager, int ID, bool collidable)
 	: Entity(name, tag ,spawnPosition, entityManager, ID, collidable),
 	m_maxSpeed(65, 65),
@@ -21,8 +20,7 @@ void Character::update(float deltaTime)
 	m_oldPosition = m_position;
 	m_position += m_velocity;
 
-	m_velocity.x = 0;
-	m_velocity.y = 0;
+	resetVelocity();
 
 	Entity::update(deltaTime);
 }

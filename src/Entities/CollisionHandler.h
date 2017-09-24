@@ -11,4 +11,5 @@ namespace CollisionHandler
 	void clampMovement(const sf::FloatRect& intersection, sf::Vector2f& movement);
 	bool isCollidableTileAtPosition(const sf::Vector2f& position, int tileSize);
 	bool isEntityAtPosition(const sf::Vector2f& position, const EntityManager& entityManager, EntityTag entityTag, int tileSize);
+	bool isEntityAtPosition(const sf::Vector2f& position, const EntityManager& entityManager, int tileSize);
 }

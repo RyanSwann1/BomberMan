@@ -9,11 +9,11 @@ enum class GameEvent
 	WinGame,
 	EnemyDeath,
 	EnemyAggressive,
-	NewState,
 	CloseWindow,
 	Pause,
 	Unpause,
 	EnemySpawned,
 	StartedNewLevel,
-	WinStateEntered
+	WinStateEntered,
+	SpawnCollidableBoxes
 };

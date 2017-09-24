@@ -24,10 +24,6 @@ public:
 		}
 	}
 
-	/*virtual void subscribe(const std::function<void(MessageType&)>& fp, std::string&& listenerName, const MessageType& message) = 0;
-	virtual void broadcast(MessageType& message) = 0;
-	virtual void unsubscribe(const std::string& listenerName, const MessageType& message) = 0;*/
-
 	virtual void broadcast(MessageType message)
 	{
 		auto iter = m_listeners.find(message);
@@ -51,6 +47,11 @@ public:
 			[&listenerName](const auto& listener) { return listener.m_name == listenerName; });
 		assert(listener != iter->second.cend());
 		iter->second.erase(listener);
+
+		if (iter->second.empty())
+		{
+			m_listeners.erase(iter);
+		}
 	}
 
 protected:

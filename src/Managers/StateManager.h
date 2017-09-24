@@ -43,7 +43,6 @@ public:
 
 	void createState(StateType stateToCreate);
 	void removeState(StateType stateToRemove);
-	void removeState(const std::vector<StateType>& statesToRemove);
 	void switchToState(StateType stateToSwitch);
 	void switchToAndRemoveState(StateType stateToSwitchTo, StateType stateToRemove);
 	void switchToAndRemoveState(StateType stateToSwitchTo, std::vector<StateType> statesToRemove);
@@ -53,12 +52,13 @@ public:
 private:
 	const StateFactory m_stateFactory;
 	std::deque<std::unique_ptr<StateBase>> m_states;
+	//std::vector<std::unique_ptr<StateBase>> m_preExistingStateQueue;
 	std::vector<StateType> m_stateQueue;
 	std::vector<StateType> m_removals;
-	std::unique_ptr<StateType> m_stateToSwap;
+	//std::unique_ptr<StateType> m_stateToSwap;
 
 	void handleQueue();
 	void handleRemovals();
-	void handleSwapState();
 	void purgeStates();
+	void addStateToQueue(StateType newStateType);
 };

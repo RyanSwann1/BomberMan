@@ -7,26 +7,20 @@
 StateMainMenu::StateMainMenu(StateManager & stateManager, StateType type)
 	: StateBase(stateManager, type)
 {
-	m_gui.addText(sf::Vector2f(75, 20), "Bomberman", 30);
-	m_gui.addButton(sf::Vector2f(150, 50), sf::Vector2f(100, 75), "Play", GUIButtonName::StartGame);
-	m_gui.addButton(sf::Vector2f(150, 150), sf::Vector2f(100, 75), "Exit", GUIButtonName::Exit);
+	m_gui.addText(sf::Vector2f(75, 20), "Bomberman", "TileText", 30);
+	m_gui.addButton(sf::Vector2f(150, 50), sf::Vector2f(100, 75), "Play", "StartGame");
+	m_gui.addButton(sf::Vector2f(150, 150), sf::Vector2f(100, 75), "Exit", "Exit");
 }
 
-void StateMainMenu::activateButton(GUIButtonName buttonName)
+void StateMainMenu::activateButton(const std::string& name)
 {
-	switch (buttonName)
-	{
-	case GUIButtonName::StartGame :
+	if (name == "StartGame")
 	{
 		m_stateManager.switchToAndRemoveState(StateType::Game, StateType::MainMenu);
-
-		break;
 	}
-	case GUIButtonName::Exit :
+	else if (name == "Exit")
 	{
 		auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
 		gameEventMessenger.broadcast(GameEvent::CloseWindow);
-		break;
-	}
 	}
 }

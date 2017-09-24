@@ -5,19 +5,38 @@
 #include <Locators\WindowLocator.h>
 #include <Window.h>
 #include <States\StateBase.h>
+#include <Managers\StateManager.h>
+#include <assert.h>
+
+//GUIComponent
+GUI::GUIComponent::GUIComponent(const std::string& name, ComponentType type)
+	: m_name(name),
+	m_type(type)
+{}
+
+GUI::GUIComponent::GUIComponent(GUIComponent & orig)
+	: m_type(orig.m_type),
+	m_name(orig.m_name)
+{
+}
+
+const std::string & GUI::GUIComponent::getName() const
+{
+	return m_name;
+}
 
 //GUI Text
-GUI::GUIText::GUIText(const std::string & text, const sf::Vector2f & position, FontManager & fontManager, int characterSize)
-	: GUIComponent(ComponentType::Text),
+GUI::GUIText::GUIText(const std::string & text, const sf::Vector2f & position, const std::string& name, FontManager & fontManager, int characterSize)
+	: GUIComponent(name, ComponentType::Text),
 	m_fontManager(fontManager),
-	m_text(text, fontManager.getResource("arial"), characterSize)
+	m_text(text, m_fontManager.getResource("arial"), characterSize)
 {
 	m_text.setPosition(position);
 	m_text.setFillColor(sf::Color::White);
 }
 
-GUI::GUIText::GUIText(GUIText & orig)
-	: GUIComponent(orig.m_type),
+GUI::GUIText::GUIText(GUIText& orig)
+	: GUIComponent(orig.m_name, ComponentType::Text),
 	m_fontManager(orig.m_fontManager)
 {
 	m_text.setPosition(orig.m_text.getPosition());
@@ -37,9 +56,8 @@ void GUI::GUIText::draw(sf::RenderWindow & window)
 }
 
 //GUI Button
-GUI::GUIButton::GUIButton(const sf::Vector2f & position, const sf::Vector2f & size, const std::string & text, FontManager & fontManager, GUIButtonName name)
-	: GUIComponent(ComponentType::Button),
-	m_name(name),
+GUI::GUIButton::GUIButton(const sf::Vector2f & position, const sf::Vector2f & size, const std::string & text, const std::string& name, FontManager & fontManager)
+	: GUIComponent(name, ComponentType::Button),
 	m_AABB(position, size),
 	m_fontManager(fontManager)
 {
@@ -55,8 +73,7 @@ GUI::GUIButton::GUIButton(const sf::Vector2f & position, const sf::Vector2f & si
 }
 
 GUI::GUIButton::GUIButton(GUIButton & orig)
-	: GUIComponent(orig.m_type),
-	m_name(orig.m_name),
+	: GUIComponent(orig.m_name, orig.m_type),
 	m_AABB(orig.m_AABB),
 	m_fontManager(orig.m_fontManager),
 	m_button(orig.m_button),
@@ -70,16 +87,6 @@ GUI::GUIButton::~GUIButton()
 	m_fontManager.releaseResource("arial");
 }
 
-const sf::FloatRect & GUI::GUIButton::getAABB() const
-{
-	return m_AABB;
-}
-
-GUIButtonName GUI::GUIButton::getName() const
-{
-	return m_name;
-}
-
 void GUI::GUIButton::draw(sf::RenderWindow & window)
 {
 	window.draw(m_button);
@@ -87,28 +94,38 @@ void GUI::GUIButton::draw(sf::RenderWindow & window)
 }
 
 //GUI
-GUI::GUI(StateBase& stateBase)
-	: m_stateBase(stateBase),
+GUI::GUI(StateBase& owner, const StateManager& stateManager)
+	: m_stateManager(stateManager),
+	m_owner(owner),
 	m_fontManager(FontManagerLocator::getFontManager()),
 	m_activateButtonTimer(0.5f, false),
-	m_components(),
+	m_guiComponents(),
 	m_buttonQueue()
 {
 }
 
-void GUI::addButton(const sf::Vector2f & position, const sf::Vector2f & size, const std::string & text, GUIButtonName name)
+void GUI::addButton(const sf::Vector2f & position, const sf::Vector2f & size, const std::string & text, const std::string& name)
 {
-	m_components.emplace_back(std::make_unique<GUIButton>(position, size, text, m_fontManager, name));
+	m_guiComponents.emplace_back(std::make_unique<GUIButton>(position, size, text, name, m_fontManager));
 }
 
-void GUI::addText(const sf::Vector2f & position, const std::string & text, int characterSize)
+void GUI::addText(const sf::Vector2f & position, const std::string & text, std::string&& name, int characterSize)
 {
-	m_components.emplace_back(std::make_unique<GUIText>(text, position, m_fontManager, characterSize));
+	m_guiComponents.emplace_back(std::make_unique<GUIText>(text, position, name, m_fontManager, characterSize));
+}
+
+void GUI::updateText(const std::string & newText, const std::string& name)
+{
+	auto iter = std::find_if(m_guiComponents.begin(), m_guiComponents.end(), [&name](const auto& component) { return component->m_name == name; });
+	assert(iter != m_guiComponents.cend());
+	assert(iter->get()->m_type == ComponentType::Text);
+
+	static_cast<GUIText*>(iter->get())->m_text.setString(newText);
 }
 
 void GUI::draw(sf::RenderWindow & window)
 {
-	for (auto& component : m_components)
+	for (auto& component : m_guiComponents)
 	{
 		component->draw(window);
 	}
@@ -130,15 +147,20 @@ void GUI::handleButtonQueue()
 
 	assert(!m_buttonQueue.empty());
 
-	const auto nextButton = m_buttonQueue.back();
-	m_stateBase.activateButton(nextButton);
+	const auto& nextButton = m_buttonQueue.back();
+	m_owner.activateButton(nextButton);
 	m_activateButtonTimer.reset();
 	m_buttonQueue.clear();
 }
 
 void GUI::handleButtonInteraction()
 {
-	if (m_components.empty() || !sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+	if (m_owner.getType() != m_stateManager.getCurrentStateType())
+	{
+		return;
+	}
+
+	if (m_guiComponents.empty() || !sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 	{
 		return;
 	}
@@ -146,14 +168,14 @@ void GUI::handleButtonInteraction()
 	const auto mousePosition = sf::Mouse::getPosition(WindowLocator::getWindow().getRenderWindow());
 	const sf::FloatRect mouseRect(sf::Vector2f(mousePosition.x, mousePosition.y), sf::Vector2f(16, 16));
 
-	for (const auto& component : m_components)
+	for (const auto& component : m_guiComponents)
 	{
 		if (component->m_type != ComponentType::Button)
 		{
 			continue;
 		}
 
-		if (mouseRect.intersects(static_cast<GUIButton*>(component.get())->getAABB()))
+		if (mouseRect.intersects(static_cast<GUIButton*>(component.get())->m_AABB))
 		{
 			const auto pressedButtonName = static_cast<GUIButton*>(component.get())->getName();
 			if (std::find_if(m_buttonQueue.cbegin(), m_buttonQueue.cend(),

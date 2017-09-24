@@ -1,8 +1,10 @@
 #include <Game\Timer.h>
 
-Timer::Timer(float expirationTime, bool active)
-	: m_expirationTime(expirationTime),
-	m_elaspedTime(0),
+Timer::Timer(float expirationTime, bool active, bool reversalTimer, float startingTime)
+	: m_reversalTimer(reversalTimer),
+	m_startingTime(startingTime),
+	m_expirationTime(expirationTime),
+	m_elaspedTime(startingTime),
 	m_active(active)
 {
 }
@@ -24,7 +26,14 @@ void Timer::update(float deltaTime)
 		return;
 	}
 
-	m_elaspedTime += deltaTime;
+	if (m_reversalTimer)
+	{
+		m_elaspedTime -= deltaTime;
+	}
+	else
+	{
+		m_elaspedTime += deltaTime;
+	}	
 }
 
 bool Timer::isActive() const
@@ -34,7 +43,7 @@ bool Timer::isActive() const
 
 bool Timer::isExpired() const
 {
-	return m_elaspedTime >= m_expirationTime;
+	return (m_reversalTimer ? m_elaspedTime <= m_expirationTime : m_elaspedTime >= m_expirationTime);
 }
 
 void Timer::reduceExpirationTime(float i)
@@ -47,7 +56,7 @@ void Timer::reduceExpirationTime(float i)
 
 void Timer::reset()
 {
-	m_elaspedTime = 0;
+	m_elaspedTime = m_startingTime;
 }
 
 void Timer::activate()
