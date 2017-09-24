@@ -6,23 +6,21 @@
 StatePauseMenu::StatePauseMenu(StateManager & stateManager, StateType type)
 	: StateBase(stateManager, type)
 {
-	m_gui.addButton(sf::Vector2f(175, 50), sf::Vector2f(100, 75), "Resume", GUIButtonName::Resume);
-	m_gui.addButton(sf::Vector2f(50, 50), sf::Vector2f(100, 75), "Main Menu", GUIButtonName::MainMenu);
+
+
+	m_gui.addButton(sf::Vector2f(175, 50), sf::Vector2f(100, 75), "Resume", "Resume");
+	m_gui.addButton(sf::Vector2f(50, 50), sf::Vector2f(100, 75), "Main Menu", "MainMenu");
 }
 
-void StatePauseMenu::activateButton(GUIButtonName buttonName)
+void StatePauseMenu::activateButton(const std::string& name)
 {
-	switch (buttonName)
-	{
-	case GUIButtonName::Resume :
+	if (name == "Resume")
 	{
 		m_stateManager.switchToState(StateType::Game);
-		break;
+		GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::Unpause);
 	}
-	case GUIButtonName::MainMenu :
+	else if (name == "MainMenu")
 	{
 		m_stateManager.switchToAndRemoveState(StateType::MainMenu, { StateType::Game, StateType::PauseMenu, StateBase::getType() });
-		break;
-	}
 	}
 }

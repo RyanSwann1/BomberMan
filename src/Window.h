@@ -1,16 +1,18 @@
 #pragma once
 
+#include <Managers\EventManager.h>
 #include <Game\GameEvent.h>
 #include <string>
 #include <SFML\Graphics.hpp>
 #include <SFML\Window.hpp>
 
+class StateManager;
 template <class GameEvent>
 class MessageHandler;
 class Window
 {
 public:
-	Window(MessageHandler<GameEvent>& gameEventMessenger, const std::string& name, const sf::Vector2i& size);
+	Window(const StateManager& stateManager, MessageHandler<GameEvent>& gameEventMessenger, const std::string& name, const sf::Vector2i& size);
 	~Window();
 
 	sf::RenderWindow& getRenderWindow();
@@ -21,6 +23,7 @@ public:
 
 private:
 	sf::RenderWindow m_window;
+	EventManager m_eventManager;
 	
 	void closeWindow();
 };

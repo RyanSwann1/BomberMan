@@ -8,5 +8,5 @@ public:
 	StateGameCompleted(StateManager& stateManager, StateType stateType);
 
 private:
-	void activateButton(GUIButtonName buttonName) override;
+	void activateButton(const std::string& name) override;
 };

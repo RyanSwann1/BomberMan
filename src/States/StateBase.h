@@ -21,7 +21,7 @@ protected:
 	StateManager& m_stateManager;
 	GUI m_gui;
 
-	virtual void activateButton(GUIButtonName) = 0;
+	virtual void activateButton(const std::string& name) = 0;
 
 private:
 	const StateType m_stateType;

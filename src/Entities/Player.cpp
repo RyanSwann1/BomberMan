@@ -11,6 +11,12 @@ Player::Player(const std::string& name, EntityTag tag, const sf::Vector2f & spaw
 {
 }
 
+Player::~Player()
+{
+	GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::PlayerDeath);
+	AudioPlayerLocator::getAudioClipPlayer().playAudioClip(AudioClipName::PlayerDeath);
+}
+
 void Player::update(float deltaTime)
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
@@ -46,15 +52,13 @@ void Player::handleEntityCollision(const std::unique_ptr<Entity>& entity, const 
 	}
 	Character::handleEntityCollision(entity, intersection);
 
-	if (m_lives <= 0)
+	switch (entity->getTag())
 	{
-		AudioPlayerLocator::getAudioClipPlayer().playAudioClip(AudioClipName::PlayerDeath);
-		GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::PlayerDeath);
-	}
-
-	if (entity->getTag() == EntityTag::PowerUp)
+	case EntityTag::PowerUp :
 	{
 		handlePowerUpCollision(entity);
+		break;
+	}
 	}
 }
 

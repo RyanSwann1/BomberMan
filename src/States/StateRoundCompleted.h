@@ -9,7 +9,7 @@ public:
 	~StateRoundCompleted();
 
 private:
-	void activateButton(GUIButtonName buttonName) override;
+	void activateButton(const std::string& name) override;
 	void onWinGame();
 	void onPlayerDeath();
 };

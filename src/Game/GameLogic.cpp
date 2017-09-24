@@ -4,6 +4,19 @@
 #include <Entities\CollisionHandler.h>
 #include <Entities\EntityTag.h>
 #include <Game\RandomNumberGenerator.h>
+#include <Locators\LevelManagerLocator.h>
+#include <Locators\EntityManagerLocator.h>
+#include <Managers\LevelManager.h>
+
+void GameLogic::removeEntityAtPosition(const sf::Vector2f & position, EntityManager & entityManager)
+{
+	const int tileSize = LevelManagerLocator::getLevelManager().getCurrentLevel()->getTileSize();
+	const auto* entityAtPosition = getEntityAtPosition(entityManager, position, tileSize);
+	if (entityAtPosition)
+	{
+		entityManager.removeEntity(entityAtPosition->get()->getID());
+	}
+}
 
 void GameLogic::spawnPowerUp(const sf::Vector2f& position, EntityManager& entityManager)
 {
@@ -38,25 +51,6 @@ const sf::Vector2f & GameLogic::getPlayerPosition(const EntityManager & entityMa
 	return entityManager.getEntity(EntityTag::Player)->getPosition();
 }
 
-bool GameLogic::isEntityAtPosition(const EntityManager & entityManager, const sf::Vector2i & position, EntityTag entityTag)
-{
-	for (const auto& entity : entityManager.getEntities())
-	{
-		if (entity->getTag() != entityTag)
-		{
-			continue;
-		}
-
-		const auto& entityPosition = sf::Vector2i(std::round(entity->getPosition().x), std::round(entity->getPosition().y));
-		if (entityPosition == position)
-		{
-			return true;
-		}
-	}
-
-	return false;
-}
-
 const std::unique_ptr<Entity>* GameLogic::getEntityAtPosition(const EntityManager & entityManager, const sf::Vector2f & position, EntityTag entityTag, int tileSize)
 {
 	for (const auto& entity : entityManager.getEntities())
@@ -74,4 +68,41 @@ const std::unique_ptr<Entity>* GameLogic::getEntityAtPosition(const EntityManage
 	}
 
 	return nullptr;
+}
+
+const std::unique_ptr<Entity>* GameLogic::getEntityAtPosition(const EntityManager & entityManager, const sf::Vector2f & position, int tileSize)
+{
+	const auto entityPosition = sf::Vector2i((std::floor(position.x / tileSize) * tileSize), std::floor(position.y / tileSize) * tileSize);
+	const auto& entities = entityManager.getEntities();
+	for (const auto& entity : entities)
+	{
+		const auto position = sf::Vector2i(std::floor(entity->getPosition().x / tileSize) * tileSize, 
+			std::floor(entity->getPosition().y / tileSize) * tileSize);
+
+		if (entityPosition == position)
+		{
+			return &entity;
+		}
+	}
+	
+	return nullptr;
+}
+
+bool GameLogic::isPlayerAlive()
+{
+	const auto& entities = EntityManagerLocator::getEntityManager().getEntities();
+	for (const auto& entity : entities)
+	{
+		if (!entity)
+		{
+			continue;
+		}
+
+		if (entity->getTag() == EntityTag::Player)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }

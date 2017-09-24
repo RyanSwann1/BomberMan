@@ -61,6 +61,13 @@ private:
 	State m_state;
 	EnemyType m_type;
 
+	//Interpolation
+	Timer m_interpolationTimer;
+	sf::Vector2f& updatePosition(float deltaTime);	
+	sf::Vector2f& interpolate(const sf::Vector2f& pointA, const sf::Vector2f& pointB, float factor) const;
+	void updateInterpolation(float deltaTime);
+
+
 	void setStateToTargetPlayer();
 	void checkExistingBombsAtPoints(int tileSize);
 	void move(const std::vector<Point>& graph, const Point& point, int tileSize);
@@ -83,8 +90,8 @@ private:
 	std::vector<sf::Vector2i> getNeighbouringPointsOnGraph(const sf::Vector2i& startingPoint, const std::vector<Point>& graph, int tileSize) const;
 	std::vector<sf::Vector2i> getNeighbouringPointsOnEntity(const sf::Vector2i& startingPoint, int tileSize, EntityTag entityTag) const;
 	std::vector<sf::Vector2i> getNeighbouringPointsOnGraphContainingBomb(const sf::Vector2i& startingPoint, const std::vector<Point>& graph, int tileSize) const;
-	const Point& getPointOnGraph(const std::vector<Point>& graph, const sf::Vector2i& position) const;
-	const Point& getPointOnGraph(const std::vector<Point>& graph, int ID) const;
+	const Point* getPointOnGraph(const std::vector<Point>& graph, const sf::Vector2i& point) const;
+	const Point* getPointOnGraph(const std::vector<Point>& graph, int ID) const;
 	bool isPointInRadiusOfHarm(const std::vector<Point>& graph, const Point& point, int tileSize) const;
 
 	void setTargetPointAtSafePoint(const std::vector<Point>& graph, int tileSize);

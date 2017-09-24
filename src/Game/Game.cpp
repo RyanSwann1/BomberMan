@@ -6,7 +6,7 @@
 
 Game::Game()
 	: m_gameEventMessenger(),
-	m_window(m_gameEventMessenger, "BomberMan", sf::Vector2i(336, 336)),
+	m_window(m_stateManager, m_gameEventMessenger, "BomberMan", sf::Vector2i(336, 336)),
 	m_textureManager(),
 	m_fontManager(),
 	m_audioClipManager(),

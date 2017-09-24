@@ -8,5 +8,5 @@ public:
 	StatePauseMenu(StateManager& stateManager, StateType type);
 
 private:
-	void activateButton(GUIButtonName buttonName) override;
+	void activateButton(const std::string& name) override;
 };

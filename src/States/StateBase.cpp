@@ -2,7 +2,7 @@
 
 StateBase::StateBase(StateManager & stateManager, StateType stateType)
 	: m_stateManager(stateManager),
-	m_gui(*this),
+	m_gui(*this, m_stateManager),
 	m_stateType(stateType)
 {
 }

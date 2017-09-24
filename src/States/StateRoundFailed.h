@@ -10,6 +10,6 @@ public:
 	~StateRoundFailed();
 
 private:
-	void activateButton(GUIButtonName buttonName) override;
+	void activateButton(const std::string& name) override;
 	void onEnteringWinState();
 };
