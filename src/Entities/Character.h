@@ -9,6 +9,7 @@ public:
 	Character(const std::string& name, EntityTag tag, const sf::Vector2f& spawnPosition, EntityManager& entityManager, int ID, bool collidable);
 	virtual ~Character() {}
 
+	void draw(sf::RenderWindow& window);
 	void update(float deltaTime) override;
 	void handleEntityCollision(const std::unique_ptr<Entity>& entity, const sf::FloatRect& intersection) override;
 
@@ -19,11 +20,12 @@ protected:
 	sf::Vector2f m_oldPosition;
 	Direction m_currentMoveDirection;
 	int m_lives;
-	
+
+	void alterVelocity(float x, float y);
 	void increaseSpeed(float x, float y);
 
 private:
-	void handleDirection();	
+	void handleDirection();
 	void handleAnimation();
 	void resetVelocity();
 };

@@ -28,10 +28,8 @@ class AnimationPlayer
 		const std::string m_tileSheetName;
 		const int m_startFrame;
 		const int m_endFrame;
-		//const float m_frameTime;
 		const bool m_animationReversible;
 		int m_currentFrame;
-		//float m_elaspedTime;
 		bool m_animationFinished;
 		bool m_proceedToNextFrame;
 		bool m_animationPlaying;

@@ -20,7 +20,8 @@
 GameManager::GameManager()
 	: m_maxEnemies(3),
 	m_enemiesRemaining(0),
-	m_gameTimer(0.0f, true, true, 80.0f)
+	m_gameTimer(0.0f, true, true, 80.0f),
+	m_startCollidableBoxesTime(45.0f)
 {
 	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
 	gameEventMessenger.subscribe(std::bind(&GameManager::onWinGame, this), "GameManager", GameEvent::WinGame);
@@ -116,16 +117,15 @@ void GameManager::onLevelReload()
 {
 	m_enemiesRemaining = 0;
 	m_gameTimer.reset();
-}
+} 
 
 void GameManager::handleGameTimer()
 {
-	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
 	if (!CollidableBoxSpawnerLocator::getCollidableBoxSpawner().isActive())
 	{
-		if (m_gameTimer.getElaspedTime() < 45.0f)
+		if (m_gameTimer.getElaspedTime() < m_startCollidableBoxesTime)
 		{
-			gameEventMessenger.broadcast(GameEvent::SpawnCollidableBoxes);
+			GameEventMessengerLocator::getGameEventMessenger().broadcast(GameEvent::SpawnCollidableBoxes);
 		}
 	}
 

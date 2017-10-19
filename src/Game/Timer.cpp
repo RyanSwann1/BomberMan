@@ -26,14 +26,7 @@ void Timer::update(float deltaTime)
 		return;
 	}
 
-	if (m_reversalTimer)
-	{
-		m_elaspedTime -= deltaTime;
-	}
-	else
-	{
-		m_elaspedTime += deltaTime;
-	}	
+	(m_reversalTimer ? m_elaspedTime -= deltaTime : m_elaspedTime += deltaTime);
 }
 
 bool Timer::isActive() const

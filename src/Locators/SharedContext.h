@@ -6,5 +6,5 @@ class AudioClipManager;
 class SharedContext
 {
 public:
-
+	
 };

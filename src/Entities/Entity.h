@@ -17,6 +17,7 @@ public:
 	const std::string& getName() const;
 	const sf::FloatRect& getAABB() const;
 	const sf::Vector2f& getPosition() const;
+	const sf::Vector2f getCentrePosition() const;
 	int getID() const;
 	
 	void draw(sf::RenderWindow& window);
@@ -28,8 +29,10 @@ protected:
 	sf::FloatRect m_AABB;
 	AnimationPlayer m_animationPlayer;
 	EntityManager& m_entityManager;
+	sf::RectangleShape m_rect;
 
 	void setPosition(float x, float y);
+	void setPosition(const sf::Vector2f& newPosition);
 
 private:
 	const int m_ID;

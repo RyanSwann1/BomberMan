@@ -19,20 +19,24 @@
 
 Enemy::Enemy(const std::string& name, EntityTag tag, const sf::Vector2f & position, EntityManager & entityManager, int entityID, bool collidable)
 	: BombCarrier(name, tag, position, entityManager, entityID, collidable),
-	m_movementTimer(0.75f, true),
 	m_stopMovementTimer(2.0f, false),
 	m_targetPoint(),
 	m_reachedTargetPoint(false),
-	m_bombAtPoints(),
-	m_state(State::InitializeState),
-	m_interpolationTimer(.0f, false)
+	m_state(State::AssignNewState),
+	m_moveDirection(Direction::None),
+	m_chooseNewMoveDirection(true),
+	m_walkingPoint(),
+	m_moveErrorTimer(12.0f, true)
 {
+	m_speed = sf::Vector2f(22.5f, 22.5f);
+
 	const int randNumb = RandomNumberGenerator::getRandomNumber(static_cast<int>(EnemyType::Passive), static_cast<int>(EnemyType::Aggressive));
 	m_type = static_cast<EnemyType>(randNumb);
 
 	auto& gameEventMessenger = GameEventMessengerLocator::getGameEventMessenger();
 	gameEventMessenger.subscribe(std::bind(&Enemy::setStateToTargetPlayer, this), "Enemy", GameEvent::EnemyAggressive);
 	gameEventMessenger.broadcast(GameEvent::EnemySpawned);
+	m_type = EnemyType::Aggressive;
 	
 	auto& entityMessenger = EntityMessengerLocator::getEntityMessenger();
 	entityMessenger.subscribe(std::bind(&Enemy::setTypeToAggressive, this, std::placeholders::_1), "Enemy", EntityEvent::TurnAggressive);
@@ -61,16 +65,13 @@ void Enemy::handleEntityCollision(const std::unique_ptr<Entity>& entity, const s
 
 	if (entity->getTag() == EntityTag::PowerUp)
 	{
-		if (entity->getName() == "PowerUpSpeedBoost")
-		{
-			if (m_movementTimer.getExpirationTime() >= 0.35f)
-			{
-				m_movementTimer.reduceExpirationTime(0.05f);
-			}
-		}
-		else if (entity->getName() == "PowerUpIncreaseBombPower")
+		if (entity->getName() == "PowerUpIncreaseBombPower")
 		{
 			BombCarrier::increaseBombPower();
+		}
+		else if (entity->getName() == "PowerUpSpeedBoost")
+		{
+			BombCarrier::increaseSpeed(2.5f, 2.5f);
 		}
 	}
 }
@@ -79,23 +80,19 @@ void Enemy::update(float deltaTime)
 {
 	BombCarrier::update(deltaTime);
 	m_stopMovementTimer.update(deltaTime);
-	m_movementTimer.update(deltaTime);
-	if (!m_movementTimer.isExpired())
-	{
-		return;
-	}
 
 	std::vector<Point> graph;
 	bool opponentFound = false;
 	bool powerUpFound = false;
-	sf::Vector2i powerUpAtPoint;
-	sf::Vector2i opponentAtPoint;
-
+	sf::Vector2f powerUpAtPoint;
+	sf::Vector2f opponentAtPoint;
 	const int tileSize = LevelManagerLocator::getLevelManager().getCurrentLevel()->getTileSize();
+
 	initializeGraph(powerUpAtPoint, opponentAtPoint, graph, opponentFound, powerUpFound, tileSize);
-	handleBombAtPoints(graph, tileSize);
+	updateLocalHazardousPoints(graph, tileSize);
+
 	handleStates(graph, powerUpAtPoint, opponentAtPoint, opponentFound, powerUpFound, tileSize);
-	handleMovement(graph, tileSize);
+	handleMovement(graph, deltaTime, tileSize);
 }
 
 void Enemy::setStateToTargetPlayer()
@@ -103,83 +100,24 @@ void Enemy::setStateToTargetPlayer()
 	setState(State::SetTargetPointAtOpponent);
 }
 
-void Enemy::checkExistingBombsAtPoints(int tileSize)
-{
-	for (auto iter = m_bombAtPoints.begin(); iter != m_bombAtPoints.end();)
-	{
-		if (!CollisionHandler::isEntityAtPosition(sf::Vector2f(iter->x, iter->y), m_entityManager, EntityTag::Bomb, tileSize))
-		{
-			iter = m_bombAtPoints.erase(iter);
-		}
-		else
-		{
-			++iter;
-		}
-	}
-}
-
-void Enemy::move(const std::vector<Point>& graph, const Point& point, int tileSize)
-{
-	bool targetAtTargetPoint = true;
-	switch (m_state)
-	{
-	case State::TargettingCrates :
-	{
-		targetAtTargetPoint = isTargetNeighbouringTargetPoint(graph, EntityTag::Crate, tileSize);
-		break;
-	}
-	case State::TargettingPowerUp :
-	{
-		targetAtTargetPoint = isTargetAtTargetPoint(graph, EntityTag::PowerUp, tileSize);
-		break;
-	}
-	}
-
-	if (!targetAtTargetPoint)
-	{
-		setState(State::InitializeState);
-		return;
-	}
-
-	if (isPointInRadiusOfHarm(graph, point, tileSize) && m_state != State::MovingToSafePoint)
-	{
-		setState(State::StopMovement);
-		return;
-	}
-
-	Entity::setPosition(point.m_point.x * tileSize, point.m_point.y * tileSize);
-	m_movementTimer.reset();
-	m_movementTimer.activate();
-}
-
-void Enemy::handleStates(const std::vector<Point>& graph, const sf::Vector2i& powerUpAtPoint, const sf::Vector2i & opponentAtPoint, bool opponentFound, bool powerUpFound, int tileSize)
+void Enemy::handleStates(const std::vector<Point>& graph, const sf::Vector2f& powerUpAtPoint, const sf::Vector2f & opponentAtPoint, bool opponentFound, bool powerUpFound, int tileSize)
 {
 	switch (m_state)
 	{
-	case State::InitializeState :
+	case State::AssignNewState :
 	{
 		if (opponentFound && m_type == EnemyType::Aggressive)
 		{
-			setState(State::SetTargetPointAtOpponent);
+			setTargetPointAtOpponent(graph, opponentAtPoint, tileSize);
 			break;
 		}
 
-		(powerUpFound ? setState(State::SetTargetPointAtPowerUp) : setState(State::SetTargetPointBesideCrate));
+		(powerUpFound ? setTargetPointAtPowerUp(powerUpAtPoint) : setTargetPointBesideCrate(graph, tileSize));
 		break;
 	}
 	case State::SetTargetPointAtOpponent:
 	{
-		const auto neighbouringPoints = getNeighbouringPointsOnGraph(opponentAtPoint, graph, tileSize);
-		if (neighbouringPoints.empty())
-		{
-			setState(State::StopMovement);
-			break;
-		}
-		//assert(!neighbouringPoints.empty());
-
-		const auto randomPointPosition = neighbouringPoints[RandomNumberGenerator::getRandomNumber(0, neighbouringPoints.size() - 1)];
-		setNewTargetPoint(randomPointPosition);
-		setState(State::TargettingOpponent);
+		setTargetPointAtOpponent(graph, opponentAtPoint, tileSize);
 		break;
 	}
 	case State::SetTargetPointBesideCrate:
@@ -203,35 +141,32 @@ void Enemy::handleStates(const std::vector<Point>& graph, const sf::Vector2i& po
 		{
 			m_stopMovementTimer.deactivate();
 			m_stopMovementTimer.reset();
-			setState(State::InitializeState);
+			setState(State::AssignNewState);
 		}
 		break;
 	}
 	case State::SetTargetPointAtPowerUp :
 	{
-		setNewTargetPoint(powerUpAtPoint);
-		setState(State::TargettingPowerUp);
+		setTargetPointAtPowerUp(powerUpAtPoint);
 		break;
 	}
-
 	}
 }
 
-void Enemy::handleBombAtPoints(const std::vector<Point>& graph, int tileSize)
-{
-	if (m_stopMovementTimer.isActive())
-	{
-		return;
-	}
-		
-	checkExistingBombsAtPoints(tileSize);
+void Enemy::updateLocalHazardousPoints(const std::vector<Point>& graph, int tileSize)
+{		
+	handleExistingHazardousPoints(tileSize);
+
 	bool newBombDiscovered = false;
-	for (const auto neighbouringPoint : getNeighbouringPointsOnGraphContainingBomb(getPointAtPosition(graph, tileSize).m_point, graph, tileSize))
+	const auto& currentPointAtPosition = getPointAtCurrentPosition(graph, tileSize).m_point;
+	for (const auto neighbouringPoint : getNeighbouringPointsOnGraphContainingBomb(currentPointAtPosition, graph, tileSize))
 	{
-		auto cIter = std::find_if(m_bombAtPoints.cbegin(), m_bombAtPoints.cend(), [&neighbouringPoint](const auto& point) { return point == neighbouringPoint; });
-		if (cIter == m_bombAtPoints.cend())
+		auto cIter = std::find_if(m_localHazardousPoints.cbegin(), m_localHazardousPoints.cend(), 
+			[&neighbouringPoint](const auto& point) { return point == neighbouringPoint; });
+
+		if (cIter == m_localHazardousPoints.cend())
 		{
-			m_bombAtPoints.emplace_back(neighbouringPoint);
+			m_localHazardousPoints.emplace_back(neighbouringPoint);
 			newBombDiscovered = true;
 			m_stopMovementTimer.reset();
 			m_stopMovementTimer.deactivate();
@@ -245,34 +180,60 @@ void Enemy::handleBombAtPoints(const std::vector<Point>& graph, int tileSize)
 	}
 }
 
-void Enemy::handleMovement(const std::vector<Point>& graph, int tileSize)
+void Enemy::handleExistingHazardousPoints(int tileSize)
 {
-	if (!m_reachedTargetPoint)
+	for (auto iter = m_localHazardousPoints.begin(); iter != m_localHazardousPoints.end();)
 	{
-		moveToTargetPoint(graph, tileSize);
-		if (reachedTargetPoint(graph, tileSize))
+		if (!CollisionHandler::isEntityAtPosition(*iter, m_entityManager, EntityTag::Bomb, tileSize))
 		{
-			if (m_state != State::MovingToSafePoint && m_state != State::TargettingPowerUp)
-			{
-				BombCarrier::placeBomb();
-			}
-
-			if (m_state == State::MovingToSafePoint)
-			{
-				setState(State::StopMovement);
-			}
-
-			if (m_state == State::TargettingPowerUp)
-			{
-				setState(State::InitializeState);
-			}
+			iter = m_localHazardousPoints.erase(iter);
+		}
+		else
+		{
+			++iter;
 		}
 	}
 }
 
-void Enemy::initializeGraph(sf::Vector2i& powerUpAtPoint, sf::Vector2i& opponentAtPoint, std::vector<Point>& graph, bool& opponentFound, bool& powerUpFound, int tileSize)
+void Enemy::assignNewMovementDirection(const sf::Vector2f& nextPointToMoveTo, int tileSize)
 {
-	const sf::Vector2i startingPoint(std::floor(m_position.x / tileSize), std::floor(m_position.y / tileSize));
+	const auto currentPosition = sf::Vector2f(std::floor(Entity::getCentrePosition().x / tileSize), std::floor(Entity::getCentrePosition().y / tileSize));
+	if (nextPointToMoveTo.x > currentPosition.x)
+	{
+		m_moveDirection = Direction::Right;
+	}
+	else if (nextPointToMoveTo.x < currentPosition.x)
+	{
+		m_moveDirection = Direction::Left;
+	}
+	else if (nextPointToMoveTo.y < currentPosition.y)
+	{
+		m_moveDirection = Direction::Up;
+	}
+	else if (nextPointToMoveTo.y > currentPosition.y)
+	{
+		m_moveDirection = Direction::Down;
+	}
+}
+
+void Enemy::setTargetPointAtOpponent(const std::vector<Point>& graph, const sf::Vector2f& opponentAtPoint, int tileSize)
+{
+	const std::vector<sf::Vector2f> neighbouringPoints = getNeighbouringPointsFromPoint(opponentAtPoint, graph, tileSize);
+	if (neighbouringPoints.empty())
+	{
+		setState(State::StopMovement);
+		return;
+	}
+
+	const sf::Vector2f randomPointPosition = neighbouringPoints[RandomNumberGenerator::getRandomNumber(0, neighbouringPoints.size() - 1)];
+	setNewTargetPoint(randomPointPosition);
+	std::cout << "Targetting Opponent\n";
+	setState(State::TargettingOpponent);
+}
+
+void Enemy::initializeGraph(sf::Vector2f& powerUpAtPoint, sf::Vector2f& opponentAtPoint, std::vector<Point>& graph, bool& opponentFound, bool& powerUpFound, int tileSize)
+{
+	const sf::Vector2f startingPoint = sf::Vector2f(std::floor(Entity::getCentrePosition().x / tileSize), std::floor(Entity::getCentrePosition().y / tileSize));
 	int pointID = 0;
 	std::deque<Point> frontier;
 	addNewPoint(startingPoint, graph, frontier, pointID, pointID);
@@ -284,10 +245,9 @@ void Enemy::initializeGraph(sf::Vector2i& powerUpAtPoint, sf::Vector2i& opponent
 	}
 }
 
-void Enemy::addNeighbouringPointsToFrontier(sf::Vector2i& powerUpAtPoint, sf::Vector2i& opponentAtPoint, const Point& point, 
+void Enemy::addNeighbouringPointsToFrontier(sf::Vector2f& powerUpAtPoint, sf::Vector2f& opponentAtPoint, const Point& point, 
 	std::vector<Point>& graph, std::deque<Point>& frontier, int& pointID, bool& opponentFound, bool& powerUpFound, int tileSize)
 {
-	//x
 	for (int x = point.m_point.x - 1; x <= point.m_point.x + 1; x += 2)
 	{
 		if (CollisionHandler::isCollidableTileAtPosition(sf::Vector2f(x, point.m_point.y), tileSize))
@@ -295,7 +255,7 @@ void Enemy::addNeighbouringPointsToFrontier(sf::Vector2i& powerUpAtPoint, sf::Ve
 			continue;
 		}
 
-		if (isPointOnGraph(graph, sf::Vector2i(x, point.m_point.y)))
+		if (isPointOnGraph(graph, sf::Vector2f(x, point.m_point.y)))
 		{
 			continue;
 		}
@@ -303,16 +263,16 @@ void Enemy::addNeighbouringPointsToFrontier(sf::Vector2i& powerUpAtPoint, sf::Ve
 		if (!opponentFound && CollisionHandler::isEntityAtPosition(sf::Vector2f(x, point.m_point.y), m_entityManager, EntityTag::Player, tileSize))
 		{
 			opponentFound = true;
-			opponentAtPoint = sf::Vector2i(x, point.m_point.y);
+			opponentAtPoint = sf::Vector2f(x, point.m_point.y);
 		}
 		
 		if (!powerUpFound && CollisionHandler::isEntityAtPosition(sf::Vector2f(x, point.m_point.y), m_entityManager, EntityTag::PowerUp, tileSize))
 		{
 			powerUpFound = true;
-			powerUpAtPoint = sf::Vector2i(x, point.m_point.y);
+			powerUpAtPoint = sf::Vector2f(x, point.m_point.y);
 		}
 
-		addNewPoint(sf::Vector2i(x, point.m_point.y), graph, frontier, pointID, point.m_ID);
+		addNewPoint(sf::Vector2f(x, point.m_point.y), graph, frontier, pointID, point.m_ID);
 	}
 
 	//y
@@ -323,7 +283,7 @@ void Enemy::addNeighbouringPointsToFrontier(sf::Vector2i& powerUpAtPoint, sf::Ve
 			continue;
 		}
 
-		if (isPointOnGraph(graph, sf::Vector2i(point.m_point.x, y)))
+		if (isPointOnGraph(graph, sf::Vector2f(point.m_point.x, y)))
 		{
 			continue;
 		}
@@ -331,26 +291,28 @@ void Enemy::addNeighbouringPointsToFrontier(sf::Vector2i& powerUpAtPoint, sf::Ve
 		if (!opponentFound && CollisionHandler::isEntityAtPosition(sf::Vector2f(point.m_point.x, y), m_entityManager, EntityTag::Player, tileSize))
 		{
 			opponentFound = true;
-			opponentAtPoint = sf::Vector2i(point.m_point.x, y);
+			opponentAtPoint = sf::Vector2f(point.m_point.x, y);
 		}
 
 		if (!powerUpFound && CollisionHandler::isEntityAtPosition(sf::Vector2f(point.m_point.x, y), m_entityManager, EntityTag::PowerUp, tileSize))
 		{
 			powerUpFound = true;
-			powerUpAtPoint = sf::Vector2i(point.m_point.x, y);
+			powerUpAtPoint = sf::Vector2f(point.m_point.x, y);
 		}
 
-		addNewPoint(sf::Vector2i(point.m_point.x, y), graph, frontier, pointID, point.m_ID);		
+		addNewPoint(sf::Vector2f(point.m_point.x, y), graph, frontier, pointID, point.m_ID);		
 	}
 }
 
-std::vector<sf::Vector2i> Enemy::getNeighbouringPointsOnGraph(const sf::Vector2i& startingPoint, const std::vector<Point>& graph, int tileSize) const
+std::vector<sf::Vector2f> Enemy::getNeighbouringPointsFromPoint(const sf::Vector2f& startingPoint, const std::vector<Point>& graph, int tileSize) const
 {
-	std::vector<sf::Vector2i> neighbouringPoints;
+	std::vector<sf::Vector2f> neighbouringPoints;
+	const sf::Vector2f searchSize(1, 1);
+	const int incrementAmount = 2;
 	//x
-	for (int x = startingPoint.x - 1; x <= startingPoint.x + 1; x += 2)
+	for (int x = startingPoint.x - searchSize.x; x <= startingPoint.x + searchSize.x; x += incrementAmount)
 	{
-		if (!isPointOnGraph(graph, sf::Vector2i(x, startingPoint.y)))
+		if (!isPointOnGraph(graph, sf::Vector2f(x, startingPoint.y)))
 		{
 			continue;
 		}
@@ -358,9 +320,9 @@ std::vector<sf::Vector2i> Enemy::getNeighbouringPointsOnGraph(const sf::Vector2i
 		neighbouringPoints.emplace_back(x, startingPoint.y);
 	}
 	//y
-	for (int y = startingPoint.y - 1; y <= startingPoint.y + 1; y += 2)
+	for (int y = startingPoint.y - searchSize.y; y <= startingPoint.y + searchSize.y; y += incrementAmount)
 	{
-		if (!isPointOnGraph(graph, sf::Vector2i(startingPoint.x, y)))
+		if (!isPointOnGraph(graph, sf::Vector2f(startingPoint.x, y)))
 		{
 			continue;
 		}
@@ -371,9 +333,9 @@ std::vector<sf::Vector2i> Enemy::getNeighbouringPointsOnGraph(const sf::Vector2i
 	return neighbouringPoints;
 }
 
-std::vector<sf::Vector2i> Enemy::getNeighbouringPointsOnEntity(const sf::Vector2i & startingPoint, int tileSize, EntityTag entityTag) const
+std::vector<sf::Vector2f> Enemy::getNeighbouringPointsOnEntity(const sf::Vector2f & startingPoint, int tileSize, EntityTag entityTag) const
 {
-	std::vector<sf::Vector2i> pointsWithCrates;
+	std::vector<sf::Vector2f> pointsWithCrates;
 	//x
 	for (int x = startingPoint.x - 1; x <= startingPoint.x + 1; x += 2)
 	{
@@ -395,13 +357,13 @@ std::vector<sf::Vector2i> Enemy::getNeighbouringPointsOnEntity(const sf::Vector2
 	return pointsWithCrates;
 }
 
-std::vector<sf::Vector2i> Enemy::getNeighbouringPointsOnGraphContainingBomb(const sf::Vector2i & startingPoint, const std::vector<Point>& graph, int tileSize) const
+std::vector<sf::Vector2f> Enemy::getNeighbouringPointsOnGraphContainingBomb(const sf::Vector2f & startingPoint, const std::vector<Point>& graph, int tileSize) const
 {
-	std::vector<sf::Vector2i> points;
+	std::vector<sf::Vector2f> points;
 	//x
 	for (int x = startingPoint.x - 5; x <= startingPoint.x + 5; ++x)
 	{
-		if (!isPointOnGraph(graph, sf::Vector2i(x, startingPoint.y)))
+		if (!isPointOnGraph(graph, sf::Vector2f(x, startingPoint.y)))
 		{
 			continue;
 		}
@@ -415,7 +377,7 @@ std::vector<sf::Vector2i> Enemy::getNeighbouringPointsOnGraphContainingBomb(cons
 	//y
 	for (int y = startingPoint.y - 5; y <= startingPoint.y + 5; ++y)
 	{
-		if (!isPointOnGraph(graph, sf::Vector2i(startingPoint.x, y)))
+		if (!isPointOnGraph(graph, sf::Vector2f(startingPoint.x, y)))
 		{
 			continue;
 		}
@@ -430,7 +392,7 @@ std::vector<sf::Vector2i> Enemy::getNeighbouringPointsOnGraphContainingBomb(cons
 	return points;
 }
 
-void Enemy::addNewPoint(const sf::Vector2i & position, std::vector<Point>& graph, std::deque<Point>& frontier, int& pointID, int cameFromID)
+void Enemy::addNewPoint(const sf::Vector2f & position, std::vector<Point>& graph, std::deque<Point>& frontier, int& pointID, int cameFromID)
 {
 	const Point newPoint(position, pointID, cameFromID);
 	frontier.push_back(newPoint);
@@ -438,10 +400,11 @@ void Enemy::addNewPoint(const sf::Vector2i & position, std::vector<Point>& graph
 	++pointID;
 }
 
-const Enemy::Point* Enemy::getPointOnGraph(const std::vector<Point>& graph, const sf::Vector2i & position) const
+const Enemy::Point* Enemy::getPointOnGraph(const std::vector<Point>& graph, const sf::Vector2f & position) const
 {
 	auto cIter = std::find_if(graph.cbegin(), graph.cend(), 
 		[&position](const auto& point) { return point.m_point == position; });
+
 	return (cIter != graph.cend() ? &(*cIter) : nullptr);
 }
 
@@ -450,37 +413,58 @@ const Enemy::Point* Enemy::getPointOnGraph(const std::vector<Point>& graph, int 
 	return &graph[ID];
 }
 
-bool Enemy::isPointInRadiusOfHarm(const std::vector<Point>& graph, const Point& point, int tileSize) const
+bool Enemy::isPointInRadiusOfHarm(const std::vector<Point>& graph, const sf::Vector2f& point, int tileSize) const
 {
 	//x
-	for (int x = point.m_point.x - 5; x != point.m_point.x + 5; ++x)
+	for (int x = point.x - 5; x != point.x + 5; ++x)
 	{
-		if (!isPointOnGraph(graph, point.m_point))
+		if (!isPointOnGraph(graph, point))
 		{
 			continue;
 		}
 
-		if (CollisionHandler::isEntityAtPosition(sf::Vector2f(x, point.m_point.y), m_entityManager, EntityTag::Bomb, tileSize))
+		if (CollisionHandler::isEntityAtPosition(sf::Vector2f(x, point.y), m_entityManager, EntityTag::Bomb, tileSize))
 		{
 			return true;
 		}
 	}
 
 	//y
-	for (int y = point.m_point.y - 5; y != point.m_point.y + 5; ++y)
+	for (int y = point.y - 5; y != point.y + 5; ++y)
 	{
-		if (!isPointOnGraph(graph, point.m_point))
+		if (!isPointOnGraph(graph, point))
 		{
 			continue;
 		}
 
-		if (CollisionHandler::isEntityAtPosition(sf::Vector2f(point.m_point.x, y), m_entityManager, EntityTag::Bomb, tileSize))
+		if (CollisionHandler::isEntityAtPosition(sf::Vector2f(point.x, y), m_entityManager, EntityTag::Bomb, tileSize))
 		{
 			return true;
 		}
 	}
 
 	return false;
+}
+
+bool Enemy::isTargetAtTargetPoint(const std::vector<Point>& graph, int tileSize) const
+{
+	bool targetAtTargetPoint = false;
+	switch (m_state)
+	{
+	case State::TargettingCrate:
+	{
+		targetAtTargetPoint = isTargetNeighbouringTargetPoint(graph, EntityTag::Crate, tileSize);
+		break;
+	}
+	case State::TargettingPowerUp:
+	{
+		targetAtTargetPoint = CollisionHandler::isEntityAtPosition(sf::Vector2f(m_targetPoint.x, m_targetPoint.y), 
+			m_entityManager, EntityTag::PowerUp, tileSize);
+		break;
+	}
+	}
+
+	return targetAtTargetPoint;
 }
 
 void Enemy::setTargetPointBesideCrate(const std::vector<Point>& graph, int tileSize)
@@ -502,63 +486,52 @@ void Enemy::setTargetPointBesideCrate(const std::vector<Point>& graph, int tileS
 		}
 	}
 
+	//No more crates to choose, target the opponent instead
 	if (cratesToChoose == maximumCratesToChoose)
 	{
 		setState(State::SetTargetPointAtOpponent);
 		return;
 	}
 
-	//assert(!neighbouringPointsOnCrate.empty());
 	const auto& randomPointID = neighbouringPointsOnCrate[RandomNumberGenerator::getRandomNumber(0, neighbouringPointsOnCrate.size() - 1)];
 	setNewTargetPoint(graph[randomPointID].m_point);
-	m_state = State::TargettingCrates;
+	m_state = State::TargettingCrate;
 }
 
-void Enemy::moveToTargetPoint(const std::vector<Point>& graph, int tileSize)
-{
-	if (m_targetPoint == sf::Vector2i(0, 0))
-	{
-		return;
-	}
-
+void Enemy::assignPointsToMoveTo(const std::vector<Point>& graph, std::deque<sf::Vector2f>& pointsToMoveTo, int tileSize)
+{	
 	const auto* moveToPoint = getPointOnGraph(graph, m_targetPoint);
 	if (!moveToPoint)
 	{
-		setState(State::StopMovement);
+		setState(State::AssignNewState);
 		return;
 	}
-	const auto& pointAtPosition = getPointAtPosition(graph, tileSize);
+
+	const auto& pointAtPosition = getPointAtCurrentPosition(graph, tileSize);
+	pointsToMoveTo.emplace_front(moveToPoint->m_point);
 	while (moveToPoint->m_point != pointAtPosition.m_point)
 	{
-		int nextPointID = moveToPoint->m_cameFromID;
-		const auto* nextPoint = getPointOnGraph(graph, nextPointID);
-		if (!nextPoint)
-		{
-			setState(State::StopMovement);
-			return;
-		}
+		const int nextPointID = moveToPoint->m_cameFromID;
+		const auto& nextPoint = *getPointOnGraph(graph, nextPointID);
 
-		if (nextPoint->m_point == pointAtPosition.m_point)
+		if (nextPoint.m_point == pointAtPosition.m_point)
 		{
-			move(graph, *moveToPoint, tileSize);
 			break;
 		}
+		pointsToMoveTo.emplace_front(nextPoint.m_point);
 		moveToPoint = getPointOnGraph(graph, nextPointID);
 	}
 
-	if (getPointAtPosition(graph, tileSize).m_point == m_targetPoint)
-	{
-		m_reachedTargetPoint = true;
-	}
+	assert(!pointsToMoveTo.empty());
 }
 
-void Enemy::setNewTargetPoint(const sf::Vector2i & point)
+void Enemy::setNewTargetPoint(const sf::Vector2f & point)
 {
 	m_targetPoint = point;
 	m_reachedTargetPoint = false;
 }
 
-bool Enemy::neighbouringCrateAtPoint(const std::vector<sf::Vector2i>& points, int tileSize) const
+bool Enemy::neighbouringCrateAtPoint(const std::vector<sf::Vector2f>& points, int tileSize) const
 {
 	for (const auto& point : points)
 	{
@@ -592,7 +565,7 @@ void Enemy::setTargetPointAtSafePoint(const std::vector<Point>& graph, int tileS
 
 	if (!safePointsID.empty())
 	{
-		const auto randPointID = RandomNumberGenerator::getRandomNumber(0, safePointsID.size() - 1);	
+		const int randPointID = RandomNumberGenerator::getRandomNumber(0, safePointsID.size() - 1);	
 		const auto& newTargetPoint = getPointOnGraph(graph, safePointsID[randPointID])->m_point;
 		setNewTargetPoint(newTargetPoint);
 		setState(State::MovingToSafePoint);
@@ -605,7 +578,7 @@ void Enemy::setTargetPointAtSafePoint(const std::vector<Point>& graph, int tileS
 
 bool Enemy::isPointAppropriateDistanceAway(const std::vector<Point>& graph, const Point & requestedPoint, int tileSize) const
 {
-	const auto& pointAtPosition = getPointAtPosition(graph, tileSize);
+	const auto& pointAtPosition = getPointAtCurrentPosition(graph, tileSize);
 	if (requestedPoint.m_point.x != pointAtPosition.m_point.x && requestedPoint.m_point.y != pointAtPosition.m_point.y)
 	{
 		return true;
@@ -627,9 +600,9 @@ bool Enemy::isPointAppropriateDistanceAway(const std::vector<Point>& graph, cons
 	return (moveSpacesAway <= 0 ? true : false);
 }
 
-bool Enemy::isPointSafeFromBombsAtPoint(const sf::Vector2i& point, int tileSize) const
+bool Enemy::isPointSafeFromBombsAtPoint(const sf::Vector2f& point, int tileSize) const
 {
-	for (const auto& bombAtPoint : m_bombAtPoints)
+	for (const auto& bombAtPoint : m_localHazardousPoints)
 	{
 		if (point.x != bombAtPoint.x && point.y != bombAtPoint.y)
 		{
@@ -640,10 +613,13 @@ bool Enemy::isPointSafeFromBombsAtPoint(const sf::Vector2i& point, int tileSize)
 	return false;
 }
 
-const Enemy::Point& Enemy::getPointAtPosition(const std::vector<Point>& graph, int tileSize) const
+const Enemy::Point& Enemy::getPointAtCurrentPosition(const std::vector<Point>& graph, int tileSize) const
 {
-	const auto* pointOnGraph = getPointOnGraph(graph, sf::Vector2i(std::floor(m_position.x / tileSize), std::floor(m_position.y / tileSize)));
-	return *pointOnGraph;
+	const auto* pointAtCurrentPosition = getPointOnGraph(graph, sf::Vector2f(std::floor(Entity::getCentrePosition().x / tileSize),
+		std::floor(Entity::getCentrePosition().y / tileSize)));
+
+	assert(pointAtCurrentPosition);
+	return *pointAtCurrentPosition;
 }
 
 void Enemy::setState(State newState)
@@ -660,9 +636,15 @@ void Enemy::setTypeToAggressive(EntityMessage & entityMessage)
 	}
 }
 
+void Enemy::setTargetPointAtPowerUp(const sf::Vector2f & powerUpPoint)
+{
+	setNewTargetPoint(powerUpPoint);
+	setState(State::TargettingPowerUp);
+}
+
 bool Enemy::reachedTargetPoint(const std::vector<Point>& graph, int tileSize) const
 {
-	return (getPointAtPosition(graph, tileSize).m_point == m_targetPoint);
+	return (getPointAtCurrentPosition(graph, tileSize).m_point == m_targetPoint);	
 }
 
 bool Enemy::isTargetNeighbouringTargetPoint(const std::vector<Point>& graph, EntityTag entityTag, int tileSize) const
@@ -678,18 +660,261 @@ bool Enemy::isTargetNeighbouringTargetPoint(const std::vector<Point>& graph, Ent
 	}
 }
 
-bool Enemy::isTargetAtTargetPoint(const std::vector<Point>& graph, EntityTag entityTag, int tileSize) const
+bool Enemy::isPointOnGraph(const std::vector<Point>& graph, const sf::Vector2f & point) const
 {
-	return CollisionHandler::isEntityAtPosition(sf::Vector2f(m_targetPoint.x, m_targetPoint.y), m_entityManager, EntityTag::PowerUp, tileSize);
-}
+	auto cIter = std::find_if(graph.cbegin(), graph.cend(), 
+		[&point](const auto& pointOnGraph) { return pointOnGraph.m_point == point; });
 
-bool Enemy::isPointOnGraph(const std::vector<Point>& graph, const sf::Vector2i & point) const
-{
-	auto cIter = std::find_if(graph.cbegin(), graph.cend(), [&point](const auto& pointOnGraph) { return pointOnGraph.m_point == point; });
 	return (cIter != graph.cend() ? true : false);
 }
 
-sf::Vector2f & Enemy::interpolate(const sf::Vector2f & pointA, const sf::Vector2f & pointB, float factor) const
+void Enemy::handleMovement(const std::vector<Point>& graph, float deltaTime, int tileSize)
 {
-	return pointA + (pointB - pointA) * factor;
+	if (m_stopMovementTimer.isActive())
+	{
+		return;
+	}
+
+	m_moveErrorTimer.update(deltaTime);
+	handleNewMoveDirection(graph, tileSize);
+	move(graph, deltaTime, tileSize);
+
+	//Hack - Fixes issue with getting stuck
+	if (m_moveErrorTimer.isExpired())
+	{
+		const auto currentPosition = Entity::getPosition();
+		const sf::Vector2f pointAtCurrentPosition = sf::Vector2f(getPointAtCurrentPosition(graph, tileSize).m_point.x * tileSize, 
+			getPointAtCurrentPosition(graph, tileSize).m_point.y * tileSize);
+		m_position = sf::Vector2f(pointAtCurrentPosition.x * tileSize, pointAtCurrentPosition.y * tileSize);
+		m_moveErrorTimer.reset();
+		m_chooseNewMoveDirection = true;
+		std::cout << "Unstuck\n";
+	}
+
+	if (m_reachedTargetPoint)
+	{
+		if (m_state == State::TargettingCrate || m_state == State::TargettingOpponent)
+		{
+			BombCarrier::placeBomb();
+		}
+
+		if (m_state == State::MovingToSafePoint)
+		{
+			setState(State::StopMovement);
+		}
+
+		if (m_state == State::TargettingPowerUp)
+		{
+			setState(State::AssignNewState);
+		}
+
+		m_reachedTargetPoint = true;
+	}
+}
+
+void Enemy::assignWalkingPoint(const std::vector<Point>& graph, const std::deque<sf::Vector2f>& pointsToMoveTo, int tileSize)
+{
+	//Have to check for obstacles in the way of the next walking point
+	//Forgot to check before
+
+	//If target point is on same axis 'x' 'y' axis
+	//Clear path to target point
+	//Can walk straight to it
+	
+	////Check if x path is clear
+	//
+
+	//Not correctly calculating the correct distance between the two points
+	//One can be minus & other can be positive
+	const auto& currentPoint = getPointAtCurrentPosition(graph, tileSize).m_point;
+	if (currentPoint.x == m_targetPoint.x || currentPoint.y == m_targetPoint.y)
+	{
+		bool clearPathToTargetPoint = true;
+
+		//Handle x axis
+		if (currentPoint.x == m_targetPoint.x)
+		{
+			if (currentPoint.y > m_targetPoint.y)
+			{
+				for (int y = currentPoint.y; y > m_targetPoint.y; --y)
+				{
+					const auto position = sf::Vector2f(currentPoint.x, y);
+					if (CollisionHandler::isCollidableTileAtPosition(position, tileSize))
+					{
+						clearPathToTargetPoint = false;
+						break;
+					}
+				}
+			}
+			else if (currentPoint.y < m_targetPoint.y)
+			{
+				for (int y = currentPoint.y; y < m_targetPoint.y; ++y)
+				{
+					const auto position = sf::Vector2f(currentPoint.x, y);
+					if (CollisionHandler::isCollidableTileAtPosition(position, tileSize))
+					{
+						clearPathToTargetPoint = false;
+						break;
+					}
+				}
+			}
+		}
+
+
+		//Handle y axis
+		if (currentPoint.y == m_targetPoint.y)
+		{
+			if (currentPoint.x < m_targetPoint.x)
+			{
+				for (int x = currentPoint.x; x < m_targetPoint.x; x++)
+				{
+					const auto position = sf::Vector2f(x, currentPoint.y);
+					if (CollisionHandler::isCollidableTileAtPosition(position, tileSize))
+					{
+						clearPathToTargetPoint = false;
+						break;
+					}
+				}
+			}
+			else if (currentPoint.x > m_targetPoint.x)
+			{
+				for (int x = currentPoint.x; x > m_targetPoint.x; x--)
+				{
+					const auto position = sf::Vector2f(x, currentPoint.y);
+					if (CollisionHandler::isCollidableTileAtPosition(position, tileSize))
+					{
+						clearPathToTargetPoint = false;
+						break;
+					}
+				}
+			}
+		}
+
+		if (clearPathToTargetPoint)
+		{
+			m_walkingPoint = m_targetPoint;
+			return;
+		}
+	}
+
+	//Find node that is just before change of axis relative to enemy
+	const sf::Vector2f* previousPoint = nullptr;
+	for (auto cIter = pointsToMoveTo.cbegin(); cIter != pointsToMoveTo.cend(); ++cIter)
+	{
+		if (cIter == pointsToMoveTo.cbegin())
+		{
+			previousPoint = &(*cIter);
+			continue;
+		}
+
+		if (cIter->x != currentPoint.x && cIter->y != currentPoint.y)
+		{
+			m_walkingPoint = *previousPoint;
+			break;
+		}
+
+		previousPoint = &(*cIter);
+	}
+}
+
+void Enemy::handleNewMoveDirection(const std::vector<Point>& graph, int tileSize)
+{
+	if (m_chooseNewMoveDirection)
+	{
+		//If target is no longer at target location
+		if (!isTargetAtTargetPoint(graph, tileSize) && m_state != State::MovingToSafePoint && m_state != State::TargettingOpponent)
+		{
+			setState(State::AssignNewState);
+			return;
+		}
+
+		//Scan immediate surrounding area
+		//If next point is only path to go, go anyway
+		std::deque<sf::Vector2f> pointsToMoveTo; 
+		assignPointsToMoveTo(graph, pointsToMoveTo, tileSize);
+		if (pointsToMoveTo.empty())
+		{
+			return;
+		}
+		m_walkingPoints = pointsToMoveTo;
+
+		//If next tile to walk over is in radius of harm, cease movement
+		if (isPointInRadiusOfHarm(graph, pointsToMoveTo.front(), tileSize) && m_state != State::MovingToSafePoint)
+		{
+			setState(State::StopMovement);
+			return;
+		}
+
+		assignWalkingPoint(graph, pointsToMoveTo, tileSize);
+		assignNewMovementDirection(pointsToMoveTo.front(), tileSize);
+		m_chooseNewMoveDirection = false;
+	}
+}
+
+void Enemy::move(const std::vector<Point>& graph, float deltaTime, int tileSize)
+{
+	const sf::FloatRect walkingPointAABB(sf::Vector2f(m_walkingPoint.x * tileSize, m_walkingPoint.y * tileSize), sf::Vector2f(tileSize, tileSize));
+	const auto centrePosition = Entity::getCentrePosition();
+	const sf::FloatRect AABB(m_position, sf::Vector2f(tileSize, tileSize));
+	bool correctPosition = false;
+
+	//Calculate intersection froim next tile
+	switch (m_moveDirection)
+	{
+	case Direction::Right:
+	{
+		if (m_position.x >= (walkingPointAABB.left) && AABB.intersects(walkingPointAABB))
+		{
+			correctPosition = true;
+			break;
+		}
+
+		m_velocity.x += m_speed.x * deltaTime;
+		break;
+	}
+	case Direction::Left:
+	{
+		if (m_position.x <= walkingPointAABB.left && AABB.intersects(walkingPointAABB))
+		{
+			correctPosition = true;
+			break;
+		}
+
+		m_velocity.x -= m_speed.x * deltaTime;
+		break;
+	}
+	case Direction::Up:
+	{
+		if (m_position.y <= (walkingPointAABB.top) && AABB.intersects(walkingPointAABB))
+		{
+			correctPosition = true;
+			break;
+		}
+		m_velocity.y -= m_speed.y * deltaTime;
+		break;
+	}
+	case Direction::Down:
+	{
+		if (m_position.y >= walkingPointAABB.top && AABB.intersects(walkingPointAABB))
+		{
+			correctPosition = true;
+			break;
+		}
+		m_velocity.y += m_speed.y * deltaTime;
+		break;
+	}
+	}
+	
+	if (correctPosition)
+	{
+		m_moveErrorTimer.reset();
+		m_position = sf::Vector2f(m_walkingPoint.x * tileSize, m_walkingPoint.y * tileSize);
+		//m_velocity = sf::Vector2f(0, 0);
+		if (reachedTargetPoint(graph, tileSize))
+		{
+			m_reachedTargetPoint = true;
+		}
+
+		m_chooseNewMoveDirection = true;
+	}
 }

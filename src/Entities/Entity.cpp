@@ -41,6 +41,11 @@ void Entity::setPosition(float x, float y)
 	m_position = sf::Vector2f(x, y);
 }
 
+void Entity::setPosition(const sf::Vector2f & newPosition)
+{
+	m_position = newPosition;
+}
+
 void Entity::updateAABB()
 {
 	m_AABB.left = m_position.x + 4;
@@ -74,6 +79,11 @@ const sf::Vector2f & Entity::getPosition() const
 	const sf::Vector2i tilePosition(m_position.x / tileSize, m_position.y / tileSize);
 
 	return m_position;
+}
+
+const sf::Vector2f Entity::getCentrePosition() const
+{
+	return sf::Vector2f(m_AABB.left + (m_AABB.width / 2.0f), m_AABB.top + (m_AABB.height / 2.0f));
 }
 
 int Entity::getID() const
