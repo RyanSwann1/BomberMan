@@ -44,11 +44,11 @@ class EntityManager
 		}
 	};
 
-	//254, 255, 256
-
 public:
 	EntityManager();
 	~EntityManager();
+
+
 
 	const std::unique_ptr<Entity>& getEntity(EntityTag entityTag) const;
 	const std::unique_ptr<Entity>& getEntity(int ID) const;

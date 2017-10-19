@@ -3,14 +3,19 @@
 #include <Managers\EntityManager.h>
 
 Character::Character(const std::string& name, EntityTag tag, const sf::Vector2f & spawnPosition, EntityManager & entityManager, int ID, bool collidable)
-	: Entity(name, tag ,spawnPosition, entityManager, ID, collidable),
-	m_maxSpeed(65, 65),
+	: Entity(name, tag, spawnPosition, entityManager, ID, collidable),
+	m_maxSpeed(50, 50),
 	m_speed(35, 35),
 	m_velocity(),
 	m_oldPosition(),
 	m_currentMoveDirection(Direction::None),
 	m_lives(1)
 {}
+
+void Character::draw(sf::RenderWindow & window)
+{
+	Entity::draw(window);
+}
 
 void Character::update(float deltaTime)
 {
@@ -19,7 +24,6 @@ void Character::update(float deltaTime)
 	CollisionHandler::checkForEntityCollisions(m_position, m_entityManager, m_velocity, *this);
 	m_oldPosition = m_position;
 	m_position += m_velocity;
-
 	resetVelocity();
 
 	Entity::update(deltaTime);
@@ -34,7 +38,7 @@ void Character::handleEntityCollision(const std::unique_ptr<Entity>& entity, con
 
 	switch (entity->getTag())
 	{
-	case EntityTag::Explosion :
+	case EntityTag::Explosion:
 	{
 		--m_lives;
 		if (!m_lives)
@@ -97,7 +101,7 @@ void Character::handleAnimation()
 	{
 		m_animationPlayer.play(AnimationName::WalkingUp, Direction::Up);
 		break;
-	}	
+	}
 	case Direction::Down:
 	{
 		m_animationPlayer.play(AnimationName::WalkingDown, Direction::Down);
@@ -117,14 +121,20 @@ void Character::resetVelocity()
 	m_velocity.y = 0;
 }
 
+void Character::alterVelocity(float x, float y)
+{
+	m_velocity.x += x;
+	m_velocity.y += y;
+}
+
 void Character::increaseSpeed(float x, float y)
 {
-	if (m_speed.x + x < m_maxSpeed.x)
+	if (std::abs(m_speed.x + x) < m_maxSpeed.x)
 	{
 		m_speed.x += x;
 	}
 
-	if (m_speed.y + y < m_maxSpeed.y)
+	if (std::abs(m_speed.y + y) < m_maxSpeed.y)
 	{
 		m_speed.y += y;
 	}

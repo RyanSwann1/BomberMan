@@ -16,7 +16,7 @@ Game::Game()
 	m_timeElasped()
 {
 	GameEventMessengerLocator::provide(m_gameEventMessenger);
-	m_stateManager.switchToState(StateType::MainMenu);
+	m_stateManager.switchToState(StateType::Game);
 }
 
 const Window & Game::getWindow() const

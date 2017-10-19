@@ -16,6 +16,7 @@ public:
 	void update(float deltaTime);
 
 private:
+	const float m_startCollidableBoxesTime;
 	const int m_maxEnemies;
 	int m_enemiesRemaining;
 	Timer m_gameTimer;

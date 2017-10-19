@@ -18,13 +18,13 @@ class Enemy : public BombCarrier
 	enum class State
 	{
 		TargettingOpponent = 0,
-		TargettingCrates,
+		TargettingCrate,
 		TargettingPowerUp,
 		SetTargetPointAtOpponent,
 		SetTargetPointBesideCrate,
 		SetTargetPointAtSafePoint,
 		SetTargetPointAtPowerUp,
-		InitializeState,
+		AssignNewState,
 		MovingToSafePoint,
 		StopMovement,
 	};
@@ -32,13 +32,13 @@ class Enemy : public BombCarrier
 	class Point
 	{
 	public:
-		Point(const sf::Vector2i& position, int ID, int cameFromID)
+		Point(const sf::Vector2f& position, int ID, int cameFromID)
 			: m_point(position),
 			m_ID(ID),
 			m_cameFromID(cameFromID)
 		{}
 
-		const sf::Vector2i m_point;
+		const sf::Vector2f m_point;
 		const int m_ID;
 		const int m_cameFromID;
 	};
@@ -53,52 +53,58 @@ public:
 	void update(float deltaTime) override;
 
 private:
-	Timer m_movementTimer;
 	Timer m_stopMovementTimer;
-	sf::Vector2i m_targetPoint;
+	Timer m_moveErrorTimer;
+	sf::Vector2f m_targetPoint;
 	bool m_reachedTargetPoint;
-	std::vector<sf::Vector2i> m_bombAtPoints;
+	bool m_chooseNewMoveDirection;
 	State m_state;
 	EnemyType m_type;
+	std::vector<sf::Vector2f> m_localHazardousPoints;
+	std::deque<sf::Vector2f> m_walkingPoints;
 
-	//Interpolation
-	Timer m_interpolationTimer;
-	sf::Vector2f& updatePosition(float deltaTime);	
-	sf::Vector2f& interpolate(const sf::Vector2f& pointA, const sf::Vector2f& pointB, float factor) const;
-	void updateInterpolation(float deltaTime);
-
+	//Movement - Temporary
+	Direction m_moveDirection;
+	bool m_correctPosition;
+	sf::Vector2f m_walkingPoint;
+	void move(const std::vector<Point>& graph, float deltaTime, int tileSize);
+	void handleMovement(const std::vector<Point>& graph, float deltaTime, int tileSize);
+	//Walking Point
+	void assignWalkingPoint(const std::vector<Point>& graph, const std::deque<sf::Vector2f>& pointsToMoveTo, int tileSize);
+	void handleNewMoveDirection(const std::vector<Point>& graph, int tileSize);
+	void handleExistingHazardousPoints(int tileSize);
 
 	void setStateToTargetPlayer();
-	void checkExistingBombsAtPoints(int tileSize);
-	void move(const std::vector<Point>& graph, const Point& point, int tileSize);
-	void handleStates(const std::vector<Point>& graph, const sf::Vector2i& powerUpAtPoint, const sf::Vector2i& opponentAtPoint, bool opponentFound, bool powerUpFound, int tileSize);
-	void handleBombAtPoints(const std::vector<Point>& graph, int tileSize);
-	void handleMovement(const std::vector<Point>& graph, int tileSize);
+	void handleStates(const std::vector<Point>& graph, const sf::Vector2f& powerUpAtPoint, const sf::Vector2f& opponentAtPoint, bool opponentFound, bool powerUpFound, int tileSize);
+	void updateLocalHazardousPoints(const std::vector<Point>& graph, int tileSize);
+	void assignNewMovementDirection(const sf::Vector2f& nextPointToMoveTo, int tileSize);
+	void setTargetPointAtOpponent(const std::vector<Point>& graph, const sf::Vector2f& opponentAtPoint, int tileSize);
 
-	void initializeGraph(sf::Vector2i& powerUpAtPoint, sf::Vector2i& opponentAtPoint, std::vector<Point>& graph, bool& opponentFound, bool& powerUpFound, int tileSize);
-	void addNeighbouringPointsToFrontier(sf::Vector2i& powerUpAtPoint, sf::Vector2i& opponentAtPoint, const Point& point, std::vector<Point>& graph, std::deque<Point>& frontier, 
-		int& pointID, bool& opponentFound, bool& powerUpFound, int tileSize);	
-	void addNewPoint(const sf::Vector2i& position, std::vector<Point>& graph, std::deque<Point>& frontier, int& pointID, int cameFromID);
+	void initializeGraph(sf::Vector2f& powerUpAtPoint, sf::Vector2f& opponentAtPoint, std::vector<Point>& graph, bool& opponentFound, bool& powerUpFound, int tileSize);
+	void addNeighbouringPointsToFrontier(sf::Vector2f& powerUpAtPoint, sf::Vector2f& opponentAtPoint, const Point& point, std::vector<Point>& graph, std::deque<Point>& frontier,
+		int& pointID, bool& opponentFound, bool& powerUpFound, int tileSize);
+	void addNewPoint(const sf::Vector2f& position, std::vector<Point>& graph, std::deque<Point>& frontier, int& pointID, int cameFromID);
 	void setTargetPointBesideCrate(const std::vector<Point>& graph, int tileSize);
-	void moveToTargetPoint(const std::vector<Point>& graph, int tileSize);
-	void setNewTargetPoint(const sf::Vector2i& point);
+	void assignPointsToMoveTo(const std::vector<Point>& graph, std::deque<sf::Vector2f>& pointsToMoveTo, int tileSize);
+	void setNewTargetPoint(const sf::Vector2f& point);
 	bool reachedTargetPoint(const std::vector<Point>& graph, int tileSize) const;
 	bool isTargetNeighbouringTargetPoint(const std::vector<Point>& graph, EntityTag entityTag, int tileSize) const;
-	bool isTargetAtTargetPoint(const std::vector<Point>& graph, EntityTag entityTag, int tileSize) const;
-	bool isPointOnGraph(const std::vector<Point>& graph, const sf::Vector2i& point) const;
+	bool isPointOnGraph(const std::vector<Point>& graph, const sf::Vector2f& point) const;
 
-	std::vector<sf::Vector2i> getNeighbouringPointsOnGraph(const sf::Vector2i& startingPoint, const std::vector<Point>& graph, int tileSize) const;
-	std::vector<sf::Vector2i> getNeighbouringPointsOnEntity(const sf::Vector2i& startingPoint, int tileSize, EntityTag entityTag) const;
-	std::vector<sf::Vector2i> getNeighbouringPointsOnGraphContainingBomb(const sf::Vector2i& startingPoint, const std::vector<Point>& graph, int tileSize) const;
-	const Point* getPointOnGraph(const std::vector<Point>& graph, const sf::Vector2i& point) const;
+	std::vector<sf::Vector2f> getNeighbouringPointsFromPoint(const sf::Vector2f& startingPoint, const std::vector<Point>& graph, int tileSize) const;
+	std::vector<sf::Vector2f> getNeighbouringPointsOnEntity(const sf::Vector2f& startingPoint, int tileSize, EntityTag entityTag) const;
+	std::vector<sf::Vector2f> getNeighbouringPointsOnGraphContainingBomb(const sf::Vector2f& startingPoint, const std::vector<Point>& graph, int tileSize) const;
+	const Point* getPointOnGraph(const std::vector<Point>& graph, const sf::Vector2f& point) const;
 	const Point* getPointOnGraph(const std::vector<Point>& graph, int ID) const;
-	bool isPointInRadiusOfHarm(const std::vector<Point>& graph, const Point& point, int tileSize) const;
+	bool isPointInRadiusOfHarm(const std::vector<Point>& graph, const sf::Vector2f& point, int tileSize) const;
+	bool isTargetAtTargetPoint(const std::vector<Point>& graph, int tileSize) const;
 
 	void setTargetPointAtSafePoint(const std::vector<Point>& graph, int tileSize);
-	bool neighbouringCrateAtPoint(const std::vector<sf::Vector2i>& points, int tileSize) const;
+	bool neighbouringCrateAtPoint(const std::vector<sf::Vector2f>& points, int tileSize) const;
 	bool isPointAppropriateDistanceAway(const std::vector<Point>& graph, const Point& requestedPoint, int tileSize) const;
-	bool isPointSafeFromBombsAtPoint(const sf::Vector2i& point, int tileSize) const;
-	const Point& getPointAtPosition(const std::vector<Point>& graph, int tileSize) const;	
+	bool isPointSafeFromBombsAtPoint(const sf::Vector2f& point, int tileSize) const;
+	const Point& getPointAtCurrentPosition(const std::vector<Point>& graph, int tileSize) const;
 	void setState(State newState);
 	void setTypeToAggressive(EntityMessage& entityMessage);
+	void setTargetPointAtPowerUp(const sf::Vector2f& powerUpPoint);
 };
