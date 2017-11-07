@@ -4,55 +4,6 @@
 #include <Game\Timer.h>
 #include <deque>
 #include <memory>
-//
-//afronym: ok, so I'm not that far in yet
-//	afronym : but looking at addNeighbouringPointsToFrontier
-//	afronym : that function has a LOT of parameters
-//	afronym : usually when something has that many inputs & outputs, I like to group them up
-//	BonBons : : O
-//	afronym : class Graph { std::vector<Point> m_points, std::deque<Point> m_frontier, Point m_powerUpPoint; };
-//	 afronym: then you can start grouping the functions a bit more
-//		 BonBons : ooh
-//		 BonBons : yeah thats totally better
-//		 afronym : Graph::create
-//		 afronym : then you divide the file into sections
-//		 afronym : the top 400 lines are graph creation
-//		 afronym : the bottom 600 lines is movement logic that uses the graph
-//		 afronym : and you can put comments / whitespace in there as clear dividers
-//		 BonBons : : o
-//		 BonBons : a
-//		 BonBons : ok
-//		 afronym : people used to do stuff like this : // ---------------------------------------------------------------------------------------
-//		 afronym : just as a way to denote a new 'section' or something
-//		 afronym : so if I'm trying to fix/change how graph creation works, I know where to stop looking
-//		 afronym : ok, next thing
-//		 afronym : looking at handleExisitngHazardousPoints
-//		 afronym : that function is a) short and b) only used once
-//				   afronym : this is kinda a preference thing, but I would just move the code into updateLocalHazardousPoints
-//		 afronym : and maybe put a commen right above it like // update local hazardous points
-//		 afronym : personally, I hate having to jump around a file to look up functions
-//		 afronym : need to re - use some code ? great, put it in a function
-//		 afronym : need to break up a really long section of code ? sure, split out a few functions
-//		 afronym : other than that, I don't like creating new functions for small pieces of single-use code
-//		 BonBons : ah
-//		 BonBons : ok
-//		 BonBons : i was jumping all aroudmn the place
-//		 BonBons : llol
-//		 afronym : yeah
-//		 afronym : not sure how you do it, but if i have a main function
-//		 f() {
-//		 a();
-//		 b();
-//	 afronym:
-//	 }
-//		  afronym: then I put a first in the file, then b, then f
-//			  afronym : you can do it however you want as long as it's consistent
-//			  afronym : for me - 'helper functions always go above the functions that call them'
-//			  afronym : just makes it easier to track around the file
-//			  afronym : if you want to put helper functions below that's fine, but try to keep them nearby
-//
-//
-
 
 enum class EnemyType
 {
