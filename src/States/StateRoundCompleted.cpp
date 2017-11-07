@@ -21,6 +21,7 @@ StateRoundCompleted::StateRoundCompleted(StateManager& stateManager, StateType s
 	m_gui.addText(sf::Vector2f(30, 30), "Round Completed!", "TitleText", 30);
 	m_gui.addButton(sf::Vector2f(175, 50), sf::Vector2f(100, 75), "Next Level", "NextLevel");
 	m_gui.addButton(sf::Vector2f(50, 50), sf::Vector2f(100, 75), "Main Menu", "MainMenu");
+
 }
 
 StateRoundCompleted::~StateRoundCompleted()

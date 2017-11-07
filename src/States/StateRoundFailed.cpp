@@ -15,6 +15,7 @@ StateRoundFailed::StateRoundFailed(StateManager & stateManager, StateType stateT
 	m_gui.addText(sf::Vector2f(75, 20), "You Died!", "TitleText", 30);
 	m_gui.addButton(sf::Vector2f(150, 50), sf::Vector2f(100, 75), "Retry", "Retry");
 	m_gui.addButton(sf::Vector2f(150, 150), sf::Vector2f(100, 75), "MainMenu", "MainMenu");
+	std::cout << "State Lost Game\n";
 }
 
 StateRoundFailed::~StateRoundFailed()
